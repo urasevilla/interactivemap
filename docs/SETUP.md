@@ -10,13 +10,23 @@ should do before each event.
 The repository is private. GitHub Pages can serve from a private repository on a
 paid plan (Pro, Team or Enterprise).
 
-1. **Settings → Pages**
-2. **Source**: Deploy from a branch
-3. **Branch**: `main` (or whichever branch you deploy), folder `/ (root)`
-4. Save. The URL appears within a minute or two, e.g.
-   `https://urasevilla.github.io/interactivemap/`
+Push to `main` and the workflow in `.github/workflows/pages.yml` does the rest —
+it turns Pages on itself the first time it runs. The URL appears within a minute
+or two:
 
-There is nothing to build. The repository *is* the site.
+```
+https://urasevilla.github.io/interactivemap/
+```
+
+Watch the run at **Actions → Deploy to GitHub Pages**. There is nothing to
+build; the repository *is* the site.
+
+If the run fails with `Get Pages site failed … Not Found`, Pages is off and the
+workflow could not turn it on. Enable it by hand at **Settings → Pages →
+Source: GitHub Actions**, then re-run the job.
+
+If it fails mentioning billing or an upgrade, that is the private-repo limit
+below.
 
 ### A note on "private"
 
