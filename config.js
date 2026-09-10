@@ -32,7 +32,7 @@ window.WIEGO_MAP_CONFIG = {
   // Fallback for before Google sign-in is wired up, or if the venue blocks
   // accounts.google.com. Generate with:  npm run passphrase -- "your phrase"
   // Leaving the hash empty disables the fallback entirely.
-  ownerPassphraseHash: '',
+  ownerPassphraseHash: 'c50f1289e075284fe4bc4e0dea62500eb811efac22d7164fc30ab13dec7d0c76',
   ownerPassphraseSalt: 'wiego-map',
 
   /* ------------------------------------------------------------------ *
@@ -43,7 +43,7 @@ window.WIEGO_MAP_CONFIG = {
   // ROTATE THIS BEFORE YOUR EVENT:  npm run secret
   // Everyone holding a code from the old secret is locked out the moment you
   // change it, which is exactly what you want between events.
-  eventSecret: '5UrE3Hm_XWXGcoO24bt2c8CJreW6Mb0r1PRiHU-J4Nc',
+  eventSecret: 'XM4JmBFDIuvIZQS-za85wbqy-wMQ8ds0CuFAnOgtQz4',
 
   // Default lifetimes, in hours. The controller can override per code.
   boothCodeHours: 24,
@@ -72,10 +72,9 @@ window.WIEGO_MAP_CONFIG = {
   // Without this block the map still runs, but visitor notes stay on the device
   // that wrote them. Fill it in to have phones and the projector share notes in
   // real time. See docs/SETUP.md § Live sync.
-  firebase: null,
-  // firebase: {
-  //   apiKey: 'AIza...',           // required
-  //   projectId: 'your-project',   // required
-  //   collection: 'notes',         // optional, defaults to "notes"
-  // },
+  firebase: {
+    apiKey: 'AIzaSyC2RFMdhMkKla7AcLcDTtJ95hxB-8dEdrA',
+    projectId: 'wiego-interactive-map',
+    collection: 'notes',
+  },
 };

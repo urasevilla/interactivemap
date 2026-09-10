@@ -32,8 +32,11 @@ Two failures at `configure-pages` mean the same thing — Pages is still off:
 
 Set the Source as above and re-run the job.
 
-Also set **Settings → Branches → Default branch** to `main`, so the repository
-front page shows what is actually deployed.
+**Set the default branch to `main`** at **Settings → General → Default branch**
+(the General page, not Branches — Branches only holds rulesets now). Turning
+Pages on creates a `github-pages` environment that accepts deployments *only
+from the default branch*, so until this is set, runs on `main` are killed in
+about a second with no runner, no steps and no logs to read.
 
 ### What "private event" means here
 

@@ -116,6 +116,38 @@ function serve() {
 }
 
 /* ------------------------------------------------------------------ */
+/* Config overrides                                                    */
+/* ------------------------------------------------------------------ */
+
+const realConfig = fs.readFileSync(path.join(root, 'config.js'), 'utf8');
+
+/**
+ * Serves config.js with extra assignments appended, so a test can pin the
+ * settings it depends on without touching the real file.
+ *
+ * Notes are the reason this exists: with Firebase configured the store talks to
+ * Firestore, and the note assertions below need a deterministic offline backend.
+ * Appending wins over editing because config.js assigns the whole object.
+ */
+function overrideConfig(context, overrides) {
+  const tail = Object.entries(overrides)
+    .map(([key, value]) => `window.WIEGO_MAP_CONFIG.${key} = ${JSON.stringify(value)};`)
+    .join('\n');
+  return context.route('**/config.js', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'text/javascript; charset=utf-8',
+      body: `${realConfig}\n${tail}\n`,
+    }),
+  );
+}
+
+/** Must match js/auth.js: PBKDF2-SHA256, 200_000 iterations, 256-bit output. */
+function passphraseHash(phrase, salt = 'wiego-map') {
+  return crypto.pbkdf2Sync(phrase, salt, 200_000, 32, 'sha256').toString('hex');
+}
+
+/* ------------------------------------------------------------------ */
 /* Assertions                                                          */
 /* ------------------------------------------------------------------ */
 
@@ -171,6 +203,7 @@ function watch(page) {
 /* ---- 1. Desktop / booth ---- */
 
 const desktop = await browser.newContext({ viewport: { width: 1600, height: 900 } });
+await overrideConfig(desktop, { firebase: null });
 const page = await desktop.newPage();
 watch(page);
 
@@ -435,6 +468,7 @@ const phone = await browser.newContext({
   userAgent:
     'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
 });
+await overrideConfig(phone, { firebase: null });
 const mobile = await phone.newPage();
 watch(mobile);
 
@@ -558,6 +592,7 @@ check('note markup is escaped, not executed', !xss.fired && xss.images === 0 && 
    seeded directly. That skips the auth check — which section 4 covers — and
    exercises the panel behind it: code issuance, moderation, export. */
 const hostContext = await browser.newContext({ viewport: { width: 1500, height: 950 } });
+await overrideConfig(hostContext, { firebase: null });
 const host = await hostContext.newPage();
 watch(host);
 
@@ -600,6 +635,7 @@ check(
 
 /* The issued code has to actually open a display session. */
 const boothContext = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+await overrideConfig(boothContext, { firebase: null });
 const booth = await boothContext.newPage();
 watch(booth);
 await booth.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded' });
@@ -780,10 +816,83 @@ check('the map stays locked when sign-in is unavailable', await signIn.isHidden(
 
 await signInContext.close();
 
-/* ---- 5. Expired credentials ---- */
+/* ---- 5. Passphrase fallback ---- */
+
+/* The host's real passphrase must not live in this file, so the test injects a
+   hash of its own and signs in with the matching phrase. That exercises the
+   mechanism — the way in when a venue blocks accounts.google.com. */
+const TEST_PHRASE = 'check-only-passphrase-not-the-real-one';
+
+const passContext = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+await overrideConfig(passContext, {
+  firebase: null,
+  googleClientId: '',
+  ownerPassphraseHash: passphraseHash(TEST_PHRASE),
+});
+const pass = await passContext.newPage();
+watch(pass);
+
+await pass.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded' });
+await pass.click('[data-gate-tab="owner"]');
+await pass.waitForTimeout(300);
+
+check('the passphrase field is offered when one is configured', await pass.isVisible('#gate-passphrase'));
+
+await pass.fill('#gate-passphrase', 'definitely-the-wrong-phrase');
+await pass.click('#gate-passphrase-submit');
+await pass.waitForTimeout(600);
+check('a wrong passphrase is refused', await pass.isHidden('#app'));
+check(
+  'the refusal says so plainly',
+  /not right/i.test((await pass.textContent('#gate-error')) || ''),
+  await pass.textContent('#gate-error'),
+);
+
+await pass.fill('#gate-passphrase', TEST_PHRASE);
+await pass.click('#gate-passphrase-submit');
+await pass.waitForSelector('#app:not([hidden])', { timeout: 20_000 });
+await pass.waitForFunction(() => !document.getElementById('loading'), { timeout: 60_000 });
+await pass.waitForTimeout(600);
+
+check('the right passphrase opens the map', true);
+check('passphrase sign-in grants the host role', (await pass.getAttribute('body', 'data-role')) === 'controller');
+check('the host gets the controller button', await pass.isVisible('#btn-control'));
+
+await passContext.close();
+
+/* ---- 6. The shipped config is event-ready ---- */
+
+/* These read the real config.js from disk — the point is what actually ships. */
+const shipped = fs.readFileSync(path.join(root, 'config.js'), 'utf8');
+const shippedSecret = /eventSecret:\s*'([^']*)'/.exec(shipped)?.[1] || '';
+
+check(
+  'an event secret is set',
+  shippedSecret.length >= 32,
+  `${shippedSecret.length} chars`,
+);
+check(
+  'a Google client ID is configured',
+  /googleClientId:\s*'[\w-]+\.apps\.googleusercontent\.com'/.test(shipped),
+);
+check(
+  'a host account is configured',
+  /ownerEmailHash:\s*'[0-9a-f]{64}'/.test(shipped) || /ownerEmail:\s*'[^']+@/.test(shipped),
+);
+check(
+  'the passphrase fallback is set, so a blocked Google cannot lock the host out',
+  /ownerPassphraseHash:\s*'[0-9a-f]{64}'/.test(shipped),
+);
+check(
+  'live sync is configured',
+  /apiKey:\s*'AIza[\w-]+'/.test(shipped) && /projectId:\s*'[\w-]+'/.test(shipped),
+);
+
+/* ---- 7. Expired credentials ---- */
 
 const expiredCode = toBase32(mintCode(secret, 1, -1, 1, 4)).match(/.{1,4}/g).join('-');
 const fresh = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+await overrideConfig(fresh, { firebase: null });
 const expiredPage = await fresh.newPage();
 watch(expiredPage);
 await expiredPage.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded' });

@@ -119,7 +119,7 @@ bad conference wifi should not depend on unpkg being up.
 
 ```bash
 npm i -g playwright   # once
-npm run check         # 75 assertions in a real browser
+npm run check         # 86 assertions in a real browser
 SHOTS=1 npm run check # also writes screenshots to .shots/
 ```
 
@@ -127,7 +127,9 @@ The check drives a real Chromium: it mints a code with the same scheme the app
 uses, unlocks the gate, waits for the WebGL scene, then exercises the picker,
 the country panel, hovering and clicking countries directly in the 3D scene, the
 Five As filter, the QR sheet, the full guest flow and the controller flow — at
-booth resolution, on a phone viewport, and as the host.
+booth resolution, on a phone viewport, and as the host — including the
+passphrase fallback, and a pass over the shipped `config.js` asserting the event
+is actually configured rather than still on the defaults.
 
 It also asserts the things that would embarrass you at a booth: that a wrong,
 expired or foreign-secret code is refused; that a note containing markup is
