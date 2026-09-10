@@ -100,17 +100,16 @@ no SDK to install — the site talks to the Firestore REST API directly.
 1. Create a project at <https://console.firebase.google.com> (the free Spark
    plan is ample for a booth).
 2. **Build → Firestore Database → Create database**, production mode.
-3. **Project settings → General → Your apps → Web app**. Copy `apiKey`,
-   `authDomain`, `projectId` and `appId` into `config.js`:
+3. **Project settings → General → Your apps → Web app**. The site talks to the
+   REST API rather than the SDK, so it needs only two of the values shown:
    ```js
    firebase: {
-     apiKey: 'AIza…',
-     authDomain: 'your-project.firebaseapp.com',
-     projectId: 'your-project',
-     appId: '1:…:web:…',
+     apiKey: 'AIza…',           // required
+     projectId: 'your-project', // required
      collection: 'notes',       // optional, defaults to "notes"
    },
    ```
+   `authDomain` and `appId` belong to the SDK and are not read here.
 4. **Firestore → Rules**. The site is unauthenticated against Firebase, so the
    rules carry the whole load. These allow visitors to add notes and read them,
    size-limit the payload, and stop anyone editing someone else's note:

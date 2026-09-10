@@ -66,9 +66,8 @@ window.WIEGO_MAP_CONFIG = {
   // real time. See docs/SETUP.md § Live sync.
   firebase: null,
   // firebase: {
-  //   apiKey: '...',
-  //   authDomain: 'your-project.firebaseapp.com',
-  //   projectId: 'your-project',
-  //   appId: '...',
+  //   apiKey: 'AIza...',           // required
+  //   projectId: 'your-project',   // required
+  //   collection: 'notes',         // optional, defaults to "notes"
   // },
 };
