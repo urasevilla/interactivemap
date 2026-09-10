@@ -11,9 +11,12 @@ This repository is public, which is what lets GitHub Pages serve it on a free
 plan. The **content** is still gated: nobody sees the map without a display code
 or a visitor pass, and both expire.
 
-Push to `main` and the workflow in `.github/workflows/pages.yml` does the rest —
-it turns Pages on itself the first time it runs. The URL appears within a minute
-or two:
+**Switch Pages on once, by hand.** Go to **Settings → Pages** and set
+**Source** to **GitHub Actions**. Nothing deploys until you do, and the workflow
+cannot do it for you — creating a Pages site needs admin rights that the
+workflow's token does not have, whatever permissions it requests.
+
+After that, every push to `main` deploys. The URL appears within a minute or two:
 
 ```
 https://urasevilla.github.io/interactivemap/
@@ -22,12 +25,15 @@ https://urasevilla.github.io/interactivemap/
 Watch the run at **Actions → Deploy to GitHub Pages**. There is nothing to
 build; the repository *is* the site.
 
-If the run fails with `Get Pages site failed … Not Found`, Pages is off and the
-workflow could not turn it on. Enable it by hand at **Settings → Pages →
-Source: GitHub Actions**, then re-run the job.
+Two failures at `configure-pages` mean the same thing — Pages is still off:
 
-If it fails mentioning billing or an upgrade, that is the private-repo limit
-below.
+- `Get Pages site failed … Not Found`
+- `Create Pages site failed … Resource not accessible by integration`
+
+Set the Source as above and re-run the job.
+
+Also set **Settings → Branches → Default branch** to `main`, so the repository
+front page shows what is actually deployed.
 
 ### What "private event" means here
 

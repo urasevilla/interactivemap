@@ -38,12 +38,15 @@ jobs:
             exit 1
           fi
 
-      # enablement turns Pages on via the API if it is off, so a fresh clone of
-      # this repo deploys without anyone visiting Settings first. Without it the
-      # step fails with a bare "Not Found" that reads like a missing file.
+      # Pages must be switched on once by hand, at Settings -> Pages -> Source:
+      # GitHub Actions. The action's `enablement: true` cannot do it for you:
+      # creating a Pages site needs admin rights that GITHUB_TOKEN does not
+      # have, so it fails with "Resource not accessible by integration" no
+      # matter what permissions this workflow requests.
+      #
+      # If this step fails with "Get Pages site failed ... Not Found", that
+      # setting is the reason.
       - uses: actions/configure-pages@v5
-        with:
-          enablement: true
 
       - uses: actions/upload-pages-artifact@v3
         with:
