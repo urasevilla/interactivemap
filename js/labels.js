@@ -21,7 +21,7 @@ const PLAIN_LABEL_ZOOM = 0.3;
  * column that points at nothing. On a narrow screen the pins carry the map at
  * low zoom and the names arrive once there is room for them.
  */
-const COMPACT_WIDTH = 760;
+const COMPACT_WIDTH = 760; // kept in step with map3d.js's own COMPACT_WIDTH
 const COMPACT_FEATURED_ZOOM = 0.32;
 const COMPACT_PLAIN_ZOOM = 0.62;
 

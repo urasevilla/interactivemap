@@ -1924,6 +1924,157 @@ svg {
    Toast
    ================================================================== */
 
+/* ==================================================================
+   Approval prompt — the controller's moderation queue
+   ================================================================== */
+
+.review {
+  position: fixed;
+  right: calc(20px + var(--sa-right));
+  bottom: calc(20px + var(--sa-bottom));
+  z-index: 110; /* over the country panel, under the sheet that moderates too */
+  width: min(360px, calc(100vw - 32px));
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--wiego-orange);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  animation: review-in 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes review-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+
+.review__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px 0;
+}
+
+/* A quiet pulse: the booth screen is across the room and usually unattended. */
+.review__dot {
+  width: 9px;
+  height: 9px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--wiego-orange);
+  animation: review-pulse 1.9s ease-in-out infinite;
+}
+
+@keyframes review-pulse {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+.review__title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.review__queue {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+.review__later {
+  margin-left: auto;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--ink-3);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.review__later:hover {
+  background: var(--paper-3);
+  color: var(--ink);
+}
+
+.review__body {
+  padding: 10px 14px 4px;
+}
+
+.review__country {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 3px 8px 3px 3px;
+  margin-bottom: 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--paper-2);
+  color: var(--ink);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.review__country:hover {
+  border-color: var(--line-strong);
+}
+
+.review__flag {
+  width: 20px;
+  height: 14px;
+  border-radius: 2px;
+  object-fit: cover;
+}
+
+.review__text {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--ink);
+  /* A long note must not push the actions off the bottom of the screen. */
+  max-height: 32vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.review__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.review__author {
+  font-weight: 700;
+}
+
+.review__actions {
+  display: flex;
+  gap: 8px;
+  padding: 12px 14px 14px;
+}
+
+.review__actions .btn {
+  flex: 1;
+}
+
 .toast {
   position: fixed;
   left: 50%;
@@ -2218,6 +2369,20 @@ svg {
 }
 
 @media (max-width: 560px) {
+  /* The host may well be moderating from their own phone rather than the
+     projector, so the prompt becomes a bottom sheet like everything else. */
+  .review {
+    right: calc(8px + var(--sa-right));
+    left: calc(8px + var(--sa-left));
+    bottom: calc(8px + var(--sa-bottom));
+    width: auto;
+  }
+
+  .review__text {
+    max-height: 26vh;
+  }
+
+
   .gate__card {
     padding: 26px 20px 20px;
   }

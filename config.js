@@ -60,8 +60,10 @@ window.WIEGO_MAP_CONFIG = {
   // from a local copy but want phones to hit the published site.
   publicUrl: '',
 
-  // true holds every visitor note until the controller approves it.
-  moderateContributions: false,
+  // true holds every visitor note until the controller approves it: the note
+  // is stored but shown to nobody except its author, and the host gets an
+  // approval prompt on the booth screen. Set false to let notes go straight up.
+  moderateContributions: true,
 
   maxNoteLength: 400,
 

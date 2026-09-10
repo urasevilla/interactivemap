@@ -42,8 +42,16 @@ target. Zoom with the wheel, pinch, the `+`/`−` buttons or a double-click.
 | **Visitor** | Scans the QR code | Browse on their phone, add notes for 24 hours |
 
 **Visitors write on the map.** A phone that scans the booth QR gets a
-time-limited pass, picks any country, and adds what they know. Their notes show
-up on the country's panel and as a count on its label.
+time-limited pass, picks any country — mapped practice or not — and adds what
+they know.
+
+**Nothing a visitor writes reaches the map unreviewed.** With
+`moderateContributions` on, a new note is stored but shown to nobody except its
+author; the host's screen raises an approval prompt naming the country and
+quoting the note, and only *Approve & post* puts it on the country's panel and
+into the count on its label. *Reject* discards it. *Later* returns it to the
+queue in the controller panel. Set `moderateContributions: false` in
+`config.js` for an unmoderated room.
 
 | | |
 |---|---|
@@ -168,6 +176,20 @@ Columns it expects: `category`, `country`, `agency`, `scheme`, `description`,
 `impact`, `sources`.
 
 ## Map notes
+
+**The camera is orthographic.** A perspective camera looking at a tilted plane
+foreshortens the far edge far harder than the near one, which across a whole
+world map reads as the projection itself being wrong — a northern hemisphere
+crushed into a band while South America stretches. A parallel projection
+foreshortens every part of the map by the same `cos(tilt)`, so Equal Earth
+arrives on screen as Equal Earth and the extruded relief keeps one depth from
+edge to edge. `tools/check.mjs` asserts it by measuring 60°N and 60°S against
+the equator, at the home view and zoomed out.
+
+**A phone opens part-way in.** Fitting the whole projection to a 390px screen
+gives each country about four pixels, so a narrow viewport opens over the belt
+carrying most of the mapped practices and pinches out from there. Taps carry a
+few pixels of forgiveness, because a fingertip is wider than Singapore.
 
 Natural Earth carries five polygons with no ISO code — Somaliland, Kosovo,
 Northern Cyprus, the Indian Ocean Territories and the Siachen Glacier. They are

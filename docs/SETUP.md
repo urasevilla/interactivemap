@@ -215,6 +215,13 @@ naming the row — nothing is written until it is fixed.
 
 **During**
 
+Visitor notes are held for you. When a phone adds one, an approval prompt
+appears on whichever machine is signed in as host — not on the display machine,
+and not on the map — naming the country and quoting the note. *Approve & post*
+publishes it; *Reject* discards it; *Later* leaves it in the queue, which the
+controller panel lists in full. Turn the review step off by setting
+`moderateContributions: false` in `config.js`.
+
 | Key | Does |
 |---|---|
 | `F` | Full screen |

@@ -533,7 +533,7 @@ export class CountryPanel {
 
     const entry = FEATURED.get(record.a2);
     const practices = entry?.practices || [];
-    const notes = this.store.forCountry(record.a2, this.auth.isController);
+    const notes = this.store.forCountry(record.a2, this.auth.noteScope);
     const primary = practices.length
       ? CATEGORY_BY_ID.get(practices[0].category).color
       : 'var(--wiego-warm-gray)';
@@ -581,14 +581,19 @@ export class CountryPanel {
       noteChildren.push(
         el(
           'p.empty',
-          this.auth.canContribute
+          this.auth.canContribute && record.a2
             ? 'Nothing added here yet. Be the first to share what you know about this country.'
             : 'Nothing added here yet. Scan the QR code to contribute from your phone.',
         ),
       );
     }
 
-    if (this.auth.canContribute) {
+    /* Every country is open for contributions, mapped practice or not — that
+       is most of the point of the QR code. The one exception is an area with
+       no ISO code: a note filed against a null country cannot be read back or
+       exported, and those areas are absent from the picker for the same
+       reason they have no agreed name. */
+    if (this.auth.canContribute && record.a2) {
       noteChildren.push(
         el(
           'button.btn.btn--secondary.btn--block',
@@ -598,7 +603,7 @@ export class CountryPanel {
             onclick: () => this.onAddNote(record.a2, record.name),
           },
           icon('plus'),
-          'Add what you know',
+          practices.length ? 'Add what you know' : 'Be the first to add a practice',
         ),
       );
     }
@@ -681,7 +686,7 @@ export class CountryPanel {
       category
         ? el('span.note__tag', { style: { '--c': category.color, background: category.color } }, category.label)
         : null,
-      !note.approved ? el('span.note__tag.note__pending', 'Awaiting review') : null,
+      !note.approved ? el('span.note__tag.note__pending', 'Awaiting the booth') : null,
     );
 
     /* Controllers moderate; a visitor may withdraw their own note. */
@@ -722,10 +727,177 @@ export class CountryPanel {
 }
 
 /* ------------------------------------------------------------------ */
+/* Approval prompt                                                     */
+/* ------------------------------------------------------------------ */
+
+/**
+ * The controller's moderation queue, as a popup on the booth screen.
+ *
+ * With `moderateContributions` on, a note written on a phone is stored but
+ * shown to nobody. It reaches the map only when whoever is running the booth
+ * approves it here, so this popup is the single place a new contribution
+ * announces itself.
+ *
+ * Modeless on purpose. The booth screen is usually mid-conversation when a
+ * note lands, and a modal dialog over the map would mean a visitor's question
+ * has to wait for a moderation decision. The map stays fully usable behind it,
+ * and "Later" puts a note back in the queue rather than deciding anything.
+ */
+export class ReviewPrompt {
+  /**
+   * @param {object} deps
+   * @param {import('./store.js').createStore} deps.store
+   * @param {(a2:string)=>void} [deps.onShow] jump the map to the note's country
+   */
+  constructor({ store, onShow }) {
+    this.store = store;
+    this.onShow = onShow;
+    this.root = document.getElementById('review');
+    this.current = null;
+    /* Ids the controller has waved off this session. They stay in the queue —
+       the controller panel still lists them — but stop reopening this popup. */
+    this.snoozed = new Set();
+  }
+
+  /** Feeds the queue. Call on every store change; safe to call repeatedly. */
+  sync(pending) {
+    const ids = new Set(pending.map((n) => n.id));
+    for (const id of [...this.snoozed]) if (!ids.has(id)) this.snoozed.delete(id);
+
+    this.queue = pending;
+
+    /* Whatever is on screen may have been handled from the controller panel,
+       or from another booth machine, between one poll and the next. */
+    if (this.current && !ids.has(this.current.id)) this.current = null;
+
+    if (!this.current) {
+      this.current = pending.find((n) => !this.snoozed.has(n.id)) || null;
+    }
+    this._render();
+  }
+
+  close() {
+    this.current = null;
+    this.root.hidden = true;
+    this.root.replaceChildren();
+  }
+
+  _advance() {
+    const next = (this.queue || []).find(
+      (n) => n.id !== this.current?.id && !this.snoozed.has(n.id),
+    );
+    this.current = next || null;
+    this._render();
+  }
+
+  _render() {
+    const note = this.current;
+    if (!note) {
+      this.root.hidden = true;
+      this.root.replaceChildren();
+      return;
+    }
+
+    const waiting = (this.queue || []).filter((n) => n.id !== note.id).length;
+    const category = note.category ? CATEGORY_BY_ID.get(note.category) : null;
+
+    const approve = el(
+      'button.btn.btn--primary.btn--sm',
+      { type: 'button' },
+      'Approve & post',
+    );
+    approve.addEventListener('click', async () => {
+      approve.disabled = true;
+      try {
+        await this.store.update(note.id, { approved: true });
+        toast(`Published to ${note.country || note.a2?.toUpperCase() || 'the map'}.`, 'success');
+        this._advance();
+      } catch (error) {
+        approve.disabled = false;
+        toast(error.message || 'Could not publish that note.', 'error');
+      }
+    });
+
+    const reject = el('button.btn.btn--ghost.btn--sm', { type: 'button' }, 'Reject');
+    reject.addEventListener('click', async () => {
+      if (!confirm(`Discard this note from ${note.author}? It cannot be recovered.`)) return;
+      reject.disabled = true;
+      try {
+        await this.store.remove(note.id);
+        toast('Note discarded.');
+        this._advance();
+      } catch (error) {
+        reject.disabled = false;
+        toast(error.message || 'Could not discard that note.', 'error');
+      }
+    });
+
+    const later = el(
+      'button.review__later',
+      { type: 'button', 'aria-label': 'Decide later' },
+      'Later',
+    );
+    later.addEventListener('click', () => {
+      this.snoozed.add(note.id);
+      this._advance();
+    });
+
+    const heading = el(
+      'div.review__head',
+      el('span.review__dot'),
+      el('h2.review__title', 'New from a visitor'),
+      waiting
+        ? el('span.review__queue', `${waiting} more waiting`)
+        : null,
+      later,
+    );
+
+    const country = el(
+      'button.review__country',
+      {
+        type: 'button',
+        title: 'Show this country on the map',
+        onclick: () => note.a2 && this.onShow?.(note.a2),
+      },
+      flagImg(note.a2, 'review__flag'),
+      el('span', note.country || note.a2?.toUpperCase() || 'Unknown'),
+    );
+
+    this.root.replaceChildren(
+      heading,
+      el(
+        'div.review__body',
+        country,
+        el('p.review__text', note.text),
+        el(
+          'div.review__meta',
+          el('span.review__author', note.author),
+          category
+            ? el(
+                'span.note__tag',
+                { style: { '--c': category.color, background: category.color } },
+                category.label,
+              )
+            : null,
+        ),
+      ),
+      el('div.review__actions', approve, reject),
+    );
+    this.root.hidden = false;
+  }
+}
+
+/* ------------------------------------------------------------------ */
 /* Add-a-note form                                                     */
 /* ------------------------------------------------------------------ */
 
-export function openAddNote({ a2, country, onSubmit, defaultAuthor = '' }) {
+/**
+ * @param {object} options
+ * @param {boolean} [options.held] true when this note will wait for the
+ *   controller's approval — the writer is told so rather than watching it
+ *   fail to appear.
+ */
+export function openAddNote({ a2, country, onSubmit, defaultAuthor = '', held = false }) {
   const textarea = el('textarea', {
     id: 'note-text',
     maxlength: String(CONFIG.maxNoteLength),
@@ -769,7 +941,17 @@ export function openAddNote({ a2, country, onSubmit, defaultAuthor = '' }) {
     el(
       'div.addnote__country',
       flagImg(a2),
-      el('div', el('div.addnote__country-name', country), el('div.field__hint', { style: { margin: '0' } }, 'Your note will appear on this country')),
+      el(
+        'div',
+        el('div.addnote__country-name', country),
+        el(
+          'div.field__hint',
+          { style: { margin: '0' } },
+          held
+            ? 'The booth reviews notes before they go on the map'
+            : 'Your note will appear on this country',
+        ),
+      ),
     ),
     el('label.field', el('span.field__label', 'Your note'), textarea),
     counter,
@@ -796,7 +978,7 @@ export function openAddNote({ a2, country, onSubmit, defaultAuthor = '' }) {
       await onSubmit({ a2, country, text, author: author.value, category });
       closeSheet();
       toast(
-        CONFIG.moderateContributions
+        held
           ? 'Thank you — your note is with the host for review.'
           : 'Thank you — your note is on the map.',
         'success',
@@ -826,7 +1008,10 @@ export function openQrSheet({ url, expiresAt, isController, onRegenerate }) {
     frame,
     el(
       'p.qr__caption',
-      'Scan to open this map on your phone and add what you know about any country.',
+      CONFIG.moderateContributions
+        ? 'Scan to open this map on your phone and add what you know about any country. ' +
+          'Notes reach the map once the host approves them here.'
+        : 'Scan to open this map on your phone and add what you know about any country.',
     ),
     expiresAt
       ? el('p.qr__expiry', `Visitor passes from this code last ${formatRemaining(expiresAt)} longer.`)

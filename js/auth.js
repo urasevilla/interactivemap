@@ -42,6 +42,15 @@ export class Auth extends EventTarget {
     return this.session?.role === 'guest' || this.session?.role === 'controller';
   }
 
+  /**
+   * What this session may see of the notes, for {@link BaseStore#visible}.
+   * A visitor sees their own note while it waits for the booth's approval;
+   * nobody else does.
+   */
+  get noteScope() {
+    return { visitorId: this.session?.visitorId };
+  }
+
   get expiresAt() {
     return this.session?.expiresAt ?? 0;
   }

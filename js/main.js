@@ -14,6 +14,7 @@ import { FEATURED, PRACTICES } from './practices.js';
 import {
   CountryPanel,
   CountryPicker,
+  ReviewPrompt,
   buildContext,
   buildLegend,
   closeSheet,
@@ -33,6 +34,7 @@ let map = null;
 let labels = null;
 let picker = null;
 let panel = null;
+let review = null;
 let index = null;
 let lastIssuedCode = null;
 let lastGuestLink = null;
@@ -254,6 +256,7 @@ async function boot() {
       openAddNote({
         a2,
         country,
+        held: CONFIG.moderateContributions && !auth.isController,
         onSubmit: async ({ text, author, category }) => {
           await store.add(
             makeNote({
@@ -263,6 +266,9 @@ async function boot() {
               author,
               category,
               visitorId: auth.session?.visitorId,
+              /* The controller is the moderator — holding their own note for
+                 their own approval would only be a prompt to click twice. */
+              approved: auth.isController,
             }),
           );
         },
@@ -274,8 +280,17 @@ async function boot() {
     },
   });
 
+  /* Only the controller moderates, so only the controller is interrupted. */
+  if (auth.isController) {
+    review = new ReviewPrompt({
+      store,
+      onShow: (a2) => selectCountry(a2, null, { fly: true }),
+    });
+  }
+
   store.addEventListener('change', () => {
-    labels.setNoteCounts(store.countsByCountry(auth.isController));
+    labels.setNoteCounts(store.countsByCountry(auth.noteScope));
+    review?.sync(store.pending());
   });
   store.addEventListener('offline', (event) => {
     toast(`Live sync is offline: ${event.detail}`, 'error');
@@ -466,6 +481,10 @@ function startLoop() {
    */
   /* Diagnostic hook: jump the camera somewhere specific from the console. */
   window.__mapFly = (lon, lat, distance) => map.flyTo([lon, lat], distance, 300);
+
+  /* Where a lon/lat lands on screen. tools/check.mjs uses it to prove the
+     projection reaches the screen undistorted. */
+  window.__mapPoint = (lon, lat) => map.lonLatToScreen(lon, lat);
 
   window.__mapSample = (size = 48) => {
     map.renderer.render(map.scene, map.camera);

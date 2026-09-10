@@ -284,6 +284,54 @@ check(
   `distance ${framing.distance?.toFixed(2)} vs home ${framing.home?.toFixed(2)}`,
 );
 
+/**
+ * The projection must reach the screen undistorted.
+ *
+ * Equal Earth is symmetric about the equator, so 60°N and 60°S sit the same
+ * distance from it. A perspective camera looking at a tilted plane does not
+ * preserve that — the far half of the map is foreshortened far harder than the
+ * near half — and the booth screen showed a northern hemisphere crushed into a
+ * band while South America stretched. An orthographic camera keeps the ratio
+ * exactly, at the home view and zoomed out past it alike.
+ */
+const symmetryAt = async (label) => {
+  const geometry = await page.evaluate(() => {
+    const north = window.__mapPoint(0, 60);
+    const equator = window.__mapPoint(0, 0);
+    const south = window.__mapPoint(0, -60);
+    const west = window.__mapPoint(-160, 0);
+    const east = window.__mapPoint(160, 0);
+    return {
+      north: equator.y - north.y,
+      south: south.y - equator.y,
+      west: equator.x - west.x,
+      east: east.x - equator.x,
+    };
+  });
+  const skew = Math.abs(geometry.north - geometry.south) / Math.max(geometry.north, 1);
+  const lean = Math.abs(geometry.west - geometry.east) / Math.max(geometry.west, 1);
+  check(
+    `the hemispheres are the same height ${label}`,
+    skew < 0.02,
+    `${geometry.north.toFixed(1)}px north vs ${geometry.south.toFixed(1)}px south`,
+  );
+  check(
+    `the map is not skewed east to west ${label}`,
+    lean < 0.02,
+    `${geometry.west.toFixed(1)}px west vs ${geometry.east.toFixed(1)}px east`,
+  );
+};
+
+await symmetryAt('at the home view');
+
+/* Zoomed all the way out is where the old camera distorted worst. */
+await page.evaluate(() => window.__mapFly(0, 0, 9999));
+await page.waitForTimeout(900);
+await symmetryAt('zoomed out');
+if (SHOTS) await page.screenshot({ path: path.join(shotDir, '02b-zoomed-out.png') });
+await page.click('#btn-reset');
+await page.waitForTimeout(1100);
+
 /* All five categories must be reachable without scrolling on a booth screen. */
 const legendFit = await page.evaluate(() => {
   const legend = document.getElementById('legend');
@@ -442,7 +490,11 @@ check(
 
 const zoomBefore = await page.evaluate(() => window.__mapZoom);
 await page.click('#btn-zoom-in');
-await page.waitForTimeout(500);
+/* The tween is published from the render loop, which under software GL can
+   miss a fixed wait entirely — poll for the change rather than sample once. */
+await page
+  .waitForFunction((before) => window.__mapZoom > before + 1e-4, zoomBefore, { timeout: 6000 })
+  .catch(() => {});
 const zoomAfter = await page.evaluate(() => window.__mapZoom);
 check('the zoom-in control changes the zoom level', zoomAfter > zoomBefore, `${zoomBefore} → ${zoomAfter}`);
 
@@ -536,36 +588,158 @@ check('the canvas fills the phone width', mobileLayout.canvasWidth === mobileLay
   `${mobileLayout.canvasWidth} vs ${mobileLayout.innerWidth}`);
 check('the context card starts collapsed on a phone', mobileLayout.contextCollapsed);
 
-/* Fourteen name chips cannot sit near their countries on a 390px world map;
-   at this zoom the pins carry the map instead. */
-const compactLabels = await mobile.evaluate(
+check('the session is recognised as a visitor', mobileLayout.role === 'guest', mobileLayout.role);
+
+/* A phone showing the whole projection gives each country four pixels, so it
+   opens part-way in — close enough that the names are readable on arrival. */
+const mobileHome = await mobile.evaluate(() => ({ ...window.__mapView, zoom: window.__mapZoom }));
+check(
+  'a phone opens zoomed in, not at the whole world',
+  mobileHome.distance < mobileHome.max * 0.6,
+  `distance ${mobileHome.distance?.toFixed(2)} of max ${mobileHome.max?.toFixed(2)}`,
+);
+const homeLabels = await mobile.evaluate(
   () => [...document.querySelectorAll('.label')].filter((l) => l.style.display !== 'none').length,
 );
-check('name chips are suppressed at world zoom on a phone', compactLabels === 0, `${compactLabels} shown`);
-check('the session is recognised as a visitor', mobileLayout.role === 'guest', mobileLayout.role);
+check('country names are legible on a phone at first load', homeLabels > 4, `${homeLabels} shown`);
+
+/* The map has to fill the screen it opened on, not float in a band. */
+const mobileFill = await mobile.evaluate(() => {
+  const canvas = document.getElementById('map');
+  const rect = canvas.getBoundingClientRect();
+  const top = window.__mapPoint(0, 90).y;
+  const bottom = window.__mapPoint(0, -90).y;
+  return { covered: (Math.min(bottom, rect.height) - Math.max(top, 0)) / rect.height };
+});
+check(
+  'the map fills the phone screen it opens on',
+  mobileFill.covered > 0.9,
+  `${Math.round(mobileFill.covered * 100)}% of the canvas height`,
+);
 
 if (SHOTS) await mobile.screenshot({ path: path.join(shotDir, '05-mobile.png') });
 
-/* Zooming in on a phone brings the names back. */
-await mobile.evaluate(() => {
-  for (let i = 0; i < 6; i++) document.getElementById('btn-zoom-in').click();
-});
-await mobile.waitForTimeout(1400);
-const zoomedLabels = await mobile.evaluate(
+/**
+ * Countries must answer a finger, not only a mouse. Before this worked a tap
+ * raycast from wherever a mouse had last been — which on a phone is nowhere —
+ * so no country on the map was reachable at all.
+ *
+ * Taps go to a lon/lat rather than a fraction of the canvas, so the assertion
+ * says which country it expects and skips any point the page chrome covers.
+ */
+const tapAt = async (lon, lat) => {
+  const spot = await mobile.evaluate(
+    ([lo, la]) => {
+      const point = window.__mapPoint(lo, la);
+      const rect = document.getElementById('map').getBoundingClientRect();
+      const x = rect.left + point.x;
+      const y = rect.top + point.y;
+      return { x, y, onCanvas: document.elementFromPoint(x, y)?.id === 'map' };
+    },
+    [lon, lat],
+  );
+  if (!spot.onCanvas) return { skipped: true };
+  await mobile.touchscreen.tap(spot.x, spot.y);
+  await mobile.waitForTimeout(700);
+  return mobile.evaluate(() => ({
+    open: !document.getElementById('panel').hidden,
+    country: document.querySelector('.panel__country')?.textContent || '',
+  }));
+};
+
+/* Water first, while the canvas is still clear. A tap carries a few pixels of
+   forgiveness so a fingertip can reach small countries; open ocean must not
+   pick the nearest land anyway. */
+const tappedSea = await tapAt(-25, 8); // mid-Atlantic
+check(
+  'a tap on open water selects nothing',
+  tappedSea.skipped || !tappedSea.open,
+  JSON.stringify(tappedSea),
+);
+
+const tapped = await tapAt(8.0, 9.6); // central Nigeria
+check(
+  'a tap on a country opens it on a phone',
+  tapped.open && tapped.country === 'Nigeria',
+  JSON.stringify(tapped),
+);
+if (SHOTS) await mobile.screenshot({ path: path.join(shotDir, '05a-mobile-tap.png') });
+
+/* Countries without a practice have to answer a finger too. The panel is a
+   bottom sheet on a phone and covers most of the canvas, so close it before
+   reaching for the map again. */
+await mobile.evaluate(() => document.getElementById('panel-close').click());
+await mobile.waitForTimeout(400);
+const tappedPlain = await tapAt(17, 27); // Libya, no mapped practice
+check(
+  'a country with no practice is tappable too',
+  tappedPlain.skipped || tappedPlain.country === 'Libya',
+  JSON.stringify(tappedPlain),
+);
+
+await mobile.evaluate(() => document.getElementById('panel-close').click());
+await mobile.waitForTimeout(400);
+
+/* Zooming out to the whole world suppresses the chips again: fourteen names
+   cannot sit near their own countries on a 390px-wide world. Driven through
+   the camera rather than the button, because repeated clicks in one task all
+   read the same starting distance and only the last one lands. */
+await mobile.evaluate(() => window.__mapFly(0, 0, 9999));
+await mobile.waitForTimeout(1200);
+const worldLabels = await mobile.evaluate(
   () => [...document.querySelectorAll('.label')].filter((l) => l.style.display !== 'none').length,
 );
-check('names return once a phone user zooms in', zoomedLabels > 0, `${zoomedLabels} shown`);
+check('name chips give way at world zoom on a phone', worldLabels === 0, `${worldLabels} shown`);
 await mobile.click('#btn-reset');
 await mobile.waitForTimeout(1100);
 
-/* Guest adds a note */
+/* Every country is reachable from the dropdown, practice or not, and every
+   country is open for contributions. */
+const pickerCounts = await mobile.evaluate(() => {
+  document.getElementById('picker-input').focus();
+  const options = [...document.querySelectorAll('.picker__option')];
+  return {
+    total: options.length,
+    plain: options.filter((o) => !o.querySelector('.picker__badge')).length,
+  };
+});
+check(
+  'the dropdown lists all 236 countries',
+  pickerCounts.total === 236,
+  `${pickerCounts.total} listed`,
+);
+check(
+  'countries without a practice are in the dropdown',
+  pickerCounts.plain === 236 - expectedCountries,
+  `${pickerCounts.plain} plain of ${pickerCounts.total}`,
+);
+
+await mobile.fill('#picker-input', 'Ireland');
+await mobile.waitForTimeout(200);
+await mobile.locator('.picker__option').first().click();
+await mobile.waitForSelector('#panel:not([hidden])');
+const plainPanel = await mobile.evaluate(() => ({
+  country: document.querySelector('.panel__country')?.textContent || '',
+  practices: document.querySelectorAll('#panel .practice').length,
+  add: [...document.querySelectorAll('#panel button')].some((b) => /add a practice|add what you know/i.test(b.textContent)),
+}));
+check(
+  'a country with no practice still opens and invites one',
+  plainPanel.country === 'Ireland' && plainPanel.practices === 0 && plainPanel.add,
+  JSON.stringify(plainPanel),
+);
+
+/* Guest adds a note. The panel is a bottom sheet on a phone and covers the
+   dropdown, so close it before reaching for the picker again. */
+await mobile.evaluate(() => document.getElementById('panel-close').click());
+await mobile.waitForTimeout(300);
 await mobile.click('#picker-input');
 await mobile.fill('#picker-input', 'Thai');
 await mobile.waitForTimeout(200);
 await mobile.locator('.picker__option').first().click();
 await mobile.waitForSelector('#panel:not([hidden])');
 
-const addButton = mobile.locator('button:has-text("Add what you know")');
+const addButton = mobile.locator('#panel button:has-text("Add what you know")');
 check('a visitor is offered the add-a-note button', (await addButton.count()) === 1);
 
 /* An inline icon with no size rule fills its button; guard against that. */
@@ -591,14 +765,24 @@ await mobile.waitForTimeout(700);
 
 const noteState = await mobile.evaluate(() => ({
   sheetClosed: document.getElementById('sheet').hidden,
-  notes: document.querySelectorAll('.note').length,
+  notes: document.querySelectorAll('#panel .note').length,
   text: document.querySelector('.note__text')?.textContent || '',
-  stored: JSON.parse(localStorage.getItem('wiego-map.notes.v1') || '[]').length,
+  stored: JSON.parse(localStorage.getItem('wiego-map.notes.v1') || '[]'),
+  pendingTag: document.querySelectorAll('#panel .note__pending').length,
 }));
 check('the add-note sheet closes on submit', noteState.sheetClosed);
 check('the note appears in the country panel', noteState.notes >= 1, `got ${noteState.notes}`);
 check('the note text is preserved', noteState.text.includes('Article 40'));
-check('the note is persisted', noteState.stored >= 1, `got ${noteState.stored}`);
+check('the note is persisted', noteState.stored.length >= 1, `got ${noteState.stored.length}`);
+
+/* Moderation: a phone's note is stored unapproved, and its author is told so
+   rather than watching it silently fail to appear. */
+check(
+  'a visitor note is held for approval',
+  noteState.stored.every((n) => n.approved === false),
+  noteState.stored.map((n) => n.approved).join(','),
+);
+check('the writer sees their own note marked as waiting', noteState.pendingTag >= 1);
 
 if (SHOTS) await mobile.screenshot({ path: path.join(shotDir, '05b-mobile-note.png') });
 
@@ -704,6 +888,17 @@ await host.evaluate(() => {
         approved: true,
         visitorId: 'v_test',
       },
+      {
+        id: 'n_pending',
+        a2: 'ke',
+        country: 'Kenya',
+        text: 'Boda boda riders pay into Haba Haba by the day, not the month.',
+        author: 'Phone visitor',
+        category: 'affordability',
+        createdAt: Date.now(),
+        approved: false,
+        visitorId: 'v_phone',
+      },
     ]),
   );
 });
@@ -711,20 +906,83 @@ await host.reload({ waitUntil: 'domcontentloaded' });
 await host.waitForFunction(() => !document.getElementById('loading'), { timeout: 60_000 });
 await host.waitForTimeout(800);
 
+/* --- Moderation: a phone's note is announced, and waits --- */
+
+const prompt = await host.evaluate(() => {
+  const root = document.getElementById('review');
+  return {
+    shown: root && !root.hidden,
+    country: root?.querySelector('.review__country')?.textContent?.trim() || '',
+    text: root?.querySelector('.review__text')?.textContent || '',
+    actions: [...(root?.querySelectorAll('.review__actions .btn') || [])].map((b) =>
+      b.textContent.trim(),
+    ),
+  };
+});
+check('a note from a phone raises the approval prompt', prompt.shown, JSON.stringify(prompt));
+check('the prompt names the country and quotes the note',
+  prompt.country.includes('Kenya') && prompt.text.includes('Haba Haba'), JSON.stringify(prompt));
+check(
+  'the prompt offers approve and reject',
+  prompt.actions.some((a) => /approve/i.test(a)) && prompt.actions.some((a) => /reject/i.test(a)),
+  prompt.actions.join(' / '),
+);
+if (SHOTS) await host.screenshot({ path: path.join(shotDir, '06b-approval.png') });
+
+/* Until it is approved it must be nowhere on the booth screen. */
+await host.fill('#picker-input', 'Kenya');
+await host.waitForTimeout(200);
+await host.locator('.picker__option').first().click();
+await host.waitForTimeout(500);
+const heldBack = await host.evaluate(() => ({
+  notes: document.querySelectorAll('#panel .note').length,
+  badge: [...document.querySelectorAll('.label--featured')].find((l) =>
+    l.textContent.includes('Kenya'),
+  )?.querySelector('.label__count')?.textContent,
+}));
+const kenyaPractices = [...practiceData.matchAll(/"a2":\s*"ke"/g)].length;
+check(
+  'an unapproved note is not posted to the map',
+  heldBack.notes === 0,
+  `${heldBack.notes} shown on the country panel`,
+);
+check(
+  'an unapproved note is not counted on the label either',
+  heldBack.badge === String(kenyaPractices),
+  `badge read ${heldBack.badge}, expected ${kenyaPractices}`,
+);
+
+/* Approving from the prompt is what posts it. */
+await host.locator('.review__actions .btn:has-text("Approve")').click();
+await host.waitForTimeout(700);
+const published = await host.evaluate(() => ({
+  promptGone: document.getElementById('review').hidden,
+  notes: document.querySelectorAll('#panel .note').length,
+  text: document.querySelector('#panel .note__text')?.textContent || '',
+  stored: JSON.parse(localStorage.getItem('wiego-map.notes.v1') || '[]').find(
+    (n) => n.id === 'n_pending',
+  )?.approved,
+}));
+check('approving posts the note to the map', published.notes === 1 && published.text.includes('Haba Haba'),
+  JSON.stringify(published));
+check('approval is written back to the store', published.stored === true, String(published.stored));
+check('the prompt clears once the queue is empty', published.promptGone);
+
 await host.click('#btn-control');
 await host.waitForSelector('#sheet:not([hidden])');
 const moderation = await host.evaluate(() => ({
   notes: document.querySelectorAll('.ctl__notes .note').length,
   stats: [...document.querySelectorAll('.ctl__stat-value')].map((n) => n.textContent),
 }));
-check('the host sees visitor notes for moderation', moderation.notes === 1, `${moderation.notes} shown`);
-check('the note counters are right', moderation.stats.join('/') === '1/0/1', moderation.stats.join('/'));
+check('the host sees visitor notes for moderation', moderation.notes === 2, `${moderation.notes} shown`);
+check('the note counters are right', moderation.stats.join('/') === '2/0/2', moderation.stats.join('/'));
 
-await host.locator('.ctl__notes .note__action--danger').first().click();
-await host.evaluate(() => {
-  window.confirm = () => true;
-});
-await host.waitForTimeout(300);
+/* Not clicked: deleting here would take away the note the next assertions
+   read back off the country panel. */
+check(
+  'every note offers the host a delete control',
+  (await host.locator('.ctl__notes .note__action--danger').count()) === 2,
+);
 
 await host.click('.sheet__close');
 

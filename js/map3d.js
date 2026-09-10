@@ -28,6 +28,57 @@ const H_HOVER = 1.7; // multiplier applied on hover
 const H_SELECT = 2.3; // multiplier applied on selection
 
 /**
+ * The camera is orthographic. A perspective camera looking at a tilted plane
+ * foreshortens the far edge far harder than the near one, and across a whole
+ * world map that reads as the projection itself being wrong: the northern
+ * hemisphere crushed into a band while South America stretches. A parallel
+ * projection foreshortens every part of the map by the same cos(tilt), so
+ * Equal Earth arrives on screen as Equal Earth, and the extruded relief keeps
+ * a constant depth from one edge to the other.
+ *
+ * VIEW_K is the only number tying the old distance scale to the new frustum:
+ * the half-height of the view at distance 1. It is the tangent of the half
+ * angle the perspective camera used to have, so every distance in this file —
+ * minDistance, the fly-to spans, the zoom steps — keeps the framing it was
+ * tuned for.
+ */
+const VIEW_K = Math.tan((38 * Math.PI) / 180 / 2);
+
+/** How far back the camera sits. Parallel projection, so this only has to
+    clear the tallest lifted country and stay inside the far plane. */
+const CAMERA_STANDOFF = 20;
+
+/**
+ * Below this canvas width the map opens part-way in rather than at the whole
+ * world — see {@link WorldMap#resize}. Deliberately the same threshold that
+ * labels.js uses to gate the name chips, so the phone's opening view is on the
+ * side of it where names are shown.
+ */
+const COMPACT_WIDTH = 760;
+
+/**
+ * Where a phone opens, expressed as a multiple of the height-fitting distance.
+ *
+ * A 390px-wide phone showing the whole projection gives each country about
+ * four pixels: the name chips are gated off, a fingertip covers three
+ * countries, and the first thing a visitor sees is an unreadable smudge. It
+ * opens instead over the belt carrying most of the mapped practices and
+ * pinches out from there.
+ *
+ * Scaled from the height fit rather than from the world fit on purpose. A
+ * portrait screen fits the world by *width*, at a distance so far out that the
+ * map occupies barely half the canvas height — taking a fraction of that
+ * inherits the same empty bands top and bottom. Fitting the inhabited band
+ * vertically and easing out a little fills the screen with map.
+ */
+const COMPACT_HOME_SCALE = 1.2;
+const COMPACT_HOME_CENTRE = [14, 0]; // lon, lat
+
+/** How far a pointer may travel and still count as a click, in CSS pixels. */
+const TAP_SLOP_MOUSE = 6;
+const TAP_SLOP_TOUCH = 14; // a finger on glass is never still
+
+/**
  * Rings below this projected area get no side walls. One projection unit is
  * roughly 7,400 km at the equator, so this is on the order of a couple of
  * thousand square kilometres — Cabo Verde's islands, Madeira, the Galápagos.
@@ -64,18 +115,22 @@ export class WorldMap {
 
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color('#EDE7DA');
-    this.scene.fog = new THREE.Fog('#EDE7DA', 6, 16);
 
-    this.camera = new THREE.PerspectiveCamera(38, 1, 0.05, 60);
+    this.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, CAMERA_STANDOFF * 2);
 
     /* Camera state — a map camera, not an orbit camera: it looks at a point on
        the z = 0 plane from a fixed bearing, and only distance and tilt vary. */
     this.target = new THREE.Vector3(0, 0, 0);
     this.tilt = 0.34; // radians off vertical; 0 would be straight down
+    this.aspect = 1;
+    this.compact = false;
     this.minDistance = 0.55;
-    /* homeDistance frames the whole world and is recomputed on every resize;
-       distance and maxDistance follow from it. */
+    /* worldDistance fits the whole projection; homeDistance is where the view
+       opens and where Reset returns to, which on a phone is closer in. Both
+       are recomputed on every resize, and maxDistance follows from the first. */
+    this.worldDistance = 5;
     this.homeDistance = 5;
+    this.homeTarget = [0, HOME_CENTRE_Y];
     this.distance = 5;
     this.maxDistance = 6;
 
@@ -428,11 +483,20 @@ export class WorldMap {
   /* ---------------------------------------------------------------- */
 
   _applyCamera() {
-    const d = this.distance;
+    /* Distance drives the frustum, not the standoff: with a parallel
+       projection moving the camera along its own axis changes nothing. */
+    const halfHeight = this.distance * VIEW_K;
+    const halfWidth = halfHeight * Math.max(this.aspect, 0.2);
+    this.camera.left = -halfWidth;
+    this.camera.right = halfWidth;
+    this.camera.top = halfHeight;
+    this.camera.bottom = -halfHeight;
+    this.camera.updateProjectionMatrix();
+
     this.camera.position.set(
       this.target.x,
-      this.target.y - Math.sin(this.tilt) * d,
-      Math.cos(this.tilt) * d,
+      this.target.y - Math.sin(this.tilt) * CAMERA_STANDOFF,
+      Math.cos(this.tilt) * CAMERA_STANDOFF,
     );
     this.camera.up.set(0, 0, 1);
     this.camera.lookAt(this.target);
@@ -442,14 +506,23 @@ export class WorldMap {
 
   /**
    * Distance at which the whole projected world fits the current viewport.
-   * The tilt foreshortens the plane vertically, hence the cos() term.
+   *
+   * Parallel projection makes this exact: the ground plane is foreshortened by
+   * cos(tilt) everywhere, so one term covers the entire map rather than only
+   * the point the camera happens to be aimed at.
    */
   _fitDistance(margin = 1.02) {
-    const halfFov = THREE.MathUtils.degToRad(this.camera.fov) / 2;
-    const t = Math.tan(halfFov);
-    const forHeight = HOME_HALF_HEIGHT / Math.cos(this.tilt) / t;
-    const forWidth = WORLD_HALF_WIDTH / (t * Math.max(this.camera.aspect, 0.2));
-    return Math.max(forHeight, forWidth) * margin;
+    return Math.max(this._heightFitDistance(), this._widthFitDistance()) * margin;
+  }
+
+  /** Distance at which the inhabited band exactly fills the viewport height. */
+  _heightFitDistance() {
+    return (HOME_HALF_HEIGHT * Math.cos(this.tilt)) / VIEW_K;
+  }
+
+  /** Distance at which the projection exactly fills the viewport width. */
+  _widthFitDistance() {
+    return WORLD_HALF_WIDTH / (VIEW_K * Math.max(this.aspect, 0.2));
   }
 
   _clampTarget() {
@@ -502,7 +575,7 @@ export class WorldMap {
   resetView() {
     this._fly = {
       from: { x: this.target.x, y: this.target.y, d: this.distance },
-      to: { x: 0, y: HOME_CENTRE_Y, d: this.homeDistance },
+      to: { x: this.homeTarget[0], y: this.homeTarget[1], d: this.homeDistance },
       start: performance.now(),
       duration: 850,
     };
@@ -537,6 +610,10 @@ export class WorldMap {
     let moved = 0;
     let lastGround = null;
     let pinchDistance = 0;
+    let startX = 0;
+    let startY = 0;
+    let coarse = false;
+    let slop = TAP_SLOP_MOUSE;
 
     const ndc = (event) => {
       const rect = canvas.getBoundingClientRect();
@@ -549,10 +626,21 @@ export class WorldMap {
     canvas.addEventListener('pointerdown', (event) => {
       canvas.setPointerCapture(event.pointerId);
       pointers.set(event.pointerId, event);
+
+      const [nx, ny] = ndc(event);
+      /* A touch sends no move before the tap, so the pointer the raycaster
+         reads has to be set here. Without it a tap fires a pick at wherever a
+         mouse last was — which on a phone is the middle of nowhere, and is why
+         the map appeared to have no clickable countries at all. */
+      this._pointer.set(nx, ny);
+
       if (pointers.size === 1) {
         dragging = true;
         moved = 0;
-        const [nx, ny] = ndc(event);
+        startX = event.clientX;
+        startY = event.clientY;
+        coarse = event.pointerType !== 'mouse';
+        slop = coarse ? TAP_SLOP_TOUCH : TAP_SLOP_MOUSE;
         lastGround = this._groundAt(nx, ny);
       } else if (pointers.size === 2) {
         const [a, b] = [...pointers.values()];
@@ -578,7 +666,7 @@ export class WorldMap {
           this._applyCamera();
         }
         pinchDistance = dist;
-        moved = 99;
+        moved = Infinity; // a pinch is never a tap, however still the fingers
         return;
       }
 
@@ -593,7 +681,10 @@ export class WorldMap {
           /* Re-read after the camera moved so the grabbed point stays put. */
           lastGround = this._groundAt(nx, ny);
         }
-        moved += Math.abs(event.movementX || 0) + Math.abs(event.movementY || 0);
+        /* Measured from where the gesture started rather than summed from
+           movementX, which a touch pointer does not report at all. */
+        moved = Math.max(moved, Math.abs(event.clientX - startX) + Math.abs(event.clientY - startY));
+        this._pointer.set(nx, ny);
         canvas.style.cursor = 'grabbing';
         return;
       }
@@ -606,7 +697,12 @@ export class WorldMap {
       pointers.delete(event.pointerId);
       if (pointers.size < 2) pinchDistance = 0;
       if (pointers.size === 0) {
-        if (dragging && moved < 6) this._handleClick();
+        /* A cancelled gesture — the browser took it over — is not a tap. */
+        if (dragging && moved < slop && event.type === 'pointerup') {
+          const [nx, ny] = ndc(event);
+          this._pointer.set(nx, ny);
+          this._handleClick(coarse);
+        }
         dragging = false;
         lastGround = null;
         canvas.style.cursor = '';
@@ -681,6 +777,40 @@ export class WorldMap {
     return null;
   }
 
+  /**
+   * Picks around the pointer rather than exactly under it.
+   *
+   * A fingertip covers roughly 9mm and Singapore is three pixels wide, so an
+   * exact ray makes several of the countries carrying a practice unreachable
+   * on a phone. Searching a small ring outward keeps the nearest country
+   * clickable without letting a tap in open water select anything: the ring is
+   * only a few pixels of forgiveness, not a nearest-country-anywhere search.
+   */
+  _pickNear(radiusPx = 18) {
+    const rect = this.canvas.getBoundingClientRect();
+    const rx = (radiusPx / (rect.width || 1)) * 2;
+    const ry = (radiusPx / (rect.height || 1)) * 2;
+    const origin = this._pointer.clone();
+
+    for (const ring of [0.55, 1]) {
+      for (let i = 0; i < 8; i++) {
+        const angle = (i * Math.PI) / 4;
+        this._pointer.set(
+          origin.x + Math.cos(angle) * rx * ring,
+          origin.y + Math.sin(angle) * ry * ring,
+        );
+        const hit = this._pick();
+        if (hit) {
+          this._pointer.copy(origin);
+          return hit;
+        }
+      }
+    }
+
+    this._pointer.copy(origin);
+    return null;
+  }
+
   _visiblePin(pin) {
     return !this.filter || pin.userData.category === this.filter;
   }
@@ -698,8 +828,8 @@ export class WorldMap {
     this.canvas.style.cursor = hit ? 'pointer' : '';
   }
 
-  _handleClick() {
-    const hit = this._pick();
+  _handleClick(coarse = false) {
+    const hit = this._pick() || (coarse ? this._pickNear() : null);
     if (!hit) {
       this.select(null);
       this.opts.onSelect?.(null);
@@ -813,34 +943,44 @@ export class WorldMap {
   resize() {
     const width = this.canvas.clientWidth || 1;
     const height = this.canvas.clientHeight || 1;
-    const aspect = width / height;
-    const portrait = aspect < 1;
 
     this.renderer.setSize(width, height, false);
-    this.camera.aspect = aspect;
-    this.camera.fov = portrait ? 52 : 38;
+    this.aspect = width / height;
+    this.compact = width < COMPACT_WIDTH;
     /* A portrait phone shows the map almost flat: the tilt buys depth on a wide
        booth screen but only wastes vertical space on a tall one. */
-    this.tilt = portrait ? 0.14 : 0.34;
-    this.camera.updateProjectionMatrix();
+    this.tilt = this.aspect < 1 ? 0.14 : 0.34;
 
     /* Refit unless the visitor has zoomed away from the home view themselves. */
     const wasHome = Math.abs(this.distance - this.homeDistance) < 0.02;
-    this.homeDistance = this._fitDistance();
-    /* Zooming out past the home view should still reach the poles. */
-    this.maxDistance = this.homeDistance * 1.3;
-    if (wasHome || this.distance > this.maxDistance) {
-      this.distance = this.homeDistance;
-      this.target.y = HOME_CENTRE_Y;
-      if (!this._fly) this._applyCamera();
-    }
 
-    /* The fog is set in world units, so it has to follow the framing distance. */
-    this.scene.fog.near = this.homeDistance * 0.8;
-    this.scene.fog.far = this.homeDistance * 2.6;
+    this.worldDistance = this._fitDistance();
+    this.homeDistance = this.compact
+      ? Math.min(this.worldDistance, this._heightFitDistance() * COMPACT_HOME_SCALE)
+      : this.worldDistance;
+    this.homeTarget = this.compact
+      ? project(COMPACT_HOME_CENTRE[0], COMPACT_HOME_CENTRE[1])
+      : [0, HOME_CENTRE_Y];
+    /* Zooming out past the home view should still reach the poles. */
+    this.maxDistance = this.worldDistance * 1.3;
+
+    /* A hard bound, so it applies even mid-flight. */
+    this.distance = Math.min(this.distance, this.maxDistance);
+
+    if (wasHome && !this._fly) {
+      this.distance = this.homeDistance;
+      this.target.x = this.homeTarget[0];
+      this.target.y = this.homeTarget[1];
+    }
 
     this._applyCamera();
     this._needsRender = true;
+  }
+
+  /** Projects a lon/lat on the ocean plane to CSS pixels within the canvas. */
+  lonLatToScreen(lon, lat, out = {}) {
+    const [x, y] = project(lon, lat);
+    return this.worldToScreen(x, y, 0, out);
   }
 
   /** Projects a world position to CSS pixels within the canvas. */
@@ -868,8 +1008,10 @@ export class WorldMap {
       if (p >= 1) this._fly = null;
     }
 
-    /* Relief follows the camera: full at the home view, flattened close in. */
-    const relief = THREE.MathUtils.clamp(this.distance / this.homeDistance, 0.12, 1);
+    /* Relief follows the camera: full at the whole-world view, flattened close
+       in. Measured against the world fit rather than the home view so a phone,
+       which opens part-way in, gets the same relief at the same map scale. */
+    const relief = THREE.MathUtils.clamp(this.distance / this.worldDistance, 0.12, 1);
     const reliefChanged = Math.abs(relief - this.relief) > 1e-4;
     if (reliefChanged) {
       this.relief = relief;

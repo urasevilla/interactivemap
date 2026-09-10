@@ -31,19 +31,35 @@ class BaseStore extends EventTarget {
     this.dispatchEvent(new CustomEvent('change', { detail: this.notes }));
   }
 
-  /** Notes visible to a given role, honouring the moderation setting. */
-  visible(isController) {
-    if (isController || !CONFIG.moderateContributions) return this.notes;
-    return this.notes.filter((n) => n.approved);
+  /**
+   * The notes that belong on the map.
+   *
+   * With moderation on, an unapproved note is invisible to everyone — the
+   * booth screen included, which is the whole point: the controller sees a new
+   * note in the approval prompt and nowhere else until they publish it. The
+   * one exception is the visitor who wrote it, who sees their own note marked
+   * as awaiting review rather than watching it vanish on submit.
+   *
+   * @param {{visitorId?: string}} [scope]
+   */
+  visible(scope = {}) {
+    if (!CONFIG.moderateContributions) return this.notes;
+    const mine = scope.visitorId;
+    return this.notes.filter((n) => n.approved || (mine && n.visitorId === mine));
   }
 
-  forCountry(a2, isController) {
-    return this.visible(isController).filter((n) => n.a2 === a2);
+  /** Notes held back for the controller to approve, oldest first. */
+  pending() {
+    return this.notes.filter((n) => !n.approved).sort((a, b) => a.createdAt - b.createdAt);
   }
 
-  countsByCountry(isController) {
+  forCountry(a2, scope) {
+    return this.visible(scope).filter((n) => n.a2 === a2);
+  }
+
+  countsByCountry(scope) {
     const counts = new Map();
-    for (const note of this.visible(isController)) {
+    for (const note of this.visible(scope)) {
       counts.set(note.a2, (counts.get(note.a2) || 0) + 1);
     }
     return counts;
@@ -265,8 +281,14 @@ export function createStore() {
   return HAS_FIREBASE ? new FirestoreStore(CONFIG.firebase) : new LocalStore();
 }
 
-/** Builds a note. Text is trimmed and capped; the UI escapes it on render. */
-export function makeNote({ a2, country, text, author, category, visitorId }) {
+/**
+ * Builds a note. Text is trimmed and capped; the UI escapes it on render.
+ *
+ * `approved` may be forced true by the caller — the controller writing on the
+ * booth machine is the moderator, so holding their own note for their own
+ * approval would only be a prompt to click twice.
+ */
+export function makeNote({ a2, country, text, author, category, visitorId, approved }) {
   return {
     id: 'n_' + crypto.randomUUID().replace(/-/g, '').slice(0, 20),
     a2,
@@ -275,7 +297,7 @@ export function makeNote({ a2, country, text, author, category, visitorId }) {
     author: String(author || '').trim().slice(0, 60) || 'Anonymous visitor',
     category: category || null,
     createdAt: Date.now(),
-    approved: !CONFIG.moderateContributions,
+    approved: approved === true || !CONFIG.moderateContributions,
     visitorId: visitorId || 'anon',
   };
 }
