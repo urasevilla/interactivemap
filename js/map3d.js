@@ -17,7 +17,7 @@ import {
   WORLD_HALF_WIDTH,
   WORLD_HALF_HEIGHT,
 } from './geo.js';
-import { BRAND, CATEGORY_BY_ID, FEATURED, categoriesFor } from './practices.js';
+import { CATEGORY_BY_ID, FEATURED, categoriesFor } from './practices.js';
 
 /* Scene constants, in projection units (the equator is ~5.4 units wide). */
 const H_BASE = 0.028; // resting height of a country with no practice
@@ -872,5 +872,3 @@ export class WorldMap {
     this._needsRender = false;
   }
 }
-
-export { H_BASE, H_FEATURED, BRAND };

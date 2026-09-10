@@ -13,7 +13,7 @@
  * A token pasted into devtools therefore will not open the controller panel.
  */
 import { CONFIG } from './config-loader.js';
-import { ROLE, ROLE_NAME, verify } from './tokens.js';
+import { ROLE, verify } from './tokens.js';
 
 const STORAGE_KEY = 'wiego-map.session.v1';
 const GOOGLE_JWKS = 'https://www.googleapis.com/oauth2/v3/certs';
@@ -337,5 +337,3 @@ export async function pbkdf2(passphrase, salt) {
   );
   return [...new Uint8Array(bits)].map((b) => b.toString(16).padStart(2, '0')).join('');
 }
-
-export { ROLE, ROLE_NAME };

@@ -7,8 +7,6 @@
  * visitor who opens a country gets a paragraph rather than a caption.
  */
 
-export const FRAMEWORK_ID = 'five-as';
-
 /** WIEGO brand palette, from the 2019 Brandbook (Guidelines 2019, p.14). */
 export const BRAND = {
   orange: '#FF671F', // Pantone 165 C — primary

@@ -45,6 +45,11 @@ target. Zoom with the wheel, pinch, the `+`/`−` buttons or a double-click.
 time-limited pass, picks any country, and adds what they know. Their notes show
 up on the country's panel and as a count on its label.
 
+| | |
+|---|---|
+| ![On a phone](docs/images/booth-map-mobile.png) | ![The controller panel](docs/images/controller.png) |
+| A visitor's phone | The host's controller panel |
+
 ---
 
 ## Quick start
@@ -113,16 +118,21 @@ bad conference wifi should not depend on unpkg being up.
 
 ```bash
 npm i -g playwright   # once
-npm run check         # 60 assertions in a real browser
+npm run check         # 67 assertions in a real browser
 SHOTS=1 npm run check # also writes screenshots to .shots/
 ```
 
 The check drives a real Chromium: it mints a code with the same scheme the app
 uses, unlocks the gate, waits for the WebGL scene, then exercises the picker,
-the panel, the filter, the QR sheet and the full guest flow — at booth
-resolution, on a phone viewport, and as the host. It also asserts that a wrong code, an
-expired code and a code from a different secret are all refused, and that a note
-containing markup is escaped rather than executed.
+the country panel, hovering and clicking countries directly in the 3D scene, the
+Five As filter, the QR sheet, the full guest flow and the controller flow — at
+booth resolution, on a phone viewport, and as the host.
+
+It also asserts the things that would embarrass you at a booth: that a wrong,
+expired or foreign-secret code is refused; that a note containing markup is
+escaped rather than executed; that all five categories fit a 1600px screen with
+five distinct colours; that the phone layout never scrolls sideways; and that a
+button icon stays icon-sized.
 
 ---
 

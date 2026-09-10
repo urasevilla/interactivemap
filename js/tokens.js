@@ -19,7 +19,6 @@ const ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
 const DECODE = new Map([...ALPHABET].map((c, i) => [c, i]));
 
 export const ROLE = { BOOTH: 1, GUEST: 2 };
-export const ROLE_NAME = { 1: 'booth', 2: 'guest' };
 
 const VERSION = 1;
 const MAC_BYTES_CODE = 4; // 16-character typed code
@@ -38,11 +37,6 @@ async function hmacKey(secret) {
     );
   }
   return keyPromise;
-}
-
-/** Discards the cached key — call if the secret is rotated at runtime. */
-export function resetKey() {
-  keyPromise = null;
 }
 
 async function sign(secret, payload, length) {

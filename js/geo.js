@@ -31,25 +31,6 @@ export function project(lon, lat) {
   return [x, y];
 }
 
-/** Inverse projection by Newton iteration — used for the coordinate readout. */
-export function unproject(x, y) {
-  let theta = y;
-  for (let i = 0; i < 12; i++) {
-    const t2 = theta * theta;
-    const t6 = t2 * t2 * t2;
-    const f = theta * (A1 + A2 * t2 + t6 * (A3 + A4 * t2)) - y;
-    const fp = A1 + 3 * A2 * t2 + t6 * (7 * A3 + 9 * A4 * t2);
-    const delta = f / fp;
-    theta -= delta;
-    if (Math.abs(delta) < 1e-12) break;
-  }
-  const t2 = theta * theta;
-  const t6 = t2 * t2 * t2;
-  const lambda = (x * SQRT3_2 * (A1 + 3 * A2 * t2 + t6 * (7 * A3 + 9 * A4 * t2))) / Math.cos(theta);
-  const phi = Math.asin(Math.sin(theta) / SQRT3_2);
-  return [(lambda * 180) / Math.PI, (phi * 180) / Math.PI];
-}
-
 /** Half-width of the projected world at the equator, for framing the camera. */
 export const WORLD_HALF_WIDTH = project(180, 0)[0];
 export const WORLD_HALF_HEIGHT = project(0, 90)[1];

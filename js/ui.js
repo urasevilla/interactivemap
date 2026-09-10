@@ -16,7 +16,7 @@ import {
   PRACTICES,
   categoriesFor,
 } from './practices.js';
-import { renderQr } from './qr.js';
+import { renderQr, qrToDataUrl } from './qr.js';
 import { formatRemaining } from './tokens.js';
 import { notesToCsv } from './store.js';
 
@@ -851,13 +851,34 @@ export function openQrSheet({ url, expiresAt, isController, onRegenerate }) {
         'Copy',
       ),
     ),
-    isController
-      ? el(
-          'button.btn.btn--ghost.btn--sm',
-          { type: 'button', onclick: onRegenerate },
-          'Issue a fresh visitor pass',
-        )
-      : null,
+    el(
+      'div.ctl__row',
+      { style: { justifyContent: 'center' } },
+      el(
+        'button.btn.btn--secondary.btn--sm',
+        {
+          type: 'button',
+          onclick: () => {
+            /* A vector file prints crisply at whatever size the stand needs. */
+            const link = el('a', {
+              href: qrToDataUrl(renderQr(url, { size: 1024 })),
+              download: 'wiego-map-visitor-qr.svg',
+            });
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+          },
+        },
+        'Download for printing',
+      ),
+      isController
+        ? el(
+            'button.btn.btn--ghost.btn--sm',
+            { type: 'button', onclick: onRegenerate },
+            'Issue a fresh pass',
+          )
+        : null,
+    ),
   );
 
   openSheet('Visitor QR code', content);

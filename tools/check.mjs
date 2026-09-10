@@ -302,6 +302,63 @@ await page.waitForTimeout(400);
 const costaRica = await page.locator('.practice').count();
 check('Costa Rica shows both of its practices', costaRica === 2, `got ${costaRica}`);
 
+/* ---- Direct interaction with the 3D scene ---- */
+
+/* The booth interaction is pointing at a country and clicking it, so the
+   raycast path matters more than the picker. Brazil is large and unambiguous. */
+await page.click('#btn-reset');
+await page.waitForTimeout(1100);
+
+const brazilPoint = await page.evaluate(() => {
+  const canvas = document.getElementById('map');
+  const box = canvas.getBoundingClientRect();
+  /* Ask the label layer where Brazil ended up rather than hard-coding pixels. */
+  const label = [...document.querySelectorAll('.label--featured')].find((l) =>
+    l.textContent.includes('Brazil'),
+  );
+  if (!label) return null;
+  const lb = label.getBoundingClientRect();
+  /* The chip sits above the country's centre; aim a little below it. */
+  return { x: lb.left + lb.width / 2 - box.left, y: lb.top + lb.height / 2 - box.top + 34 };
+});
+check('the Brazil label is placed on screen', Boolean(brazilPoint));
+
+if (brazilPoint) {
+  await page.mouse.move(brazilPoint.x, brazilPoint.y);
+  await page.waitForTimeout(450);
+  const hovered = await page.evaluate(() => ({
+    cursor: document.getElementById('map').style.cursor,
+    hot: [...document.querySelectorAll('.label--hot')].map((l) => l.textContent.trim()),
+  }));
+  check('hovering a country marks it', hovered.cursor === 'pointer', `cursor "${hovered.cursor}"`);
+
+  await page.mouse.click(brazilPoint.x, brazilPoint.y);
+  await page.waitForTimeout(700);
+  const clicked = await page.evaluate(() => ({
+    panelOpen: !document.getElementById('panel').hidden,
+    country: document.querySelector('.panel__country')?.textContent,
+    picker: document.getElementById('picker-input').value,
+  }));
+  check('clicking a country on the map opens its panel', clicked.panelOpen && clicked.country === 'Brazil', `got "${clicked.country}"`);
+  check('the picker follows a map click', clicked.picker === 'Brazil', clicked.picker);
+}
+
+/* Clicking empty canvas clears the selection. The point has to miss the
+   overlays: the picker sits bottom-left, the country panel right. */
+const emptyPoint = await page.evaluate(() => {
+  const box = document.getElementById('map').getBoundingClientRect();
+  return { x: box.left + box.width * 0.55, y: box.top + box.height * 0.95 };
+});
+const overlayAtPoint = await page.evaluate(
+  (p) => document.elementFromPoint(p.x, p.y)?.id,
+  emptyPoint,
+);
+check('the empty-canvas probe hits the canvas', overlayAtPoint === 'map', `hit "${overlayAtPoint}"`);
+
+await page.mouse.click(emptyPoint.x, emptyPoint.y);
+await page.waitForTimeout(500);
+check('clicking away clears the selection', await page.isHidden('#panel'));
+
 /* ---- Five As filter ---- */
 
 await page.locator('.legend__item[data-category="affordability"]').click();
@@ -344,8 +401,13 @@ const qr = await page.evaluate(() => {
 });
 check('a QR code is rendered', qr.present && qr.modules > 500);
 check('the QR link carries a guest token', /#g=[A-Za-z0-9_-]{20,}/.test(qr.url), qr.url.slice(0, 60));
+check('the QR sheet offers a printable download', (await page.locator('button:has-text("Download for printing")').count()) === 1);
 
-if (SHOTS) await page.screenshot({ path: path.join(shotDir, '04-qr.png') });
+/* The sheet fades in over ~0.3s; screenshot after it lands. */
+if (SHOTS) {
+  await page.waitForTimeout(500);
+  await page.screenshot({ path: path.join(shotDir, '04-qr.png') });
+}
 await page.click('.sheet__close');
 
 /* ---- Booth role must not be able to write ---- */
@@ -475,7 +537,7 @@ check('the note appears in the country panel', noteState.notes >= 1, `got ${note
 check('the note text is preserved', noteState.text.includes('Article 40'));
 check('the note is persisted', noteState.stored >= 1, `got ${noteState.stored}`);
 
-if (SHOTS) await mobile.screenshot({ path: path.join(shotDir, '06-mobile-note.png') });
+if (SHOTS) await mobile.screenshot({ path: path.join(shotDir, '05b-mobile-note.png') });
 
 /* Notes must be escaped, not executed. */
 await mobile.locator('button:has-text("Add what you know")').click();
@@ -527,7 +589,8 @@ check(
 );
 
 await host.locator('button:has-text("Issue display code")').click();
-await host.waitForTimeout(400);
+await host.waitForTimeout(500);
+if (SHOTS) await host.screenshot({ path: path.join(shotDir, '06-controller.png') });
 const issued = (await host.textContent('.code-display__value'))?.trim() || '';
 check(
   'issuing produces a 16-character grouped code',
@@ -624,7 +687,10 @@ const framework = await host.evaluate(() => ({
 }));
 check('the Five As explainer opens', framework.title === 'The Five As', framework.title);
 check('it covers all five levers', framework.sections === 5, `${framework.sections}`);
-if (SHOTS) await host.screenshot({ path: path.join(shotDir, '07-controller.png') });
+if (SHOTS) {
+  await host.waitForTimeout(500);
+  await host.screenshot({ path: path.join(shotDir, '07-framework.png') });
+}
 await host.click('.sheet__close');
 
 await hostContext.close();
