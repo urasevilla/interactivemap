@@ -6,7 +6,7 @@
  */
 import { WorldMap } from './map3d.js';
 import { LabelLayer } from './labels.js';
-import { Auth } from './auth.js';
+import { Auth, ownerLabel } from './auth.js';
 import { createStore, makeNote } from './store.js';
 import { CONFIG, HAS_SECRET, siteUrl } from './config-loader.js';
 import { issueBoothCode, issueGuestToken, formatCode, formatRemaining, normalizeCode } from './tokens.js';
@@ -110,7 +110,7 @@ function setupGate() {
   for (const part of passphraseParts) part.hidden = !hasPassphrase;
 
   if (auth.googleEnabled) {
-    googleNote.textContent = `Only ${CONFIG.ownerEmail} can control this map.`;
+    googleNote.textContent = `Only ${ownerLabel()} can control this map.`;
 
     /* Venues do block accounts.google.com, and the script can also load without
        ever defining the button API. Both end with no button on screen, so say

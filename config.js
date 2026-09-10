@@ -12,8 +12,16 @@ window.WIEGO_MAP_CONFIG = {
    * Who controls the map                                                *
    * ------------------------------------------------------------------ */
 
-  // Only this Google account can open the controller panel.
-  ownerEmail: 'urasevilla@gmail.com',
+  // The Google account allowed to open the controller panel.
+  //
+  // ownerEmailHash keeps the address out of this public repository and off the
+  // page — auth.js hashes the verified email claim and compares digests.
+  // Regenerate with:  npm run ownerhash -- you@example.com
+  //
+  // Prefer plaintext instead? Put the address in ownerEmail and leave the hash
+  // empty; the hash wins whenever both are set.
+  ownerEmail: '',
+  ownerEmailHash: '4d8e4717bbc7d29290adb1d5ee80467fdbda0385730ca9855dc780c76f4947fb',
 
   // Google OAuth 2.0 *Web application* client ID.
   // Create one at https://console.cloud.google.com/apis/credentials and add

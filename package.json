@@ -9,6 +9,7 @@
     "build:index": "node tools/build-index.mjs",
     "secret": "node tools/secret.mjs",
     "passphrase": "node tools/passphrase.mjs",
+    "ownerhash": "node tools/ownerhash.mjs",
     "check": "node tools/check.mjs"
   },
   "engines": {

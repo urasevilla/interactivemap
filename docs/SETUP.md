@@ -7,8 +7,9 @@ should do before each event.
 
 ## 1. Publish the site
 
-The repository is private. GitHub Pages can serve from a private repository on a
-paid plan (Pro, Team or Enterprise).
+This repository is public, which is what lets GitHub Pages serve it on a free
+plan. The **content** is still gated: nobody sees the map without a display code
+or a visitor pass, and both expire.
 
 Push to `main` and the workflow in `.github/workflows/pages.yml` does the rest —
 it turns Pages on itself the first time it runs. The URL appears within a minute
@@ -28,24 +29,32 @@ Source: GitHub Actions**, then re-run the job.
 If it fails mentioning billing or an upgrade, that is the private-repo limit
 below.
 
-### A note on "private"
+### What "private event" means here
 
-GitHub has two different meanings for private, and only one of them fits this
-project:
+Access control lives in the page, not in the hosting. That is not a compromise
+forced by the free plan — it is the only arrangement that works. Booth visitors
+scanning the QR code do not have GitHub accounts, so a login-gated site would
+lock out exactly the people it is for.
 
 | | Who can open the URL | Works for QR visitors? |
 |---|---|---|
-| **Private repo, public Pages** | Anyone with the link | **Yes** |
-| **Private repo, private Pages** (Enterprise) | Only repo collaborators, after a GitHub login | No |
+| **Public repo, public Pages** (this setup) | Anyone with the link | **Yes** |
+| **Private repo, public Pages** (needs Pro) | Anyone with the link | Yes |
+| **Private Pages** (Enterprise) | Repo collaborators, after a GitHub login | No |
 
-Booth visitors scanning the QR code do not have GitHub accounts, so private
-Pages would lock them out. This site therefore keeps the **source** private and
-does its own access control in the page: nobody sees the map without a display
-code or a visitor pass, and both expire. That is the privacy layer — not the
-hosting.
+The first two are identical from a visitor's point of view: the site is publicly
+reachable either way, so `config.js` and the event secret inside it are readable
+by anyone who has the URL. A public repository makes that source *discoverable*
+rather than newly exposed. The gate, the code expiry and the secret rotation are
+what actually close an event down.
 
-If you would rather nobody outside your organisation can even load the shell,
-use private Pages and accept that the QR contribution flow will not work.
+Because the source is public, two things are worth keeping out of it:
+
+- **The host's email address.** `ownerEmailHash` holds a SHA-256 digest instead
+  of the address — see §3. Anyone who suspects an address can confirm it by
+  hashing their guess, so this defeats scrapers rather than determined people.
+- **Anything you would not want indexed.** Do not put attendee lists, unpublished
+  figures or partner names in `config.js` or the practice text.
 
 ---
 
@@ -76,12 +85,22 @@ one Google account. Wire it up once:
    https://urasevilla.github.io
    ```
    Add `http://localhost:8080` too if you want to test locally.
-4. Copy the client ID (it ends in `.apps.googleusercontent.com`) into
+4. Under **OAuth consent screen → Test users**, add the address you will sign in
+   with. In Testing mode Google refuses anyone not on that list, even with a
+   valid client ID — this is the step most people miss.
+5. Copy the client ID (it ends in `.apps.googleusercontent.com`) into
    `config.js`:
    ```js
    googleClientId: '1234567890-abcdefg.apps.googleusercontent.com',
    ```
-5. Confirm `ownerEmail` is the account you will sign in with.
+6. Point the site at your account. Since this repository is public, store a
+   digest rather than the address:
+   ```bash
+   npm run ownerhash -- you@example.com
+   ```
+   Paste both printed lines into `config.js`. To use the plain address instead,
+   set `ownerEmail` and leave `ownerEmailHash` empty — the hash wins when both
+   are present.
 
 The site verifies the returned ID token properly — signature against Google's
 published keys, then issuer, audience, expiry and the email claim — so a token

@@ -37,7 +37,7 @@ target. Zoom with the wheel, pinch, the `+`/`−` buttons or a double-click.
 
 | Role | How they get in | What they can do |
 |---|---|---|
-| **Host** | Google sign-in, restricted to one account | Issue codes, moderate notes, export |
+| **Host** | Google sign-in, matched against a hashed address | Issue codes, moderate notes, export |
 | **Display** | Types a 16-character code | Full-screen presentation |
 | **Visitor** | Scans the QR code | Browse on their phone, add notes for 24 hours |
 
@@ -104,6 +104,7 @@ tools/
   serve.mjs           Local static server
   secret.mjs          Prints a new event secret
   passphrase.mjs      Hashes an owner passphrase
+  ownerhash.mjs       Hashes the host's email so it stays out of the source
 
 vendor/               three.js, earcut, qrcode-generator — all committed
 assets/flags/         270 SVG flags (flag-icons)
@@ -118,7 +119,7 @@ bad conference wifi should not depend on unpkg being up.
 
 ```bash
 npm i -g playwright   # once
-npm run check         # 67 assertions in a real browser
+npm run check         # 75 assertions in a real browser
 SHOTS=1 npm run check # also writes screenshots to .shots/
 ```
 

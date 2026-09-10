@@ -727,10 +727,43 @@ check(
   signInState.clientId || '(empty)',
 );
 check(
-  'the gate names the account allowed to control the map',
-  signInState.owner === 'urasevilla@gmail.com',
-  signInState.owner,
+  'the gate says who may control the map without publishing the address',
+  /can control this map/.test(signInState.note) || /could not load/.test(signInState.note),
+  signInState.note,
 );
+
+/* The repository is public, so the host's address must not be sitting in the
+   served source for a scraper to pick up. */
+const emailLeak = await signIn.evaluate(async () => {
+  const sources = await Promise.all(
+    ['config.js', 'js/config-loader.js', 'js/auth.js', 'js/main.js', 'index.html'].map((f) =>
+      fetch(f).then((r) => r.text()),
+    ),
+  );
+  const found = sources.join('\n').match(/[\w.+-]+@[\w-]+\.[\w.]+/g) || [];
+  /* noreply@ addresses in licence headers are not the host's. */
+  return found.filter((a) => !/noreply@|example\.com|\.png$|\.svg$/.test(a));
+});
+check(
+  'no host email address is served in the source',
+  emailLeak.length === 0,
+  emailLeak.join(', '),
+);
+
+/* And the digest still has to identify the right account. */
+const digestWorks = await signIn.evaluate(async () => {
+  const hash = async (email) => {
+    const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(email));
+    return [...new Uint8Array(d)].map((b) => b.toString(16).padStart(2, '0')).join('');
+  };
+  const configured = window.WIEGO_MAP_CONFIG.ownerEmailHash;
+  return {
+    matchesOwner: (await hash('urasevilla@gmail.com')) === configured,
+    rejectsOther: (await hash('someone.else@gmail.com')) !== configured,
+  };
+});
+check('the configured digest matches the host account', digestWorks.matchesOwner);
+check('the digest rejects a different account', digestWorks.rejectsOther);
 check(
   'a blocked accounts.google.com is reported, not left silent',
   /could not load/i.test(signInState.note),

@@ -131,8 +131,10 @@ export class Auth extends EventTarget {
 
     const email = String(claims.email || '').toLowerCase();
     if (!claims.email_verified) throw new Error('That Google account has no verified email address.');
-    if (email !== CONFIG.ownerEmail.toLowerCase()) {
-      throw new Error(`Signed in as ${email}. Only ${CONFIG.ownerEmail} can control this map.`);
+    if (!(await isOwnerEmail(email))) {
+      throw new Error(
+        `Signed in as ${email}, which is not the host account for this map.`,
+      );
     }
 
     return this._commit({
@@ -158,8 +160,8 @@ export class Auth extends EventTarget {
 
     return this._commit({
       role: 'controller',
-      email: CONFIG.ownerEmail,
-      name: CONFIG.ownerEmail,
+      email: CONFIG.ownerEmail || 'Event host',
+      name: CONFIG.ownerEmail || 'Event host',
       picture: '',
       expiresAt: Date.now() + 12 * 3600_000,
     });
@@ -219,6 +221,36 @@ export class Auth extends EventTarget {
     }
     return false;
   }
+}
+
+/**
+ * Matches a verified Google email against the configured host account, by
+ * digest when `ownerEmailHash` is set so the address never has to ship.
+ */
+export async function isOwnerEmail(email) {
+  const normalized = String(email || '').trim().toLowerCase();
+  if (!normalized) return false;
+
+  if (CONFIG.ownerEmailHash) {
+    const digest = await crypto.subtle.digest(
+      'SHA-256',
+      new TextEncoder().encode(normalized),
+    );
+    const hex = [...new Uint8Array(digest)]
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
+    return hex === CONFIG.ownerEmailHash.trim().toLowerCase();
+  }
+
+  if (CONFIG.ownerEmail) return normalized === CONFIG.ownerEmail.trim().toLowerCase();
+
+  /* Neither configured: refuse rather than admit everyone. */
+  return false;
+}
+
+/** How to describe the host account without necessarily naming it. */
+export function ownerLabel() {
+  return CONFIG.ownerEmail || 'the event host’s Google account';
 }
 
 function codeError(reason) {

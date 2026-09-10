@@ -5,8 +5,14 @@
  */
 
 const defaults = {
-  /** The only Google account allowed to open the controller panel. */
-  ownerEmail: 'urasevilla@gmail.com',
+  /**
+   * The only Google account allowed to open the controller panel. Set either
+   * the address itself or, to keep it out of a public repository and off the
+   * page, its SHA-256 digest via `npm run ownerhash`. The hash wins when both
+   * are present.
+   */
+  ownerEmail: '',
+  ownerEmailHash: '',
 
   /** Google OAuth Web client ID. Empty falls back to the owner passphrase. */
   googleClientId: '',
