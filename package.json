@@ -1,0 +1,18 @@
+{
+  "name": "wiego-good-practices-map",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Interactive booth map of global good practices extending social insurance to informal and self-employed workers.",
+  "type": "module",
+  "scripts": {
+    "start": "node tools/serve.mjs",
+    "build:index": "node tools/build-index.mjs",
+    "secret": "node tools/secret.mjs",
+    "passphrase": "node tools/passphrase.mjs",
+    "check": "node tools/check.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "UNLICENSED"
+}

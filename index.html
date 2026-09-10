@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=5" />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#EDE7DA" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta
+      name="description"
+      content="Interactive map of global good practices extending social insurance to informal and self-employed workers."
+    />
+    <title>Global Good Practices — Social Insurance for Informal Workers</title>
+
+    <link rel="icon" href="assets/brand/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;0,900;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+
+    <script src="config.js"></script>
+    <script src="vendor/lib/earcut.min.js"></script>
+    <script src="vendor/lib/qrcode-generator.js"></script>
+    <script type="importmap">
+      { "imports": { "three": "./vendor/three/three.module.min.js" } }
+    </script>
+  </head>
+
+  <body data-role="locked">
+    <!-- ================================================================= -->
+    <!-- Access gate                                                        -->
+    <!-- ================================================================= -->
+    <div id="gate" class="gate">
+      <div class="gate__card">
+        <img class="gate__logo" src="assets/brand/wiego-logo-colour.png" alt="WIEGO" />
+
+        <h1 class="gate__title">Global Good Practices</h1>
+        <p class="gate__subtitle">
+          Extending social insurance to informal and self-employed workers
+        </p>
+
+        <div class="gate__tabs" role="tablist">
+          <button class="gate__tab is-active" role="tab" data-gate-tab="booth" aria-selected="true">
+            Display code
+          </button>
+          <button class="gate__tab" role="tab" data-gate-tab="owner" aria-selected="false">
+            Event host
+          </button>
+        </div>
+
+        <!-- Booth: type the code the host gave you -->
+        <section class="gate__panel is-active" data-gate-panel="booth">
+          <label class="field">
+            <span class="field__label">Enter the display code</span>
+            <input
+              id="gate-code"
+              class="field__input field__input--code"
+              type="text"
+              inputmode="latin"
+              autocomplete="off"
+              autocapitalize="characters"
+              spellcheck="false"
+              placeholder="XXXX-XXXX-XXXX-XXXX"
+              maxlength="19"
+              aria-describedby="gate-code-hint"
+            />
+          </label>
+          <p id="gate-code-hint" class="field__hint">
+            The event host generates this from the controller panel.
+          </p>
+          <button id="gate-code-submit" class="btn btn--primary btn--block">Open the map</button>
+        </section>
+
+        <!-- Owner: Google sign-in, or the passphrase fallback -->
+        <section class="gate__panel" data-gate-panel="owner">
+          <div id="gate-google" class="gate__google"></div>
+          <p id="gate-google-note" class="field__hint gate__google-note"></p>
+
+          <div class="gate__divider" data-passphrase><span>or</span></div>
+
+          <label class="field" data-passphrase>
+            <span class="field__label">Owner passphrase</span>
+            <input
+              id="gate-passphrase"
+              class="field__input"
+              type="password"
+              autocomplete="current-password"
+              placeholder="••••••••••••"
+            />
+          </label>
+          <button id="gate-passphrase-submit" class="btn btn--primary btn--block" data-passphrase>
+            Sign in as host
+          </button>
+        </section>
+
+        <p id="gate-error" class="gate__error" role="alert" hidden></p>
+
+        <footer class="gate__footer">
+          <span id="gate-mode-note">Private event · access by code only</span>
+        </footer>
+      </div>
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- Application                                                        -->
+    <!-- ================================================================= -->
+    <div id="app" class="app" hidden>
+      <!-- ---------------------------------------------------------- -->
+      <!-- Header                                                      -->
+      <!-- ---------------------------------------------------------- -->
+      <header class="topbar">
+        <div class="topbar__brand">
+          <img class="topbar__logo" src="assets/brand/wiego-logo-colour.png" alt="WIEGO" />
+          <div class="topbar__titles">
+            <h1 class="topbar__title">Global Good Practices</h1>
+            <p class="topbar__subtitle">
+              Extending social insurance to informal &amp; self-employed workers
+            </p>
+          </div>
+        </div>
+
+        <nav class="legend" id="legend" aria-label="The Five As framework — filter the map">
+          <!-- built by ui.js -->
+        </nav>
+
+        <div class="topbar__actions">
+          <span class="session-chip" id="session-chip" hidden></span>
+          <button class="btn btn--ghost btn--icon" id="btn-qr" title="Show the visitor QR code" aria-label="Show the visitor QR code">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h7v7H3V3zm2 2v3h3V5H5zm9-2h7v7h-7V3zm2 2v3h3V5h-3zM3 14h7v7H3v-7zm2 2v3h3v-3H5zm9-2h3v3h-3v-3zm5 0h2v2h-2v-2zm-5 5h2v2h-2v-2zm3 0h4v4h-2v-2h-2v-2z"/></svg>
+          </button>
+          <button class="btn btn--ghost btn--icon" id="btn-control" title="Controller panel" aria-label="Controller panel" hidden>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8a4 4 0 100 8 4 4 0 000-8zm0 2a2 2 0 110 4 2 2 0 010-4z"/><path d="M19.4 13a7.6 7.6 0 000-2l2-1.6-2-3.4-2.4 1a7.6 7.6 0 00-1.7-1L14.9 3H9.1l-.4 2.6a7.6 7.6 0 00-1.7 1l-2.4-1-2 3.4L4.6 11a7.6 7.6 0 000 2l-2 1.6 2 3.4 2.4-1c.5.4 1.1.8 1.7 1l.4 2.6h5.8l.4-2.6c.6-.2 1.2-.6 1.7-1l2.4 1 2-3.4-2-1.6z" opacity=".35"/></svg>
+          </button>
+          <button class="btn btn--ghost btn--icon" id="btn-fullscreen" title="Full screen" aria-label="Full screen">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5v2H6v3H4zm11-5h5v5h-2V6h-3V4zM4 15h2v3h3v2H4v-5zm14 0h2v5h-5v-2h3v-3z"/></svg>
+          </button>
+          <button class="btn btn--ghost btn--icon" id="btn-exit" title="Sign out" aria-label="Sign out">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 4h6a2 2 0 012 2v12a2 2 0 01-2 2h-6v-2h6V6h-6V4z"/><path d="M12.6 12l-3.3-3.3 1.4-1.4L16.4 12l-5.7 5.7-1.4-1.4L12.6 12H3v-2h9.6z"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- ---------------------------------------------------------- -->
+      <!-- Map stage                                                   -->
+      <!-- ---------------------------------------------------------- -->
+      <main class="stage">
+        <canvas id="map" aria-label="World map of good practices"></canvas>
+
+        <!-- Country name labels, positioned each frame by labels.js -->
+        <div class="labels" id="labels" aria-hidden="true"></div>
+
+        <!-- Context strip -->
+        <section class="context" id="context">
+          <button class="context__toggle" id="context-toggle" aria-expanded="true">
+            <span class="context__toggle-label">Context</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5z"/></svg>
+          </button>
+          <div class="context__body" id="context-body"><!-- built by ui.js --></div>
+        </section>
+
+        <!-- Map controls -->
+        <div class="mapctl">
+          <div class="picker" id="picker">
+            <label class="picker__label" for="picker-input">Find a country</label>
+            <div class="picker__field">
+              <img class="picker__flag" id="picker-flag" alt="" hidden />
+              <input
+                id="picker-input"
+                class="picker__input"
+                type="text"
+                role="combobox"
+                aria-expanded="false"
+                aria-autocomplete="list"
+                aria-controls="picker-list"
+                autocomplete="off"
+                placeholder="All countries…"
+              />
+              <button class="picker__clear" id="picker-clear" aria-label="Clear selection" hidden>&times;</button>
+              <button class="picker__caret" id="picker-caret" aria-label="Show all countries">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5z"/></svg>
+              </button>
+            </div>
+            <ul class="picker__list" id="picker-list" role="listbox" hidden></ul>
+          </div>
+
+          <div class="zoomctl" role="group" aria-label="Zoom">
+            <button class="zoomctl__btn" id="btn-zoom-in" aria-label="Zoom in">+</button>
+            <button class="zoomctl__btn" id="btn-zoom-out" aria-label="Zoom out">&minus;</button>
+            <button class="zoomctl__btn zoomctl__btn--wide" id="btn-reset" aria-label="Reset the view">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5V2L8 6l4 4V7a5 5 0 11-5 5H5a7 7 0 107-7z"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <p class="disclaimer" id="disclaimer"></p>
+
+        <div class="loading" id="loading">
+          <div class="loading__spinner" aria-hidden="true"></div>
+          <p class="loading__text">Building the map…</p>
+        </div>
+      </main>
+
+      <!-- ---------------------------------------------------------- -->
+      <!-- Country panel                                               -->
+      <!-- ---------------------------------------------------------- -->
+      <aside class="panel" id="panel" hidden aria-live="polite">
+        <button class="panel__close" id="panel-close" aria-label="Close">&times;</button>
+        <div class="panel__scroll" id="panel-body"><!-- built by ui.js --></div>
+      </aside>
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- Overlays                                                           -->
+    <!-- ================================================================= -->
+    <div class="sheet" id="sheet" hidden>
+      <div class="sheet__backdrop" data-sheet-close></div>
+      <div class="sheet__card" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+        <header class="sheet__head">
+          <h2 class="sheet__title" id="sheet-title"></h2>
+          <button class="sheet__close" data-sheet-close aria-label="Close">&times;</button>
+        </header>
+        <div class="sheet__body" id="sheet-body"></div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+    <noscript>
+      <div class="noscript">
+        This interactive map needs JavaScript and WebGL. Please enable JavaScript,
+        or open the site in a current version of Chrome, Edge, Firefox or Safari.
+      </div>
+    </noscript>
+
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>

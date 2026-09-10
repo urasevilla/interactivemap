@@ -1,0 +1,74 @@
+/**
+ * Event configuration.
+ *
+ * This file is deliberately plain: edit it, commit, and GitHub Pages picks the
+ * changes up on the next deploy. Nothing here is read at build time.
+ *
+ * Read docs/SETUP.md before your first event — at minimum, rotate eventSecret
+ * and set googleClientId.
+ */
+window.WIEGO_MAP_CONFIG = {
+  /* ------------------------------------------------------------------ *
+   * Who controls the map                                                *
+   * ------------------------------------------------------------------ */
+
+  // Only this Google account can open the controller panel.
+  ownerEmail: 'urasevilla@gmail.com',
+
+  // Google OAuth 2.0 *Web application* client ID.
+  // Create one at https://console.cloud.google.com/apis/credentials and add
+  // your Pages origin (e.g. https://urasevilla.github.io) to the list of
+  // Authorised JavaScript origins. Leave empty to use the passphrase fallback.
+  googleClientId: '',
+
+  // Fallback for before Google sign-in is wired up, or if the venue blocks
+  // accounts.google.com. Generate with:  npm run passphrase -- "your phrase"
+  // Leaving the hash empty disables the fallback entirely.
+  ownerPassphraseHash: '',
+  ownerPassphraseSalt: 'wiego-map',
+
+  /* ------------------------------------------------------------------ *
+   * Access codes                                                        *
+   * ------------------------------------------------------------------ */
+
+  // HMAC secret behind every display code and visitor pass.
+  // ROTATE THIS BEFORE YOUR EVENT:  npm run secret
+  // Everyone holding a code from the old secret is locked out the moment you
+  // change it, which is exactly what you want between events.
+  eventSecret: '5UrE3Hm_XWXGcoO24bt2c8CJreW6Mb0r1PRiHU-J4Nc',
+
+  // Default lifetimes, in hours. The controller can override per code.
+  boothCodeHours: 24,
+  guestPassHours: 24,
+
+  /* ------------------------------------------------------------------ *
+   * Presentation                                                        *
+   * ------------------------------------------------------------------ */
+
+  eventName: 'WIEGO Booth',
+
+  // Base URL encoded into the QR code. Leave empty to derive it from whatever
+  // address the page is currently open at — set it explicitly if you present
+  // from a local copy but want phones to hit the published site.
+  publicUrl: '',
+
+  // true holds every visitor note until the controller approves it.
+  moderateContributions: false,
+
+  maxNoteLength: 400,
+
+  /* ------------------------------------------------------------------ *
+   * Live sync (optional)                                                *
+   * ------------------------------------------------------------------ */
+
+  // Without this block the map still runs, but visitor notes stay on the device
+  // that wrote them. Fill it in to have phones and the projector share notes in
+  // real time. See docs/SETUP.md § Live sync.
+  firebase: null,
+  // firebase: {
+  //   apiKey: '...',
+  //   authDomain: 'your-project.firebaseapp.com',
+  //   projectId: 'your-project',
+  //   appId: '...',
+  // },
+};
