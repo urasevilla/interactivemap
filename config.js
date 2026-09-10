@@ -19,7 +19,7 @@ window.WIEGO_MAP_CONFIG = {
   // Create one at https://console.cloud.google.com/apis/credentials and add
   // your Pages origin (e.g. https://urasevilla.github.io) to the list of
   // Authorised JavaScript origins. Leave empty to use the passphrase fallback.
-  googleClientId: '',
+  googleClientId: '379669462580-jqba8m8jmabe3t2kjohiq4ts68mvr3rc.apps.googleusercontent.com',
 
   // Fallback for before Google sign-in is wired up, or if the venue blocks
   // accounts.google.com. Generate with:  npm run passphrase -- "your phrase"

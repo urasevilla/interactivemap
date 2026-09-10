@@ -111,12 +111,23 @@ function setupGate() {
 
   if (auth.googleEnabled) {
     googleNote.textContent = `Only ${CONFIG.ownerEmail} can control this map.`;
+
+    /* Venues do block accounts.google.com, and the script can also load without
+       ever defining the button API. Both end with no button on screen, so say
+       what is actually available rather than pointing at a hidden section. */
+    const googleUnavailable = () => {
+      googleNote.textContent = hasPassphrase
+        ? 'Google sign-in could not load — use the owner passphrase below.'
+        : 'Google sign-in could not load, and no owner passphrase is configured. ' +
+          'Set one with: npm run passphrase';
+    };
+
     auth
       .mountGoogleButton(document.getElementById('gate-google'), showGateError)
-      .catch(() => {
-        googleNote.textContent =
-          'Google sign-in could not load — check the network, or use the passphrase below.';
-      });
+      .then((mounted) => {
+        if (!mounted) googleUnavailable();
+      })
+      .catch(googleUnavailable);
   } else {
     googleNote.textContent = hasPassphrase
       ? 'Google sign-in is not configured yet. Use the owner passphrase.'

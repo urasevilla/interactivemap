@@ -695,7 +695,59 @@ await host.click('.sheet__close');
 
 await hostContext.close();
 
-/* ---- 4. Expired credentials ---- */
+/* ---- 4. Host sign-in ---- */
+
+/* A configured client ID must actually reach the gate, and the booth has to
+   degrade honestly when the venue blocks accounts.google.com — which is the
+   one failure mode that would strand the host in front of an audience. */
+const signInContext = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+const signIn = await signInContext.newPage();
+
+/* Simulate the venue firewall. */
+await signIn.route('**://accounts.google.com/**', (route) => route.abort());
+
+await signIn.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded' });
+await signIn.click('[data-gate-tab="owner"]');
+await signIn.waitForTimeout(1200);
+
+const configuredClientId = /googleClientId:\s*'([^']*)'/.exec(
+  fs.readFileSync(path.join(root, 'config.js'), 'utf8'),
+)?.[1];
+
+const signInState = await signIn.evaluate(() => ({
+  clientId: window.WIEGO_MAP_CONFIG.googleClientId,
+  owner: window.WIEGO_MAP_CONFIG.ownerEmail,
+  note: document.getElementById('gate-google-note').textContent,
+  passphraseShown: !document.querySelector('.field[data-passphrase]')?.hidden,
+}));
+
+check(
+  'the configured Google client ID reaches the page',
+  signInState.clientId === configuredClientId && signInState.clientId.endsWith('.apps.googleusercontent.com'),
+  signInState.clientId || '(empty)',
+);
+check(
+  'the gate names the account allowed to control the map',
+  signInState.owner === 'urasevilla@gmail.com',
+  signInState.owner,
+);
+check(
+  'a blocked accounts.google.com is reported, not left silent',
+  /could not load/i.test(signInState.note),
+  signInState.note,
+);
+check(
+  'the blocked-network message matches what is actually configured',
+  signInState.passphraseShown
+    ? /passphrase below/i.test(signInState.note)
+    : /no owner passphrase is configured/i.test(signInState.note),
+  `passphrase ${signInState.passphraseShown ? 'set' : 'unset'} — "${signInState.note}"`,
+);
+check('the map stays locked when sign-in is unavailable', await signIn.isHidden('#app'));
+
+await signInContext.close();
+
+/* ---- 5. Expired credentials ---- */
 
 const expiredCode = toBase32(mintCode(secret, 1, -1, 1, 4)).match(/.{1,4}/g).join('-');
 const fresh = await browser.newContext({ viewport: { width: 1280, height: 800 } });
