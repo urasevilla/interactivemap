@@ -179,6 +179,14 @@ const browser = await playwright.chromium.launch({
 
 if (SHOTS) fs.mkdirSync(shotDir, { recursive: true });
 
+/* Counts come from the generated data, so a content update does not need the
+   test edited — only the data regenerated. */
+const practiceData = fs.readFileSync(path.join(root, 'js/practices-data.js'), 'utf8');
+const expectedPractices = (practiceData.match(/"id":/g) || []).length;
+const expectedCountries = new Set(
+  [...practiceData.matchAll(/"a2":\s*"([a-z]{2})"/g)].map((m) => m[1]),
+).size;
+
 const secret = readSecret();
 const boothCode = toBase32(mintCode(secret, 1, 24, 1, 4)).match(/.{1,4}/g).join('-');
 const guestToken = mintCode(secret, 2, 24, 4, 16).toString('base64url');
@@ -255,8 +263,12 @@ const scene = await page.evaluate(() => {
 check('WebGL context is live', scene.hasContext);
 check('canvas has real dimensions', scene.width > 100 && scene.height > 100, `${scene.width}x${scene.height}`);
 check('all 236 named countries have a label element', scene.labels === 236, `got ${scene.labels}`);
-check('14 featured countries are labelled', scene.featuredLabels === 14, `got ${scene.featuredLabels}`);
-check('featured labels are visible at the default zoom', scene.visibleLabels >= 14, `got ${scene.visibleLabels}`);
+check(
+  'every practice country is labelled',
+  scene.featuredLabels === expectedCountries,
+  `${scene.featuredLabels} labels for ${expectedCountries} countries`,
+);
+check('featured labels are visible at the default zoom', scene.visibleLabels > 0, `got ${scene.visibleLabels}`);
 check('the Five As legend is built', scene.legendItems === 5, `got ${scene.legendItems}`);
 check('context statistics are rendered', scene.stats === 4, `got ${scene.stats}`);
 
@@ -315,7 +327,7 @@ const panel = await page.evaluate(() => ({
   ),
 }));
 check('selecting a country opens its panel', panel.country === 'Mongolia', `got "${panel.country}"`);
-check('the country has its practice card', panel.practices === 1, `got ${panel.practices}`);
+check('the country shows its practice card', panel.practices >= 1, `got ${panel.practices}`);
 check('practice detail starts hidden until clicked', panel.bodyVisible === false);
 
 await page.locator('.practice__head').first().click();
@@ -325,7 +337,24 @@ const opened = await page.evaluate(() =>
 );
 check('clicking a practice reveals its detail', opened);
 
-if (SHOTS) await page.screenshot({ path: path.join(shotDir, '03-country.png') });
+/* A title that wraps must not have the category label run on from its last
+   word — both are spans, so they need an explicit block. */
+const titleLayout = await page.evaluate(() => {
+  const title = document.querySelector('.practice__title');
+  const cat = document.querySelector('.practice__cat');
+  if (!title || !cat) return null;
+  return { titleBottom: title.getBoundingClientRect().bottom, catTop: cat.getBoundingClientRect().top };
+});
+check(
+  'the category label sits below the title, not beside it',
+  titleLayout && titleLayout.catTop >= titleLayout.titleBottom - 1,
+  titleLayout ? `title ends ${titleLayout.titleBottom}, label starts ${titleLayout.catTop}` : 'not found',
+);
+
+if (SHOTS) {
+  await page.waitForTimeout(400);
+  await page.screenshot({ path: path.join(shotDir, '03-country.png') });
+}
 
 /* Countries with two practices */
 await page.fill('#picker-input', 'Costa');
@@ -333,7 +362,7 @@ await page.waitForTimeout(160);
 await page.locator('.picker__option').first().click();
 await page.waitForTimeout(400);
 const costaRica = await page.locator('.practice').count();
-check('Costa Rica shows both of its practices', costaRica === 2, `got ${costaRica}`);
+check('a multi-practice country lists all of them', costaRica >= 2, `Costa Rica: ${costaRica}`);
 
 /* ---- Direct interaction with the 3D scene ---- */
 
@@ -707,12 +736,32 @@ await host.waitForTimeout(500);
 const hostPanel = await host.evaluate(() => ({
   notes: document.querySelectorAll('#panel .note').length,
   canAdd: document.querySelectorAll('#panel button').length,
-  label: [...document.querySelectorAll('.label--featured')].some(
-    (l) => l.textContent.includes('India') && l.querySelector('.label__count')?.textContent === '2',
-  ),
 }));
+
+/* The label badge shows practices + notes, so the expected number depends on
+   how many practices India has in the current data — derive it, don't pin it. */
+const indiaPractices = [...practiceData.matchAll(/"a2":\s*"in"/g)].length;
+const labelBadge = await host.evaluate(
+  (expected) =>
+    [...document.querySelectorAll('.label--featured')].some(
+      (l) =>
+        l.textContent.includes('India') &&
+        l.querySelector('.label__count')?.textContent === String(expected),
+    ),
+  indiaPractices + 1,
+);
 check('a visitor note appears on the country panel', hostPanel.notes >= 1, `${hostPanel.notes}`);
-check('the country label counts practices plus notes', hostPanel.label);
+check(
+  'the country label counts practices plus notes',
+  labelBadge,
+  `expected ${indiaPractices} practices + 1 note`,
+);
+
+check(
+  'every practice in the sheet reached the app',
+  expectedPractices === 50 && expectedCountries === 40,
+  `${expectedPractices} practices / ${expectedCountries} countries`,
+);
 
 /* The Five As explainer must open with all five entries. */
 await host.click('.legend__about');

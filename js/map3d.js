@@ -16,6 +16,8 @@ import {
   flatRingArea,
   WORLD_HALF_WIDTH,
   WORLD_HALF_HEIGHT,
+  HOME_HALF_HEIGHT,
+  HOME_CENTRE_Y,
 } from './geo.js';
 import { CATEGORY_BY_ID, FEATURED, categoriesFor } from './practices.js';
 
@@ -24,6 +26,13 @@ const H_BASE = 0.028; // resting height of a country with no practice
 const H_FEATURED = 0.075; // resting height of a country that has one
 const H_HOVER = 1.7; // multiplier applied on hover
 const H_SELECT = 2.3; // multiplier applied on selection
+
+/**
+ * Rings below this projected area get no side walls. One projection unit is
+ * roughly 7,400 km at the equator, so this is on the order of a couple of
+ * thousand square kilometres — Cabo Verde's islands, Madeira, the Galápagos.
+ */
+const MIN_WALL_AREA = 5e-5;
 
 const COL_LAND = new THREE.Color('#DCD2BE');
 const COL_LAND_NEUTRAL = new THREE.Color('#D3C9B6');
@@ -69,6 +78,13 @@ export class WorldMap {
     this.homeDistance = 5;
     this.distance = 5;
     this.maxDistance = 6;
+
+    /* Countries are extruded solids, so each one shows a wall along its coast.
+       At the home view that wall reads as pleasing relief; at close zoom the
+       same wall is a smear trailing off the coastline, and on a small island it
+       is larger than the island. Shrinking the relief as the camera closes in
+       keeps the 3D at a constant, subtle size on screen. */
+    this.relief = 1;
 
     this.countries = new Map(); // key -> { mesh, record, restHeight, targetHeight, baseColor }
     this.pins = [];
@@ -301,7 +317,14 @@ export class WorldMap {
           const count = ringEnd - ringStart;
           if (count >= 3) {
             const sub = flat.slice(ringStart * 2, ringEnd * 2);
-            const outward = flatRingArea(sub) > 0 ? 1 : -1;
+            const signedArea = flatRingArea(sub);
+            const outward = signedArea > 0 ? 1 : -1;
+
+            /* On an island smaller than the extrusion is tall, the wall is
+               wider than the land and reads as a coloured smear trailing into
+               the sea. Those get a flat top face and no sides; the missing
+               relief is imperceptible at that size. */
+            const tiny = Math.abs(signedArea) < MIN_WALL_AREA;
 
             for (let i = 0; i < count; i++) {
               const a = ringStart + i;
@@ -317,10 +340,12 @@ export class WorldMap {
               const nx = (ey / len) * outward;
               const ny = (-ex / len) * outward;
 
-              const base = positions.length / 3;
-              positions.push(ax, ay, 0, bx, by, 0, bx, by, 1, ax, ay, 1);
-              for (let k = 0; k < 4; k++) normals.push(nx, ny, 0);
-              indices.push(base, base + 1, base + 2, base, base + 2, base + 3);
+              if (!tiny) {
+                const base = positions.length / 3;
+                positions.push(ax, ay, 0, bx, by, 0, bx, by, 1, ax, ay, 1);
+                for (let k = 0; k < 4; k++) normals.push(nx, ny, 0);
+                indices.push(base, base + 1, base + 2, base, base + 2, base + 3);
+              }
 
               /* The border layer is one merged object in world space, so each
                  country's outline is emitted at that country's own resting
@@ -419,10 +444,10 @@ export class WorldMap {
    * Distance at which the whole projected world fits the current viewport.
    * The tilt foreshortens the plane vertically, hence the cos() term.
    */
-  _fitDistance(margin = 1.04) {
+  _fitDistance(margin = 1.02) {
     const halfFov = THREE.MathUtils.degToRad(this.camera.fov) / 2;
     const t = Math.tan(halfFov);
-    const forHeight = WORLD_HALF_HEIGHT / Math.cos(this.tilt) / t;
+    const forHeight = HOME_HALF_HEIGHT / Math.cos(this.tilt) / t;
     const forWidth = WORLD_HALF_WIDTH / (t * Math.max(this.camera.aspect, 0.2));
     return Math.max(forHeight, forWidth) * margin;
   }
@@ -477,7 +502,7 @@ export class WorldMap {
   resetView() {
     this._fly = {
       from: { x: this.target.x, y: this.target.y, d: this.distance },
-      to: { x: 0, y: 0, d: this.homeDistance },
+      to: { x: 0, y: HOME_CENTRE_Y, d: this.homeDistance },
       start: performance.now(),
       duration: 850,
     };
@@ -802,9 +827,11 @@ export class WorldMap {
     /* Refit unless the visitor has zoomed away from the home view themselves. */
     const wasHome = Math.abs(this.distance - this.homeDistance) < 0.02;
     this.homeDistance = this._fitDistance();
-    this.maxDistance = this.homeDistance * 1.12;
+    /* Zooming out past the home view should still reach the poles. */
+    this.maxDistance = this.homeDistance * 1.3;
     if (wasHome || this.distance > this.maxDistance) {
       this.distance = this.homeDistance;
+      this.target.y = HOME_CENTRE_Y;
       if (!this._fly) this._applyCamera();
     }
 
@@ -841,16 +868,29 @@ export class WorldMap {
       if (p >= 1) this._fly = null;
     }
 
+    /* Relief follows the camera: full at the home view, flattened close in. */
+    const relief = THREE.MathUtils.clamp(this.distance / this.homeDistance, 0.12, 1);
+    const reliefChanged = Math.abs(relief - this.relief) > 1e-4;
+    if (reliefChanged) {
+      this.relief = relief;
+      this.borders.scale.z = relief;
+      this._needsRender = true;
+    }
+
     /* Height tweens. */
     const k = 1 - Math.exp(-dt * 11);
     for (const entry of this.countries.values()) {
-      if (Math.abs(entry.height - entry.targetHeight) > 1e-5) {
+      const settling = Math.abs(entry.height - entry.targetHeight) > 1e-5;
+      if (settling) {
         entry.height += (entry.targetHeight - entry.height) * k;
-        entry.mesh.scale.z = entry.height;
         this._needsRender = true;
       }
+      if (settling || reliefChanged) entry.mesh.scale.z = entry.height * relief;
     }
-    if (this._outlineEntry) this._outline.scale.z = this._outlineEntry.height;
+
+    /* Labels read renderHeight, so they sit on the flattened top face too. */
+    this.renderHeightScale = relief;
+    if (this._outlineEntry) this._outline.scale.z = this._outlineEntry.height * relief;
 
     /* Pin bob and ground-ring pulse. Pins are scaled with camera distance so a
        practice marker stays the same size on screen at every zoom level. */
@@ -861,7 +901,9 @@ export class WorldMap {
       const pin = this.pins[i];
       if (!pin.visible) continue;
       pin.scale.setScalar(pinScale);
-      pin.position.z = pin.userData.baseZ + Math.sin(t * 1.7 + i * 0.7) * 0.012 * pinScale;
+      /* Sit on the flattened land rather than floating above where it was. */
+      pin.position.z =
+        pin.userData.baseZ * relief + Math.sin(t * 1.7 + i * 0.7) * 0.012 * pinScale;
       const pulse = 1 + Math.sin(t * 2.1 + i * 0.9) * 0.16;
       pin.userData.ring.scale.setScalar(pulse);
       pin.userData.ring.material.opacity = 0.42 - (pulse - 1) * 0.7;

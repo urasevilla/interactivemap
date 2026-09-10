@@ -186,7 +186,23 @@ no SDK to install — the site talks to the Firestore REST API directly.
 
 ---
 
-## 5. Running the booth
+## 5. Updating the practices
+
+The map's content is generated from `data/source/good-practices.csv`, exported
+from the "Good Practices (5As)" sheet of WIEGO's database.
+
+```bash
+npm run import     # CSV -> js/practices-data.js
+npm run check      # confirm nothing broke
+```
+
+Commit both the CSV and the generated file, then push. A row with an unknown 5A
+category or a country the map does not carry stops the import with an error
+naming the row — nothing is written until it is fixed.
+
+---
+
+## 6. Running the booth
 
 **Before the doors open**
 
@@ -215,7 +231,7 @@ no SDK to install — the site talks to the Firestore REST API directly.
 
 ---
 
-## 6. Local development
+## 7. Local development
 
 ```bash
 npm start          # http://localhost:8080

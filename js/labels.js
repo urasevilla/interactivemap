@@ -97,6 +97,7 @@ export class LabelLayer {
         el,
         countEl: count,
         featured,
+        practiceCount: FEATURED.get(record.a2)?.practices.length || 0,
         area: record.area,
         anchor: country.anchor,
         country,
@@ -162,7 +163,7 @@ export class LabelLayer {
       const screen = map.worldToScreen(
         entry.anchor[0],
         entry.anchor[1],
-        entry.country.height + 0.01,
+        entry.country.height * (map.renderHeightScale ?? 1) + 0.01,
         this._scratch,
       );
       if (!screen.visible || screen.x < -80 || screen.x > rect.width + 80 || screen.y < -40 || screen.y > rect.height + 40) {
@@ -173,7 +174,12 @@ export class LabelLayer {
       candidates.push({ entry, x: screen.x, y: screen.y, priority: isFeatured ? 0 : 1 });
     }
 
-    candidates.sort((a, b) => a.priority - b.priority || b.entry.area - a.entry.area);
+    candidates.sort(
+      (a, b) =>
+        a.priority - b.priority ||
+        b.entry.practiceCount - a.entry.practiceCount ||
+        b.entry.area - a.entry.area,
+    );
 
     for (const candidate of candidates) {
       const { entry } = candidate;
@@ -192,13 +198,14 @@ export class LabelLayer {
             Math.abs(other.y - py) < (other.height + height) / 2 + COLLISION_PAD,
         );
 
-      /* Featured labels are never dropped for a collision — losing one would
-         hide a practice from the visitor — so they step away from the anchor,
-         alternating above and below, until they find clear space. */
+      /* Featured labels step away from their anchor to find space, but only so
+         far. A chip parked three rows from its country points at the wrong
+         place, which is worse than no chip: the country is still coloured and
+         still carries a pin, and the name returns as soon as zooming frees up
+         room. Ranking above means the countries with the most practices keep
+         their names when space is short. */
       const step = height + COLLISION_PAD;
-      const offsets = entry.featured
-        ? [0, -step, step, -step * 2, step * 2, -step * 3, step * 3]
-        : [0];
+      const offsets = entry.featured ? [0, -step, step, -step * 2, step * 2] : [0];
 
       let y = null;
       for (const offset of offsets) {
@@ -209,15 +216,10 @@ export class LabelLayer {
         }
       }
 
+      /* No slot within reach: give way rather than mislabel the map. */
       if (y === null) {
-        /* Every slot taken. On a wide screen a featured label still shows,
-           stacked at the last offset, rather than disappearing; on a narrow one
-           a chip that far from its country is noise, so it gives way too. */
-        if (!entry.featured || compact) {
-          this._hide(entry);
-          continue;
-        }
-        y = clamp(baseY + offsets.at(-1), height / 2 + 6, rect.height - height / 2 - 6);
+        this._hide(entry);
+        continue;
       }
 
       this._show(entry, x, y);

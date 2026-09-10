@@ -2,7 +2,7 @@
 
 An interactive 3D world map for a conference booth, built to teach visitors how
 countries are extending social insurance to informal and self-employed workers.
-Seventeen good practices across fourteen countries, organised by the **Five As**
+Fifty good practices across forty countries, organised by the **Five As**
 framework.
 
 Built as a static site: no server, no build step, no framework. Publish the
@@ -20,7 +20,7 @@ and extruded into WebGL geometry with Three.js. Every one of the 241 features is
 individually pickable. The projection is Equal Earth, so no country is inflated
 relative to another.
 
-**The fourteen countries with a practice stand up out of the map**, coloured by
+**The forty countries with a practice stand up out of the map**, coloured by
 their Five As category, named with a flag and a count. Everything else stays
 low and quiet in WIEGO's khaki.
 
@@ -87,7 +87,8 @@ js/
   geo.js              Equal Earth projection and TopoJSON decoding
   labels.js           DOM country labels, placement and collision
   ui.js               Legend, picker, country panel, sheets
-  practices.js        All the content — the Five As and the 17 practices
+  practices.js        The Five As framework, context and lookups
+  practices-data.js   GENERATED from the spreadsheet — do not hand-edit
   auth.js             Roles, Google ID token verification
   tokens.js           Self-verifying display codes and visitor passes
   store.js            Visitor notes: local, or Firestore when configured
@@ -97,9 +98,12 @@ js/
 data/
   countries-50m.json  Natural Earth 1:50m admin-0 (world-atlas)
   world-index.json    Generated: ISO codes, names, bboxes, label anchors
+  source/
+    good-practices.csv  The content of record — edit here, then npm run import
 
 tools/
   build-index.mjs     Regenerates world-index.json
+  import-practices.mjs  CSV -> js/practices-data.js
   check.mjs           End-to-end browser test
   serve.mjs           Local static server
   secret.mjs          Prints a new event secret
@@ -119,7 +123,7 @@ bad conference wifi should not depend on unpkg being up.
 
 ```bash
 npm i -g playwright   # once
-npm run check         # 86 assertions in a real browser
+npm run check         # 87 assertions in a real browser
 SHOTS=1 npm run check # also writes screenshots to .shots/
 ```
 
@@ -139,18 +143,29 @@ button icon stays icon-sized.
 
 ---
 
-## Content notes
+## Updating the content
 
-The practice text follows the source infographic, expanded from caption length to
-a paragraph a visitor can actually learn from. One figure was corrected:
+The practices come from WIEGO's own database, not from anything written here.
+`data/source/good-practices.csv` is the file of record — a CSV rather than the
+original `.xlsx` so that a content change shows up as a reviewable diff instead
+of an opaque binary blob.
 
-- **Germany, Künstlersozialversicherung.** The infographic gives 30% / 30% / 20%,
-  which totals 80%. The published Künstlersozialkasse split is **50% artist,
-  30% levy on commissioning businesses, 20% federal subsidy**. The panel shows the
-  corrected figures and says so in a footnote.
+To update after a new export:
 
-Spellings were also normalised to the schemes' own names: AHMINI (not ANMINI),
-Casa do Cidadão, Cabo Verde, Germany.
+```bash
+# Export the "Good Practices (5As)" sheet as CSV over the existing file, then:
+npm run import
+npm run check
+```
+
+The importer places and classifies; it never rewrites. Scheme names,
+descriptions, impacts and sources are copied verbatim, and any row it cannot
+resolve — an unknown 5A category, a country not on the map, a missing scheme
+name — is a hard error that writes nothing, rather than a silent drop that would
+leave a country quietly unlit at the booth.
+
+Columns it expects: `category`, `country`, `agency`, `scheme`, `description`,
+`impact`, `sources`.
 
 ## Map notes
 

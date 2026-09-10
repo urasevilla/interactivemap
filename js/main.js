@@ -223,6 +223,10 @@ async function boot() {
 
   labels = new LabelLayer(document.getElementById('labels'), map);
   labels.build(index);
+  /* Seed the count badges from the practices alone. Without this they stay
+     blank until the notes backend answers — and if it never does, a booth with
+     no connectivity shows no counts at all. */
+  labels.setNoteCounts(new Map());
 
   /* --- UI --- */
 
@@ -460,6 +464,9 @@ function startLoop() {
    * task — which is why this exists rather than the test calling toDataURL.
    * Used by tools/check.mjs to prove the map is not a blank canvas.
    */
+  /* Diagnostic hook: jump the camera somewhere specific from the console. */
+  window.__mapFly = (lon, lat, distance) => map.flyTo([lon, lat], distance, 300);
+
   window.__mapSample = (size = 48) => {
     map.renderer.render(map.scene, map.camera);
     const gl = map.renderer.getContext();

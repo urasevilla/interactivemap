@@ -624,10 +624,15 @@ export class CountryPanel {
       icon('chevron', 'practice__chev'),
     );
 
+    /* Many source descriptions are a single sentence, in which case the summary
+       and the detail are the same text — show it once. */
+    const detailAddsSomething =
+      practice.detail && practice.detail.trim() !== practice.summary.trim();
+
     const body = el(
       'div.practice__body',
       el('p.practice__summary', practice.summary),
-      el('p.practice__detail', practice.detail),
+      detailAddsSomething ? el('p.practice__detail', practice.detail) : null,
       practice.lever
         ? el('div.practice__lever', icon('lever'), el('span', practice.lever))
         : null,

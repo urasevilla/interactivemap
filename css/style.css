@@ -27,7 +27,7 @@
 
   /* Five As */
   --cat-affordability: #1f5673;
-  --cat-accessibility: #8e8c13;
+  --cat-access: #8e8c13;
   --cat-adequacy: #a31d3c;
   --cat-awareness: #d6a419;
   --cat-advocacy: #ff671f;
@@ -1318,7 +1318,10 @@ svg {
   min-width: 0;
 }
 
+/* These are spans, so without an explicit block they stay inline and the
+   category label runs on from the end of a title that wraps to two lines. */
 .practice__title {
+  display: block;
   font-size: 15px;
   font-weight: 900;
   letter-spacing: -0.012em;
@@ -1326,6 +1329,7 @@ svg {
 }
 
 .practice__subtitle {
+  display: block;
   font-size: 12px;
   color: var(--ink-3);
   font-style: italic;

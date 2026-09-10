@@ -35,6 +35,19 @@ export function project(lon, lat) {
 export const WORLD_HALF_WIDTH = project(180, 0)[0];
 export const WORLD_HALF_HEIGHT = project(0, 90)[1];
 
+/**
+ * The inhabited world, which is what the home view should frame.
+ *
+ * Fitting the full projection wastes a third of a landscape screen on empty
+ * polar ocean and Antarctica — no country, no label, no practice. Framing this
+ * band instead fills the booth display without cropping anything a visitor
+ * would look for: it still reaches past northern Norway and below Cape Horn.
+ */
+export const HOME_LAT_NORTH = 74;
+export const HOME_LAT_SOUTH = -56;
+export const HOME_HALF_HEIGHT = (project(0, HOME_LAT_NORTH)[1] - project(0, HOME_LAT_SOUTH)[1]) / 2;
+export const HOME_CENTRE_Y = (project(0, HOME_LAT_NORTH)[1] + project(0, HOME_LAT_SOUTH)[1]) / 2;
+
 /* ------------------------------------------------------------------ */
 /* TopoJSON decoding                                                   */
 /* ------------------------------------------------------------------ */
