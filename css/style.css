@@ -1042,6 +1042,21 @@ svg {
 }
 
 .picker__group {
+  /* 236 countries in two groups: the heading has to stay put, or a phone
+     scrolling past the practice countries has no idea it has crossed over.
+     The offset covers the list's own 6px padding, which the heading would
+     otherwise let options slide through. */
+  position: sticky;
+  top: -6px;
+  z-index: 1;
+  background: var(--paper);
+  /* Both headings stick at the same offset, so the outgoing one sits directly
+     under the incoming one rather than being pushed off. They only hide each
+     other while they are the same height — let one wrap to two lines and its
+     second line reappears from under the other. */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   padding: 10px 10px 5px;
   font-size: 10.5px;
   font-weight: 900;
@@ -2073,6 +2088,14 @@ svg {
 
 .review__actions .btn {
   flex: 1;
+}
+
+.addnote__prompt {
+  display: block;
+  margin: -1px 2px 9px;
+  font-size: 13.5px;
+  line-height: 1.4;
+  color: var(--ink-2);
 }
 
 .toast {

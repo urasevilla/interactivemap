@@ -298,6 +298,9 @@ export function buildContext(container) {
 /* Country picker                                                      */
 /* ------------------------------------------------------------------ */
 
+/** How far a finger may travel on an option and still count as choosing it. */
+const PICKER_TAP_SLOP = 10;
+
 export class CountryPicker {
   /**
    * @param {object} index    world-index.json
@@ -419,7 +422,7 @@ export class CountryPicker {
       /* Group headings only make sense on the unfiltered list. */
       if (!query) {
         if (country.featured && !headed) {
-          this.list.appendChild(el('li.picker__group', 'Countries with a good practice'));
+          this.list.appendChild(el('li.picker__group', 'With a good practice'));
           headed = true;
         } else if (!country.featured && !plainHeaded) {
           this.list.appendChild(el('li.picker__group', 'All other countries'));
@@ -439,9 +442,36 @@ export class CountryPicker {
           : null,
       );
 
+      /**
+       * A finger landing on an option has to be allowed to become a scroll.
+       * Choosing on pointerdown — and calling preventDefault, which also
+       * cancels the browser's own touch scrolling — meant this list could
+       * never be dragged on a phone: the first country you touched was
+       * selected, so only the group at the top was ever reachable.
+       *
+       * A mouse keeps the old behaviour, because preventDefault there is what
+       * holds focus in the input for the keyboard flow.
+       */
+      let startX = 0;
+      let startY = 0;
+      let coarse = false;
+
       option.addEventListener('pointerdown', (event) => {
-        event.preventDefault(); // keep focus in the input
+        coarse = event.pointerType !== 'mouse';
+        startX = event.clientX;
+        startY = event.clientY;
+        if (coarse) return; // the choice lands on pointerup instead
+        event.preventDefault();
         this._choose(country);
+      });
+
+      /* Touch gets implicit pointer capture, so this fires on the option the
+         finger started on even if it drifted. A gesture that travelled was a
+         scroll; the browser also sends pointercancel once it takes one over. */
+      option.addEventListener('pointerup', (event) => {
+        if (!coarse) return;
+        const moved = Math.abs(event.clientX - startX) + Math.abs(event.clientY - startY);
+        if (moved < PICKER_TAP_SLOP) this._choose(country);
       });
 
       this.list.appendChild(option);
@@ -901,9 +931,19 @@ export function openAddNote({ a2, country, onSubmit, defaultAuthor = '', held = 
   const textarea = el('textarea', {
     id: 'note-text',
     maxlength: String(CONFIG.maxNoteLength),
-    placeholder:
-      'What do you know about extending social insurance here? A scheme, a barrier, a number, a question…',
+    placeholder: 'A scheme, a barrier, a number, a question…',
   });
+
+  /**
+   * The question the note is answering, kept above the box rather than inside
+   * it as placeholder text. A placeholder disappears the moment someone starts
+   * typing — exactly when the framing still matters — and this map is about
+   * one specific thing, not notes on a country in general.
+   */
+  const prompt = el(
+    'span.addnote__prompt',
+    `How is social insurance being extended to informal or self-employed workers in ${country}?`,
+  );
 
   const counter = el('div.addnote__counter', `0 / ${CONFIG.maxNoteLength}`);
   textarea.addEventListener('input', () => {
@@ -953,7 +993,7 @@ export function openAddNote({ a2, country, onSubmit, defaultAuthor = '', held = 
         ),
       ),
     ),
-    el('label.field', el('span.field__label', 'Your note'), textarea),
+    el('label.field', el('span.field__label', 'Your note'), prompt, textarea),
     counter,
     el(
       'div.field',

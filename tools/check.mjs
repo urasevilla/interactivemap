@@ -714,6 +714,131 @@ check(
   `${pickerCounts.plain} plain of ${pickerCounts.total}`,
 );
 
+/**
+ * Listing them is not the same as reaching them. The 40 practice countries
+ * come first, so everything else is a scroll away — and the list used to
+ * choose a country on pointerdown, which both fired the moment a finger
+ * landed and cancelled the browser's own scrolling. The list could not be
+ * dragged at all: whatever you touched was selected, and only the top group
+ * was ever reachable.
+ *
+ * Driven as a real touch drag through CDP, so this exercises native scrolling
+ * rather than a scrollTop the test set itself.
+ */
+const listBox = await mobile.locator('#picker-list').boundingBox();
+const cdp = await phone.newCDPSession(mobile);
+const touchDrag = async (x, fromY, toY, steps = 6) => {
+  await cdp.send('Input.dispatchTouchEvent', {
+    type: 'touchStart',
+    touchPoints: [{ x, y: fromY }],
+  });
+  for (let i = 1; i <= steps; i++) {
+    await cdp.send('Input.dispatchTouchEvent', {
+      type: 'touchMove',
+      touchPoints: [{ x, y: fromY + ((toY - fromY) * i) / steps }],
+    });
+    await mobile.waitForTimeout(16);
+  }
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  await mobile.waitForTimeout(400);
+};
+
+const scrollable = await mobile.evaluate(() => {
+  const list = document.getElementById('picker-list');
+  list.scrollTop = 0;
+  return list.scrollHeight - list.clientHeight;
+});
+check('the dropdown is long enough to need scrolling', scrollable > 100, `${scrollable}px of overflow`);
+
+await touchDrag(
+  listBox.x + listBox.width / 2,
+  listBox.y + listBox.height * 0.8,
+  listBox.y + listBox.height * 0.15,
+);
+const dragged = await mobile.evaluate(() => ({
+  scrollTop: Math.round(document.getElementById('picker-list').scrollTop),
+  stillOpen: !document.getElementById('picker-list').hidden,
+  panelOpened: !document.getElementById('panel').hidden,
+}));
+check(
+  'dragging the dropdown scrolls it',
+  dragged.scrollTop > 40 && dragged.stillOpen,
+  JSON.stringify(dragged),
+);
+check('dragging the dropdown does not choose a country', !dragged.panelOpened, JSON.stringify(dragged));
+
+/* Reaching the bottom of the list has to show countries with no practice. */
+const deepInList = await mobile.evaluate(() => {
+  const list = document.getElementById('picker-list');
+  list.scrollTop = list.scrollHeight;
+  const box = list.getBoundingClientRect();
+  const visible = [...list.querySelectorAll('.picker__option')].filter((o) => {
+    const r = o.getBoundingClientRect();
+    return r.bottom > box.top + 2 && r.top < box.bottom - 2;
+  });
+  return {
+    visible: visible.length,
+    plain: visible.filter((o) => !o.querySelector('.picker__badge')).length,
+    heading: [...list.querySelectorAll('.picker__group')].map((g) => g.textContent),
+  };
+});
+check(
+  'the far end of the list is countries with no practice',
+  deepInList.visible > 0 && deepInList.plain === deepInList.visible,
+  JSON.stringify(deepInList),
+);
+check(
+  'the list is grouped so both kinds are findable',
+  deepInList.heading.length === 2,
+  deepInList.heading.join(' / '),
+);
+
+/* The two group headings stick at the same offset and hide each other only
+   while they are the same height; a wrapped one shows its second line from
+   under the other. */
+const headingBox = await mobile.evaluate(() => {
+  const rows = [...document.querySelectorAll('.picker__group')].map((g) => ({
+    text: g.textContent,
+    height: Math.round(g.getBoundingClientRect().height),
+    wrapped: g.scrollWidth > g.clientWidth + 1,
+  }));
+  return rows;
+});
+check(
+  'the group headings are one line and the same height',
+  headingBox.length === 2 &&
+    headingBox[0].height === headingBox[1].height &&
+    headingBox.every((h) => !h.wrapped),
+  JSON.stringify(headingBox),
+);
+
+/* A tap that does not travel must still choose. Reopen first: if the drag
+   above wrongly chose a country, the list is closed and this would otherwise
+   die on a missing element instead of reporting the failure above. */
+await mobile.evaluate(() => {
+  const list = document.getElementById('picker-list');
+  if (list.hidden) document.getElementById('picker-input').focus();
+  list.scrollTop = 0;
+});
+await mobile.waitForTimeout(250);
+await mobile.evaluate(() => document.getElementById('panel-close')?.click());
+await mobile.waitForTimeout(250);
+
+const optionBox = await mobile.locator('.picker__option').first().boundingBox();
+if (!optionBox) {
+  check('a tap on a dropdown option still selects it', false, 'the dropdown would not open');
+} else {
+  await mobile.touchscreen.tap(optionBox.x + optionBox.width / 2, optionBox.y + optionBox.height / 2);
+  await mobile.waitForTimeout(600);
+  check(
+    'a tap on a dropdown option still selects it',
+    await mobile.evaluate(() => !document.getElementById('panel').hidden),
+  );
+}
+await mobile.evaluate(() => document.getElementById('panel-close')?.click());
+await mobile.waitForTimeout(300);
+
+await mobile.click('#picker-input');
 await mobile.fill('#picker-input', 'Ireland');
 await mobile.waitForTimeout(200);
 await mobile.locator('.picker__option').first().click();
@@ -757,6 +882,27 @@ check(
 
 await addButton.click();
 await mobile.waitForSelector('#sheet:not([hidden])');
+
+/* The map is about one specific thing, and the form has to say so. The
+   framing sits above the box rather than in the placeholder, which would
+   vanish the moment someone started typing. */
+const notePrompt = await mobile.evaluate(() => ({
+  prompt: document.querySelector('.addnote__prompt')?.textContent || '',
+  visible: Boolean(document.querySelector('.addnote__prompt')?.offsetParent),
+}));
+check(
+  'the note form asks about social insurance for informal and self-employed workers',
+  /social insurance/i.test(notePrompt.prompt) &&
+    /informal/i.test(notePrompt.prompt) &&
+    /self-employed/i.test(notePrompt.prompt),
+  notePrompt.prompt,
+);
+check(
+  'the prompt names the country and stays visible',
+  notePrompt.prompt.includes('Thailand') && notePrompt.visible,
+  JSON.stringify(notePrompt),
+);
+
 await mobile.fill('#note-text', 'Vendors in Bangkok markets told us the Article 40 top-up is what made them join.');
 await mobile.locator('.chip:has-text("Affordability")').click();
 await mobile.fill('.addnote__country + .field input, input[placeholder*="organization"]', 'Booth visitor');
