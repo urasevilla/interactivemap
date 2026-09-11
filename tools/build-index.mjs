@@ -273,8 +273,11 @@ function round(n) {
 
 entries.sort((a, b) => a.name.localeCompare(b.name, 'en'));
 
+/* No build timestamp. The CI guard regenerates this file and fails on any
+   diff, so a date stamp meant the guard failed every day after the day the
+   index was committed — testing the calendar rather than the data. Git already
+   records when it was generated, and nothing reads the field. */
 const out = {
-  generated: new Date().toISOString().slice(0, 10),
   source: 'Natural Earth 1:50m Admin 0 via world-atlas@2.0.2',
   count: entries.length,
   countries: entries,
