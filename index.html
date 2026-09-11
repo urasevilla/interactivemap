@@ -163,6 +163,13 @@
 
         <!-- Map controls -->
         <div class="mapctl">
+          <div class="mapctl__stack">
+          <!-- Which workers a practice targets. Built by ui.js. -->
+          <div class="workers" id="workers">
+            <span class="picker__label" id="workers-label">Worker group</span>
+            <div class="workers__chips" role="group" aria-labelledby="workers-label"></div>
+          </div>
+
           <div class="picker" id="picker">
             <label class="picker__label" for="picker-input">Find a country</label>
             <div class="picker__field">
@@ -184,6 +191,7 @@
               </button>
             </div>
             <ul class="picker__list" id="picker-list" role="listbox" hidden></ul>
+          </div>
           </div>
 
           <div class="zoomctl" role="group" aria-label="Zoom">

@@ -19,7 +19,7 @@ import {
   HOME_HALF_HEIGHT,
   HOME_CENTRE_Y,
 } from './geo.js';
-import { CATEGORY_BY_ID, FEATURED, categoriesFor } from './practices.js';
+import { CATEGORY_BY_ID, FEATURED, categoriesFor, countryMatches } from './practices.js';
 
 /* Scene constants, in projection units (the equator is ~5.4 units wide). */
 const H_BASE = 0.028; // resting height of a country with no practice
@@ -79,11 +79,26 @@ const TAP_SLOP_MOUSE = 6;
 const TAP_SLOP_TOUCH = 14; // a finger on glass is never still
 
 /**
- * Rings below this projected area get no side walls. One projection unit is
- * roughly 7,400 km at the equator, so this is on the order of a couple of
- * thousand square kilometres — Cabo Verde's islands, Madeira, the Galápagos.
+ * Rings below this projected area get no side walls at all. One projection
+ * unit is roughly 7,400 km at the equator, so this is on the order of a couple
+ * of thousand square kilometres — Cabo Verde's islands, Madeira, the Galápagos.
  */
 const MIN_WALL_AREA = 5e-5;
+
+/**
+ * A wall is capped at this fraction of its own ring's width.
+ *
+ * Relief used to be one height for every ring in a country, which reads as
+ * depth on a continent and as a smear on an island: at world zoom the
+ * Philippines was a blur, because each island's wall stood as tall as the
+ * island is wide and buried the coastline under its own side. Scaling the wall
+ * to sqrt(area) keeps Brazil's relief while letting Luzon's drop to about a
+ * fifth of it, so an archipelago still reads as separate islands.
+ *
+ * The floor stops the largest of the wall-less rings from jumping to nothing.
+ */
+const WALL_TO_RING_SIZE = 0.32;
+const MIN_WALL_FRACTION = 0.12;
 
 const COL_LAND = new THREE.Color('#DCD2BE');
 const COL_LAND_NEUTRAL = new THREE.Color('#D3C9B6');
@@ -146,6 +161,7 @@ export class WorldMap {
     this.hovered = null;
     this.selected = null;
     this.filter = null; // category id, or null for "show all"
+    this.workerFilter = null; // worker-group id, or null for "show all"
 
     this._raycaster = new THREE.Raycaster();
     this._pointer = new THREE.Vector2();
@@ -264,7 +280,14 @@ export class WorldMap {
       const featured = FEATURED.has(record.a2);
       const restHeight = featured ? H_FEATURED : H_BASE;
 
-      const built = this._extrude(polygons, borderSegments, restHeight + 0.003);
+      const outlineSegments = [];
+      const built = this._extrude(
+        polygons,
+        borderSegments,
+        outlineSegments,
+        restHeight,
+        restHeight + 0.003,
+      );
       if (!built) continue;
 
       const baseColor = featured
@@ -297,6 +320,8 @@ export class WorldMap {
         restHeight,
         height: restHeight,
         targetHeight: restHeight,
+        /* Authored at z = 1 so scaling z lands them on the top face. */
+        outlinePositions: new Float32Array(outlineSegments),
         anchor: project(record.anchor[0], record.anchor[1]),
       });
     }
@@ -328,7 +353,7 @@ export class WorldMap {
    * Border segments for the merged line layer are collected as a side effect,
    * since the ring walk already has the vertices in hand.
    */
-  _extrude(polygons, borderSegments, borderZ) {
+  _extrude(polygons, borderSegments, outlineSegments, restHeight, borderZ) {
     const positions = [];
     const normals = [];
     const indices = [];
@@ -381,6 +406,18 @@ export class WorldMap {
                relief is imperceptible at that size. */
             const tiny = Math.abs(signedArea) < MIN_WALL_AREA;
 
+            /* Everything else gets a wall in proportion to its own size, so an
+               island's relief cannot outgrow the island. The top edge stays at
+               z = 1; it is the base that rises. */
+            const ringSize = Math.sqrt(Math.abs(signedArea));
+            const wallBase =
+              1 -
+              THREE.MathUtils.clamp(
+                (WALL_TO_RING_SIZE * ringSize) / restHeight,
+                MIN_WALL_FRACTION,
+                1,
+              );
+
             for (let i = 0; i < count; i++) {
               const a = ringStart + i;
               const b = ringStart + ((i + 1) % count);
@@ -397,10 +434,15 @@ export class WorldMap {
 
               if (!tiny) {
                 const base = positions.length / 3;
-                positions.push(ax, ay, 0, bx, by, 0, bx, by, 1, ax, ay, 1);
+                positions.push(ax, ay, wallBase, bx, by, wallBase, bx, by, 1, ax, ay, 1);
                 for (let k = 0; k < 4; k++) normals.push(nx, ny, 0);
                 indices.push(base, base + 1, base + 2, base, base + 2, base + 3);
               }
+
+              /* The selection outline, collected here rather than recovered
+                 later by scanning the geometry for a z pattern — walls no
+                 longer start at z = 0, and tiny rings have none to scan. */
+              outlineSegments.push(ax, ay, 1, bx, by, 1);
 
               /* The border layer is one merged object in world space, so each
                  country's outline is emitted at that country's own resting
@@ -469,7 +511,15 @@ export class WorldMap {
       ring.position.z = 0.002;
       pin.add(ring);
 
-      pin.userData = { practiceId: practice.id, a2: practice.a2, category: practice.category, ring, material, baseZ: pin.position.z };
+      pin.userData = {
+        practiceId: practice.id,
+        a2: practice.a2,
+        category: practice.category,
+        workers: practice.workers,
+        ring,
+        material,
+        baseZ: pin.position.z,
+      };
       group.add(pin);
       this.pins.push(pin);
     }
@@ -812,7 +862,7 @@ export class WorldMap {
   }
 
   _visiblePin(pin) {
-    return !this.filter || pin.userData.category === this.filter;
+    return pin.visible;
   }
 
   _updateHover() {
@@ -863,15 +913,35 @@ export class WorldMap {
   /** Dims everything outside a category; pass null to clear. */
   setFilter(categoryId) {
     this.filter = categoryId;
+    this._applyFilters();
+  }
+
+  /** Dims everything outside a worker group; pass null to clear. */
+  setWorkerFilter(workersId) {
+    this.workerFilter = workersId;
+    this._applyFilters();
+  }
+
+  /** True when a country has a practice matching every filter in force. */
+  _matches(a2) {
+    return countryMatches(a2, this.filter, this.workerFilter);
+  }
+
+  /**
+   * The two filters compose: a country stays lit only if it has a practice
+   * answering both at once. Picking a category and a worker group that never
+   * meet leaves an empty map, which is the honest answer.
+   */
+  _applyFilters() {
     for (const entry of this.countries.values()) {
       if (!entry.featured) continue;
-      const active = !categoryId || categoriesFor(entry.record.a2).includes(categoryId);
       entry.material.color.copy(entry.baseColor);
-      if (!active) entry.material.color.lerp(COL_LAND, 0.72);
+      if (!this._matches(entry.record.a2)) entry.material.color.lerp(COL_LAND, 0.72);
     }
     for (const pin of this.pins) {
-      const active = !categoryId || pin.userData.category === categoryId;
-      pin.visible = active;
+      pin.visible =
+        (!this.filter || pin.userData.category === this.filter) &&
+        (!this.workerFilter || pin.userData.workers === this.workerFilter);
     }
     this._refreshHeights();
     this._needsRender = true;
@@ -880,7 +950,8 @@ export class WorldMap {
   _refreshHeights() {
     for (const entry of this.countries.values()) {
       let height = entry.restHeight;
-      if (this.filter && entry.featured && !categoriesFor(entry.record.a2).includes(this.filter)) {
+      const filtered = this.filter || this.workerFilter;
+      if (filtered && entry.featured && !this._matches(entry.record.a2)) {
         height = H_BASE;
       }
       if (entry.key === this.hovered) height *= H_HOVER;
@@ -906,21 +977,6 @@ export class WorldMap {
       this._outline.visible = false;
       this._needsRender = true;
       return;
-    }
-
-    if (!entry.outlinePositions) {
-      const source = entry.mesh.geometry.getAttribute('position');
-      const out = [];
-      /* Wall quads were emitted as 4 vertices each, base-base-top-top; the two
-         top vertices of each quad are exactly the country's outline. */
-      for (let i = 0; i < source.count; i += 4) {
-        if (source.getZ(i) !== 0 || source.getZ(i + 2) !== 1) continue;
-        out.push(
-          source.getX(i + 3), source.getY(i + 3), 1,
-          source.getX(i + 2), source.getY(i + 2), 1,
-        );
-      }
-      entry.outlinePositions = new Float32Array(out);
     }
 
     const geometry = new THREE.BufferGeometry();

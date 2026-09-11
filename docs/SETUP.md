@@ -197,8 +197,13 @@ npm run check      # confirm nothing broke
 ```
 
 Commit both the CSV and the generated file, then push. A row with an unknown 5A
-category or a country the map does not carry stops the import with an error
-naming the row — nothing is written until it is fixed.
+category, an unknown worker group, or a country the map does not carry stops the
+import with an error naming the row — nothing is written until it is fixed.
+
+The sheet's **Worker Group** column drives the worker filter on the map. A new
+value needs adding to `WORKER_IDS` in `tools/import-practices.mjs` and
+`WORKER_GROUPS` in `js/practices.js`; until it is, the import fails loudly
+rather than dropping those practices.
 
 ---
 

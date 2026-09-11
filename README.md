@@ -168,14 +168,27 @@ npm run check
 
 The importer places and classifies; it never rewrites. Scheme names,
 descriptions, impacts and sources are copied verbatim, and any row it cannot
-resolve — an unknown 5A category, a country not on the map, a missing scheme
-name — is a hard error that writes nothing, rather than a silent drop that would
-leave a country quietly unlit at the booth.
+resolve — an unknown 5A category, an unknown worker group, a country not on the
+map, a missing scheme name — is a hard error that writes nothing, rather than a
+silent drop that would leave a country quietly unlit at the booth.
 
-Columns it expects: `category`, `country`, `agency`, `scheme`, `description`,
-`impact`, `sources`.
+Columns it expects: `category`, `workers`, `country`, `agency`, `scheme`,
+`description`, `impact`, `sources`.
+
+`workers` drives the worker-group filter, and its permitted values are the
+labels in `WORKER_IDS` (`tools/import-practices.mjs`), kept in step with
+`WORKER_GROUPS` in `js/practices.js`. Adding a group means adding it to both —
+the importer refuses a row naming a group it does not know, so a whole class of
+workers cannot go missing from the filter unnoticed.
 
 ## Map notes
+
+**Two lenses, one map.** The Five As filter (what barrier a practice
+addresses) and the worker-group filter (who it is for) compose rather than
+replace each other: a country stays lit only if it has a practice answering
+both. The context card follows — unfiltered it carries the framing, all five
+barriers and the headline numbers; under a lens it narrows to that one barrier
+and what is currently on the map.
 
 **The camera is orthographic.** A perspective camera looking at a tilted plane
 foreshortens the far edge far harder than the near one, which across a whole
@@ -185,6 +198,12 @@ foreshortens every part of the map by the same `cos(tilt)`, so Equal Earth
 arrives on screen as Equal Earth and the extruded relief keeps one depth from
 edge to edge. `tools/check.mjs` asserts it by measuring 60°N and 60°S against
 the equator, at the home view and zoomed out.
+
+**Relief is proportional to the land.** Every country is an extruded solid,
+and a fixed wall height reads as depth on a continent but as a smear on an
+island — the Philippines at world zoom was a blur, because each island's wall
+stood as tall as the island is wide. Walls are capped at a fraction of their
+own ring's width, so Brazil keeps its relief and Luzon gets a sliver of it.
 
 **A phone opens part-way in.** Fitting the whole projection to a 390px screen
 gives each country about four pixels, so a narrow viewport opens over the belt

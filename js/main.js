@@ -17,6 +17,7 @@ import {
   ReviewPrompt,
   buildContext,
   buildLegend,
+  buildWorkerFilter,
   closeSheet,
   initSheet,
   openAddNote,
@@ -35,6 +36,7 @@ let labels = null;
 let picker = null;
 let panel = null;
 let review = null;
+let context = null;
 let index = null;
 let lastIssuedCode = null;
 let lastGuestLink = null;
@@ -233,10 +235,23 @@ async function boot() {
   /* --- UI --- */
 
   initSheet();
-  buildContext(document.getElementById('context-body'));
+  context = buildContext(document.getElementById('context-body'));
+
+  /* The two filters are independent lenses on the same map, and the context
+     card follows whichever are in force. */
+  let lens = null;
+  let workers = null;
 
   buildLegend(document.getElementById('legend'), (categoryId) => {
+    lens = categoryId;
     map.setFilter(categoryId);
+    context.setLens(lens, workers);
+  });
+
+  buildWorkerFilter(document.getElementById('workers'), (workersId) => {
+    workers = workersId;
+    map.setWorkerFilter(workersId);
+    context.setLens(lens, workers);
   });
 
   picker = new CountryPicker(index, (key) => {
@@ -485,6 +500,26 @@ function startLoop() {
   /* Where a lon/lat lands on screen. tools/check.mjs uses it to prove the
      projection reaches the screen undistorted. */
   window.__mapPoint = (lon, lat) => map.lonLatToScreen(lon, lat);
+
+  /**
+   * The lowest point of a country's geometry, in top-face units: 0 means its
+   * walls run the full extrusion height, 1 means it is flat. tools/check.mjs
+   * uses it to prove an archipelago's relief stays in proportion to its
+   * islands rather than burying them.
+   */
+  window.__mapWallBase = (key) => {
+    const entry = map.countries.get(key);
+    if (!entry) return null;
+    const position = entry.mesh.geometry.getAttribute('position');
+    let lowest = 1;
+    for (let i = 0; i < position.count; i++) lowest = Math.min(lowest, position.getZ(i));
+    return lowest;
+  };
+
+  /* Hide the practice pins, so a screenshot can judge the land underneath. */
+  window.__mapPins = (visible) => {
+    map.pinGroup.visible = visible;
+  };
 
   window.__mapSample = (size = 48) => {
     map.renderer.render(map.scene, map.camera);

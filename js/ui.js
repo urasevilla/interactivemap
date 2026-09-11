@@ -14,7 +14,10 @@ import {
   DISCLAIMER,
   FEATURED,
   PRACTICES,
+  WORKER_BY_ID,
+  WORKER_GROUPS,
   categoriesFor,
+  countsFor,
 } from './practices.js';
 import { renderQr, qrToDataUrl } from './qr.js';
 import { formatRemaining } from './tokens.js';
@@ -268,16 +271,84 @@ export function openFrameworkSheet() {
 /* Context strip                                                       */
 /* ------------------------------------------------------------------ */
 
+/**
+ * The context strip.
+ *
+ * Two states. Unfiltered, it carries the framing paragraph, all five barriers,
+ * and the headline numbers — the reading a visitor gets before they touch
+ * anything. With a lens selected it narrows to that one barrier and what the
+ * map is currently showing, so the card answers the question the visitor just
+ * asked instead of repeating the whole framework beside a filtered map.
+ *
+ * @returns {{setLens: (category: string|null, workers: string|null) => void}}
+ */
 export function buildContext(container) {
-  container.replaceChildren(
-    el('p.context__text', CONTEXT.standfirst),
-    el(
+  const body = el('div.context__panel');
+
+  const render = (category, workers) => {
+    const lens = category ? CATEGORY_BY_ID.get(category) : null;
+    const group = workers ? WORKER_BY_ID.get(workers) : null;
+    const counts = countsFor(category, workers);
+
+    const showing = el(
       'div.context__stats',
-      CONTEXT.stats.map((stat) =>
-        el('div.stat', el('span.stat__value', stat.value), el('span.stat__label', stat.label)),
+      el(
+        'div.stat',
+        el('span.stat__value', String(counts.practices)),
+        el('span.stat__label', counts.practices === 1 ? 'good practice shown' : 'good practices shown'),
       ),
-    ),
-  );
+      el(
+        'div.stat',
+        el('span.stat__value', String(counts.countries)),
+        el('span.stat__label', counts.countries === 1 ? 'country' : 'countries'),
+      ),
+    );
+
+    if (lens) {
+      body.replaceChildren(
+        el(
+          'div.context__lens',
+          { style: { '--c': lens.color } },
+          el('span.context__lens-icon', icon(lens.icon)),
+          el(
+            'div',
+            el('h3.context__lens-name', lens.short),
+            el('p.context__lens-text', lens.barrier),
+          ),
+        ),
+        group ? el('p.context__filtered', `Filtered to ${group.label.toLowerCase()}.`) : null,
+        showing,
+      );
+      return;
+    }
+
+    body.replaceChildren(
+      el('p.context__text', CONTEXT.standfirst),
+      el(
+        'ul.context__barriers',
+        CATEGORIES.map((c) =>
+          el(
+            'li.context__barrier',
+            { style: { '--c': c.color } },
+            el('span.context__barrier-name', c.short),
+            el('span.context__barrier-text', c.barrier),
+          ),
+        ),
+      ),
+      group ? el('p.context__filtered', `Filtered to ${group.label.toLowerCase()}.`) : null,
+      group
+        ? showing
+        : el(
+            'div.context__stats',
+            CONTEXT.stats.map((stat) =>
+              el('div.stat', el('span.stat__value', stat.value), el('span.stat__label', stat.label)),
+            ),
+          ),
+    );
+  };
+
+  render(null, null);
+  container.replaceChildren(body);
 
   const toggle = document.getElementById('context-toggle');
   toggle.addEventListener('click', () => {
@@ -292,6 +363,63 @@ export function buildContext(container) {
   }
 
   document.getElementById('disclaimer').textContent = DISCLAIMER;
+
+  return { setLens: render };
+}
+
+/* ------------------------------------------------------------------ */
+/* Worker group filter                                                 */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Which workers a practice is aimed at.
+ *
+ * A second lens on the same map, alongside the Five As: "show me what has been
+ * tried for domestic workers" is the question a visitor from a domestic
+ * workers' union actually arrives with. Rendered as chips rather than a select
+ * so the counts are visible without opening anything, and so a booth visitor
+ * can reach them with one tap.
+ */
+export function buildWorkerFilter(container, onFilter) {
+  const chips = container.querySelector('.workers__chips');
+  chips.replaceChildren();
+
+  const all = el(
+    'button.workers__chip.is-active',
+    { type: 'button', 'data-workers': '', 'aria-pressed': 'true' },
+    'All',
+  );
+
+  const buttons = [all];
+  for (const group of WORKER_GROUPS) {
+    const count = PRACTICES.filter((p) => p.workers === group.id).length;
+    if (!count) continue;
+    buttons.push(
+      el(
+        'button.workers__chip',
+        {
+          type: 'button',
+          'data-workers': group.id,
+          'aria-pressed': 'false',
+          title: `${group.label} — ${count} practice${count === 1 ? '' : 's'}`,
+        },
+        el('span', group.short),
+        el('span.workers__count', String(count)),
+      ),
+    );
+  }
+
+  for (const button of buttons) {
+    button.addEventListener('click', () => {
+      for (const other of buttons) {
+        const active = other === button;
+        other.classList.toggle('is-active', active);
+        other.setAttribute('aria-pressed', String(active));
+      }
+      onFilter(button.dataset.workers || null);
+    });
+    chips.appendChild(button);
+  }
 }
 
 /* ------------------------------------------------------------------ */

@@ -30,6 +30,8 @@ export const BRAND = {
 export const CATEGORIES = [
   {
     id: 'affordability',
+    barrier:
+      'Contributions indexed to formal salaries are out of reach for irregular, low, or seasonal incomes.',
     label: 'Affordability',
     short: 'Affordability',
     blurb: 'Financial entry barriers reduced.',
@@ -40,6 +42,8 @@ export const CATEGORIES = [
   },
   {
     id: 'access',
+    barrier:
+      'Registration and enrollment systems assume a formal employer, ID, or fixed workplace informal workers don’t have.',
     label: 'Access',
     short: 'Access',
     blurb: 'Outreach and registration simplified.',
@@ -50,6 +54,8 @@ export const CATEGORIES = [
   },
   {
     id: 'adequacy',
+    barrier:
+      'Even when workers get in, benefit levels and coverage often don’t match their real risks or needs.',
     label: 'Attractiveness & Adequacy',
     short: 'Adequacy',
     blurb: 'Meaningful, relevant benefits.',
@@ -60,6 +66,8 @@ export const CATEGORIES = [
   },
   {
     id: 'awareness',
+    barrier:
+      'Many eligible workers simply don’t know a scheme exists or how to use it.',
     label: 'Awareness',
     short: 'Awareness',
     blurb: 'Proactive information and education.',
@@ -70,8 +78,10 @@ export const CATEGORIES = [
   },
   {
     id: 'advocacy',
-    label: 'Advocacy & Representation',
-    short: 'Advocacy',
+    barrier:
+      'Without a union or cooperative to organize through, informal workers have no collective voice to negotiate for coverage or hold schemes accountable.',
+    label: 'Association & Representation',
+    short: 'Association',
     blurb: 'Collective bargaining and representation.',
     detail:
       'Workers’ own organizations negotiate terms, sit on governing boards and act as the administrative bridge between members and the scheme — so informal workers help design what they are asked to join.',
@@ -81,6 +91,22 @@ export const CATEGORIES = [
 ];
 
 export const CATEGORY_BY_ID = new Map(CATEGORIES.map((c) => [c.id, c]));
+
+/**
+ * Who each practice is aimed at, as the source database groups them.
+ *
+ * Kept in step with WORKER_IDS in tools/import-practices.mjs — the importer
+ * refuses a row naming a group that is not here, so the two cannot drift.
+ */
+export const WORKER_GROUPS = [
+  { id: 'general', label: 'Informal economy (general)', short: 'Informal economy' },
+  { id: 'domestic', label: 'Domestic workers', short: 'Domestic' },
+  { id: 'self-employed', label: 'Self-employed / own-account', short: 'Self-employed' },
+  { id: 'agricultural', label: 'Agricultural / rural workers', short: 'Agricultural' },
+  { id: 'platform', label: 'Platform & gig workers', short: 'Platform & gig' },
+];
+
+export const WORKER_BY_ID = new Map(WORKER_GROUPS.map((w) => [w.id, w]));
 
 /** Countries with at least one practice, keyed by lowercase ISO alpha-2. */
 export const FEATURED = (() => {
@@ -96,17 +122,30 @@ export const FEATURED = (() => {
 export const CONTEXT = {
   title: 'Global Good Practices: Extending Social Insurance to Informal and Self-Employed Workers',
   standfirst:
-    'Informal employment accounts for 56% of the global workforce — up to 66% in Asia-Pacific — and has traditionally fallen outside social security. COVID-19 exposed that gap. The Five As framework guides how countries adapt financing, simplify registration and use technology to move toward universal social protection.',
+    'Workers in the informal economy — street vendors, domestic workers, home-based workers, waste pickers — are largely locked out of social insurance. Contributions are often unaffordable given irregular incomes, registration systems assume a formal employer, benefits rarely match real needs, and many workers simply don’t know what they’re entitled to. Countries are testing different fixes: matching contributions, mobile registration, portable benefits across jobs, and outreach through worker organizations. This map tracks such practices across countries, organized around the workers and barriers they target.',
   stats: [
-    { value: '56%', label: 'of the global workforce is in informal employment' },
-    { value: '66%', label: 'informal employment in Asia-Pacific' },
     {
-      value: String(PRACTICES.length),
-      label: `good practices mapped across ${FEATURED.size} countries`,
+      value: '56%',
+      label: 'of the global workforce works informally — most without access to social insurance',
     },
-    { value: '5', label: 'design levers in the “Five As” framework' },
+    { value: '66%', label: 'in Asia-Pacific' },
+    { value: String(PRACTICES.length), label: 'good practices mapped' },
+    { value: String(new Set(PRACTICES.map((p) => p.a2)).size), label: 'countries mapped' },
   ],
 };
+
+/** Practices matching a category and/or a worker group; null means "any". */
+export function practicesMatching(category, workers) {
+  return PRACTICES.filter(
+    (p) => (!category || p.category === category) && (!workers || p.workers === workers),
+  );
+}
+
+/** How many practices and countries sit behind a filter, for the context card. */
+export function countsFor(category, workers) {
+  const matches = practicesMatching(category, workers);
+  return { practices: matches.length, countries: new Set(matches.map((p) => p.a2)).size };
+}
 
 /**
  * A featured country's map colour comes from its first practice; countries with
@@ -116,6 +155,15 @@ export function categoriesFor(a2) {
   const entry = FEATURED.get(a2);
   if (!entry) return [];
   return [...new Set(entry.practices.map((p) => p.category))];
+}
+
+/** True when a country has a practice matching both filters; null means "any". */
+export function countryMatches(a2, category, workers) {
+  const entry = FEATURED.get(a2);
+  if (!entry) return false;
+  return entry.practices.some(
+    (p) => (!category || p.category === category) && (!workers || p.workers === workers),
+  );
 }
 
 export const DISCLAIMER =

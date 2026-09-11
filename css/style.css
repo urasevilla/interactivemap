@@ -463,7 +463,7 @@ svg {
 }
 
 .topbar__logo {
-  height: 40px;
+  height: 54px;
   width: auto;
 }
 
@@ -781,6 +781,12 @@ svg {
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   overflow: hidden;
+  /* The card carries the framing, five barriers and the numbers, which on a
+     short booth screen is taller than the space above the country picker.
+     Cap it and let the body scroll rather than run off the bottom. */
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - var(--topbar-h) - 250px);
 }
 
 .context__toggle {
@@ -810,6 +816,8 @@ svg {
 
 .context__body {
   padding: 0 15px 15px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .context__toggle[aria-expanded='false'] + .context__body {
@@ -831,6 +839,85 @@ svg {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
+}
+
+/* The five barriers, shown together only in the unfiltered view. */
+.context__barriers {
+  list-style: none;
+  margin: 0 0 14px;
+  padding: 0;
+  display: grid;
+  gap: 7px;
+}
+
+.context__barrier {
+  padding: 0 0 0 9px;
+  border-left: 3px solid var(--c, var(--wiego-orange));
+}
+
+.context__barrier-name {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--c, var(--ink-2));
+}
+
+.context__barrier-text {
+  display: block;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--ink-3);
+  margin-top: 2px;
+}
+
+/* The one barrier a visitor asked about, once a lens is selected. */
+.context__lens {
+  display: flex;
+  gap: 11px;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.context__lens-icon {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: var(--c, var(--wiego-orange));
+  color: #fff;
+}
+
+.context__lens-icon svg {
+  width: 19px;
+  height: 19px;
+  fill: currentColor;
+}
+
+.context__lens-name {
+  margin: 1px 0 4px;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--c, var(--ink));
+}
+
+.context__lens-text {
+  margin: 0;
+  font-size: 12.8px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.context__filtered {
+  margin: 0 0 10px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--ink-3);
 }
 
 .stat {
@@ -870,6 +957,63 @@ svg {
 
 /* ---- Map controls ---- */
 
+/* ==================================================================
+   Worker group filter
+   ================================================================== */
+
+.workers {
+  padding: 8px 12px 10px;
+  background: rgba(250, 247, 240, 0.96);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  width: 296px;
+  max-width: calc(100vw - 110px);
+}
+
+.workers__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 7px;
+}
+
+.workers__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 9px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--paper-2);
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 700;
+  line-height: 1.1;
+  cursor: pointer;
+  transition: background 0.14s, color 0.14s, border-color 0.14s;
+}
+
+.workers__chip:hover {
+  border-color: var(--line-strong);
+  color: var(--ink);
+}
+
+.workers__chip.is-active {
+  background: var(--wiego-brown);
+  border-color: var(--wiego-brown);
+  color: #fff;
+}
+
+.workers__count {
+  font-size: 10px;
+  font-weight: 900;
+  opacity: 0.7;
+}
+
 .mapctl {
   position: absolute;
   left: calc(16px + var(--sa-left));
@@ -878,6 +1022,19 @@ svg {
   display: flex;
   align-items: flex-end;
   gap: 10px;
+}
+
+/* Worker group above country search: two ways of narrowing the same map,
+   stacked so neither crowds the zoom controls beside them. */
+.mapctl__stack {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  /* Shares the row with the zoom buttons; min-width lets it shrink rather
+     than shoving them off a narrow screen. */
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .picker {
@@ -1075,6 +1232,10 @@ svg {
 .zoomctl {
   display: flex;
   flex-direction: column;
+  /* Never shrink: squeezed, its buttons overflow the rounded box and the
+     reset control is clipped off the edge of a phone. The control stack
+     beside it gives way instead. */
+  flex: none;
   gap: 1px;
   background: var(--line);
   border: 1px solid var(--line);
@@ -2262,6 +2423,21 @@ svg {
     right: 10px;
     width: auto;
     max-width: none;
+    /* Expanded, the framing plus five barriers is taller than a phone. Leave
+       the map visible underneath rather than covering it end to end. */
+    max-height: 52vh;
+  }
+
+  /* The worker chips keep their heading on a phone even though the country
+     picker drops its own — without it the chips read as loose buttons. */
+  .workers .picker__label {
+    display: block;
+    font-size: 10px;
+  }
+
+  .workers {
+    width: auto;
+    max-width: none;
   }
 
   .context__text {
@@ -2392,6 +2568,25 @@ svg {
 }
 
 @media (max-width: 560px) {
+  /* Five chips wrapped is five rows of control over a 390px map. One
+     scrolling row keeps the map visible; the active chip is always first
+     into view because "All" leads. */
+  .workers__chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+
+  .workers__chips::-webkit-scrollbar {
+    display: none;
+  }
+
+  .workers__chip {
+    flex: none;
+  }
+
   /* The host may well be moderating from their own phone rather than the
      projector, so the prompt becomes a bottom sheet like everything else. */
   .review {

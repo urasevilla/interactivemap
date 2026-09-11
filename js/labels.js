@@ -10,7 +10,7 @@
  * have a practice" is the first thing a visitor should be able to read from
  * across the booth. Everything else fades in as you zoom, largest first.
  */
-import { CATEGORY_BY_ID, FEATURED, categoriesFor } from './practices.js';
+import { CATEGORY_BY_ID, FEATURED, categoriesFor, countryMatches } from './practices.js';
 
 /** Zoom (0 = whole world, 1 = fully in) at which plain labels start appearing. */
 const PLAIN_LABEL_ZOOM = 0.3;
@@ -126,7 +126,7 @@ export class LabelLayer {
   update() {
     const map = this.map;
     const zoom = map.zoomLevel;
-    const filter = map.filter;
+    const filtered = Boolean(map.filter || map.workerFilter);
     const rect = this.container.getBoundingClientRect();
 
     /* Featured labels claim their space first, then plain ones fill the gaps —
@@ -144,7 +144,7 @@ export class LabelLayer {
       }
 
       /* A filter dims the map; unrelated names would just add noise. */
-      if (filter && isFeatured && !categoriesFor(entry.record.a2).includes(filter)) {
+      if (filtered && isFeatured && !countryMatches(entry.record.a2, map.filter, map.workerFilter)) {
         this._hide(entry);
         continue;
       }

@@ -180,12 +180,30 @@ const browser = await playwright.chromium.launch({
 if (SHOTS) fs.mkdirSync(shotDir, { recursive: true });
 
 /* Counts come from the generated data, so a content update does not need the
-   test edited — only the data regenerated. */
-const practiceData = fs.readFileSync(path.join(root, 'js/practices-data.js'), 'utf8');
-const expectedPractices = (practiceData.match(/"id":/g) || []).length;
-const expectedCountries = new Set(
-  [...practiceData.matchAll(/"a2":\s*"([a-z]{2})"/g)].map((m) => m[1]),
-).size;
+   test edited — only the data regenerated. Imported rather than pattern-matched
+   so the assertions below read the same objects the app does. */
+const { PRACTICES } = await import(pathToFileURL(path.join(root, 'js/practices-data.js')).href);
+const expectedPractices = PRACTICES.length;
+const expectedCountries = new Set(PRACTICES.map((p) => p.a2)).size;
+const expectedWorkerGroups = new Set(PRACTICES.map((p) => p.workers));
+const countPractices = (category, workers) =>
+  PRACTICES.filter(
+    (p) => (!category || p.category === category) && (!workers || p.workers === workers),
+  ).length;
+
+/**
+ * Every row of the source sheet must survive the import. The importer errors
+ * rather than dropping, so a mismatch here means the generated file is stale —
+ * someone edited the CSV and forgot `npm run import`.
+ *
+ * Counted by the category column, which leads every row and is never quoted,
+ * so a description containing a newline cannot inflate the total.
+ */
+const sourceCsv = fs.readFileSync(path.join(root, 'data/source/good-practices.csv'), 'utf8');
+const expectedSourceRows = sourceCsv
+  .split('\n')
+  .filter((line) => /^(Affordability|Access|Awareness|Attractiveness|Advocacy)[^,]*,/.test(line))
+  .length;
 
 const secret = readSecret();
 const boothCode = toBase32(mintCode(secret, 1, 24, 1, 4)).match(/.{1,4}/g).join('-');
@@ -344,6 +362,121 @@ const legendFit = await page.evaluate(() => {
   };
 });
 check('the legend fits a 1600px booth screen', !legendFit.overflows);
+
+/**
+ * Relief has to stay in proportion to the land it belongs to.
+ *
+ * Every ring used to get the same wall height, which reads as depth on a
+ * continent and as a smear on an island: at world zoom the Philippines was a
+ * blur because each island's wall stood as tall as the island is wide. Walls
+ * are now capped at a fraction of their own ring's width, so an archipelago
+ * keeps only a sliver of extrusion while a continent keeps all of it.
+ */
+const relief = await page.evaluate(() => ({
+  philippines: window.__mapWallBase('ph'),
+  indonesia: window.__mapWallBase('id'),
+  brazil: window.__mapWallBase('br'),
+  russia: window.__mapWallBase('ru'),
+}));
+check(
+  'an archipelago gets only a sliver of relief',
+  relief.philippines > 0.5 && relief.indonesia > 0.5,
+  `Philippines base ${relief.philippines?.toFixed(2)}, Indonesia ${relief.indonesia?.toFixed(2)}`,
+);
+check(
+  'a continent-sized country keeps its full relief',
+  relief.brazil < 0.05 && relief.russia < 0.05,
+  `Brazil base ${relief.brazil?.toFixed(2)}, Russia ${relief.russia?.toFixed(2)}`,
+);
+
+/* --- Context: the whole framework unfiltered, one barrier under a lens --- */
+
+const contextDefault = await page.evaluate(() => ({
+  barriers: [...document.querySelectorAll('.context__barrier-name')].map((n) => n.textContent),
+  text: document.querySelector('.context__text')?.textContent || '',
+  stats: [...document.querySelectorAll('.stat__label')].map((n) => n.textContent),
+  lens: document.querySelectorAll('.context__lens').length,
+}));
+check(
+  'the unfiltered context names all five barriers',
+  contextDefault.barriers.length === 5,
+  contextDefault.barriers.join(' / '),
+);
+check(
+  'the framing paragraph is the one the host wrote',
+  /street vendors, domestic workers, home-based workers, waste pickers/.test(contextDefault.text) &&
+    /organized around the workers and barriers they target/.test(contextDefault.text),
+  contextDefault.text.slice(0, 80),
+);
+check(
+  'the four headline numbers are shown',
+  contextDefault.stats.length === 4 &&
+    /most without access to social insurance/.test(contextDefault.stats[0]) &&
+    /Asia-Pacific/.test(contextDefault.stats[1]) &&
+    /good practices mapped/.test(contextDefault.stats[2]) &&
+    /countries mapped/.test(contextDefault.stats[3]),
+  contextDefault.stats.join(' | '),
+);
+check('no single-lens panel is shown unfiltered', contextDefault.lens === 0);
+
+/* Selecting a lens narrows the card to that barrier and what is on the map. */
+await page.locator('.legend__item[data-category="affordability"]').click();
+await page.waitForTimeout(600);
+const contextLens = await page.evaluate(() => ({
+  name: document.querySelector('.context__lens-name')?.textContent || '',
+  text: document.querySelector('.context__lens-text')?.textContent || '',
+  barriers: document.querySelectorAll('.context__barrier').length,
+  stats: [...document.querySelectorAll('.stat__value')].map((n) => Number(n.textContent)),
+}));
+check(
+  'a selected lens swaps the card to that barrier alone',
+  contextLens.name === 'Affordability' &&
+    /out of reach for irregular, low, or seasonal incomes/.test(contextLens.text) &&
+    contextLens.barriers === 0,
+  JSON.stringify(contextLens),
+);
+const affordabilityCount = countPractices('affordability', null);
+check(
+  'the lens reports what the map is actually showing',
+  contextLens.stats[0] === affordabilityCount,
+  `card says ${contextLens.stats[0]}, data has ${affordabilityCount}`,
+);
+
+/* --- Worker group filter --- */
+
+const workerChips = await page.evaluate(() =>
+  [...document.querySelectorAll('.workers__chip')].map((c) => c.dataset.workers),
+);
+check(
+  'every worker group in the data has a chip',
+  workerChips.length === expectedWorkerGroups.size + 1 /* plus "All" */,
+  `${workerChips.length} chips for ${expectedWorkerGroups.size} groups`,
+);
+
+await page.locator('.workers__chip[data-workers="domestic"]').click();
+await page.waitForTimeout(700);
+const combined = await page.evaluate(() => ({
+  stats: [...document.querySelectorAll('.stat__value')].map((n) => Number(n.textContent)),
+  note: document.querySelector('.context__filtered')?.textContent || '',
+  litLabels: [...document.querySelectorAll('.label--featured')].filter(
+    (l) => l.style.display !== 'none',
+  ).length,
+}));
+const bothCount = countPractices('affordability', 'domestic');
+check(
+  'the two filters compose rather than replace each other',
+  combined.stats[0] === bothCount && /domestic workers/.test(combined.note),
+  `card says ${combined.stats[0]}, data has ${bothCount}; note "${combined.note}"`,
+);
+
+/* Clearing both must put the whole framework back. */
+await page.locator('.legend__item[data-category="affordability"]').click();
+await page.locator('.workers__chip[data-workers=""]').click();
+await page.waitForTimeout(700);
+check(
+  'clearing both filters restores the full context',
+  (await page.evaluate(() => document.querySelectorAll('.context__barrier').length)) === 5,
+);
 check(
   'each category has its own colour',
   new Set(legendFit.colours).size === 5,
@@ -1086,7 +1219,7 @@ const heldBack = await host.evaluate(() => ({
     l.textContent.includes('Kenya'),
   )?.querySelector('.label__count')?.textContent,
 }));
-const kenyaPractices = [...practiceData.matchAll(/"a2":\s*"ke"/g)].length;
+const kenyaPractices = PRACTICES.filter((p) => p.a2 === 'ke').length;
 check(
   'an unapproved note is not posted to the map',
   heldBack.notes === 0,
@@ -1144,7 +1277,7 @@ const hostPanel = await host.evaluate(() => ({
 
 /* The label badge shows practices + notes, so the expected number depends on
    how many practices India has in the current data — derive it, don't pin it. */
-const indiaPractices = [...practiceData.matchAll(/"a2":\s*"in"/g)].length;
+const indiaPractices = PRACTICES.filter((p) => p.a2 === 'in').length;
 const labelBadge = await host.evaluate(
   (expected) =>
     [...document.querySelectorAll('.label--featured')].some(
@@ -1163,8 +1296,8 @@ check(
 
 check(
   'every practice in the sheet reached the app',
-  expectedPractices === 50 && expectedCountries === 40,
-  `${expectedPractices} practices / ${expectedCountries} countries`,
+  expectedPractices === expectedSourceRows && expectedCountries > 0,
+  `${expectedPractices} practices from ${expectedSourceRows} source rows / ${expectedCountries} countries`,
 );
 
 /* The Five As explainer must open with all five entries. */

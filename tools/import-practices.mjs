@@ -79,8 +79,29 @@ const CATEGORY_IDS = {
   'Advocacy & Representation': 'advocacy',
 };
 
-/** Sheet spellings that differ from the Natural Earth names in world-index. */
+/**
+ * Sheet worker-group label -> the id the worker filter uses.
+ *
+ * Kept in step with WORKER_GROUPS in js/practices.js. A row naming a group
+ * that is not listed here is an error rather than an "other" bucket: a filter
+ * silently missing a whole class of workers is worse than a failed import.
+ */
+const WORKER_IDS = {
+  'Informal economy (general)': 'general',
+  'Domestic workers': 'domestic',
+  'Self-employed / own-account': 'self-employed',
+  'Agricultural / rural workers': 'agricultural',
+  'Platform & gig workers': 'platform',
+};
+
+/**
+ * Sheet spellings that differ from the Natural Earth names in world-index.
+ *
+ * Sub-national entries map to their country: the map has no Tamil Nadu to
+ * light up, and the state is named in the scheme and description anyway.
+ */
 const COUNTRY_ALIASES = {
+  'India (Tamil Nadu)': 'India',
   'Viet Nam': 'Vietnam',
   'Lao PDR': 'Laos',
   'Korea, Rep.': 'South Korea',
@@ -146,6 +167,12 @@ for (const [line, record] of records.entries()) {
     continue;
   }
 
+  const workers = WORKER_IDS[record.workers];
+  if (!workers) {
+    errors.push(`${where}: unknown worker group "${record.workers}"`);
+    continue;
+  }
+
   const name = COUNTRY_ALIASES[record.country] || record.country;
   const country = byName.get(name);
   if (!country) {
@@ -180,6 +207,7 @@ for (const [line, record] of records.entries()) {
       ];
 
   const facts = [];
+  if (record.workers) facts.push(['Worker group', record.workers]);
   if (record.agency) facts.push(['Implementing agency', record.agency]);
   if (record.impact) facts.push(['Coverage & key features', record.impact]);
   if (record.sources) facts.push(['Source', record.sources]);
@@ -190,6 +218,8 @@ for (const [line, record] of records.entries()) {
     a2: country.a2,
     lonlat,
     category,
+    workers,
+    workersLabel: record.workers,
     title: record.scheme,
     summary: summarize(record.description),
     detail: record.description,
@@ -214,6 +244,8 @@ if (errors.length) {
 const countries = new Set(practices.map((p) => p.a2));
 const perCategory = {};
 for (const p of practices) perCategory[p.category] = (perCategory[p.category] || 0) + 1;
+const perWorkers = {};
+for (const p of practices) perWorkers[p.workers] = (perWorkers[p.workers] || 0) + 1;
 
 const banner = `/**
  * GENERATED FILE — do not edit by hand.
@@ -231,6 +263,10 @@ fs.writeFileSync(
 
 console.log(`\n  js/practices-data.js: ${practices.length} practices, ${countries.size} countries`);
 for (const [id, n] of Object.entries(perCategory).sort((a, b) => b[1] - a[1])) {
+  console.log(`    ${String(n).padStart(3)}  ${id}`);
+}
+console.log();
+for (const [id, n] of Object.entries(perWorkers).sort((a, b) => b[1] - a[1])) {
   console.log(`    ${String(n).padStart(3)}  ${id}`);
 }
 console.log();
