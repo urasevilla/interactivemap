@@ -80,7 +80,7 @@ export const CATEGORIES = [
     id: 'advocacy',
     barrier:
       'Without a union or cooperative to organize through, informal workers have no collective voice to negotiate for coverage or hold schemes accountable.',
-    label: 'Association & Representation',
+    label: 'Association',
     short: 'Association',
     blurb: 'Collective bargaining and representation.',
     detail:
@@ -122,7 +122,7 @@ export const FEATURED = (() => {
 export const CONTEXT = {
   title: 'Global Good Practices: Extending Social Insurance to Informal and Self-Employed Workers',
   standfirst:
-    'Workers in the informal economy — street vendors, domestic workers, home-based workers, waste pickers — are largely locked out of social insurance. Contributions are often unaffordable given irregular incomes, registration systems assume a formal employer, benefits rarely match real needs, and many workers simply don’t know what they’re entitled to. Countries are testing different fixes: matching contributions, mobile registration, portable benefits across jobs, and outreach through worker organizations. This map tracks such practices across countries, organized around the workers and barriers they target.',
+    'Workers in the informal economy are largely locked out of social insurance. Contributions are often unaffordable given irregular incomes, registration systems assume a formal employer, benefits rarely match real needs, and many workers simply don’t know what they’re entitled to. Countries are testing different fixes: matching contributions, mobile registration, portable benefits across jobs, and outreach through worker organizations. This map tracks such practices across countries, organized around the workers and barriers they target.',
   stats: [
     {
       value: '56%',

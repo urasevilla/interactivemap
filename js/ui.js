@@ -56,6 +56,28 @@ export function el(spec, ...rest) {
 }
 
 /**
+ * Replaces an element's children, with the same contract as {@link el}:
+ * nullish and false entries are skipped, arrays are flattened.
+ *
+ * replaceChildren stringifies anything that is not a Node, so handing it a
+ * `condition ? el(...) : null` writes the literal word "null" onto the page.
+ * That is exactly what appeared under the context card's numbers.
+ */
+export function setChildren(node, ...items) {
+  const out = [];
+  const add = (item) => {
+    if (item == null || item === false) return;
+    if (Array.isArray(item)) {
+      for (const child of item) add(child);
+      return;
+    }
+    out.push(item instanceof Node ? item : document.createTextNode(String(item)));
+  };
+  for (const item of items) add(item);
+  node.replaceChildren(...out);
+}
+
+/**
  * Applies a style object. Custom properties have to go through setProperty —
  * assigning them onto the CSSStyleDeclaration silently does nothing, which is
  * how every category colour on this page once came out the same orange.
@@ -305,7 +327,8 @@ export function buildContext(container) {
     );
 
     if (lens) {
-      body.replaceChildren(
+      setChildren(
+        body,
         el(
           'div.context__lens',
           { style: { '--c': lens.color } },
@@ -322,7 +345,8 @@ export function buildContext(container) {
       return;
     }
 
-    body.replaceChildren(
+    setChildren(
+      body,
       el('p.context__text', CONTEXT.standfirst),
       el(
         'ul.context__barriers',
@@ -665,6 +689,8 @@ export class CountryPanel {
     this.root = document.getElementById('panel');
     this.body = document.getElementById('panel-body');
     this.current = null;
+    /** Practice cards the reader has expanded, kept across refreshes. */
+    this.open = new Set();
 
     document.getElementById('panel-close').addEventListener('click', () => {
       this.close();
@@ -672,21 +698,53 @@ export class CountryPanel {
     });
 
     this.store.addEventListener('change', () => {
-      if (this.current) this.render(this.current.record, this.current.openPractice);
+      if (!this.current) return;
+      /* The notes backend polls every few seconds. Rebuilding the panel on
+         every poll threw the reader back to the top of whatever they were
+         reading and collapsed the practice they had open — so only rebuild
+         when this country's notes have actually changed, and keep their place
+         when it happens. */
+      const notes = this._noteSignature(this.current.record.a2);
+      if (notes === this.current.notes) return;
+      this.render(this.current.record, this.current.openPractice, { keepScroll: true });
     });
   }
 
   close() {
     this.root.hidden = true;
     this.current = null;
+    this.open.clear();
   }
 
   /**
    * @param {object} record          the world-index record for the country
    * @param {string} [openPracticeId] a practice to expand on open
    */
-  render(record, openPracticeId) {
-    this.current = { record, openPractice: openPracticeId };
+  /** Identifies this country's visible notes, so a poll that changed nothing
+      does not rebuild the panel under the reader. */
+  _noteSignature(a2) {
+    return this.store
+      .forCountry(a2, this.auth.noteScope)
+      .map((n) => `${n.id}:${n.approved ? 1 : 0}`)
+      .join(',');
+  }
+
+  /**
+   * @param {object} record            the world-index record for the country
+   * @param {string} [openPracticeId]  a practice to expand on open
+   * @param {{keepScroll?: boolean}} [options] keep the reader's place, for a
+   *   refresh they did not ask for
+   */
+  render(record, openPracticeId, { keepScroll = false } = {}) {
+    /* Selecting a country starts at the top; a background refresh does not. */
+    const scrollBack = keepScroll ? this.body.scrollTop : 0;
+    if (this.current?.record.key !== record.key) this.open.clear();
+    if (openPracticeId) this.open.add(openPracticeId);
+    this.current = {
+      record,
+      openPractice: openPracticeId,
+      notes: this._noteSignature(record.a2),
+    };
     this.root.hidden = false;
 
     const entry = FEATURED.get(record.a2);
@@ -720,7 +778,7 @@ export class CountryPanel {
         el(
           'section.panel__section',
           el('h3.panel__section-title', 'Good practices'),
-          practices.map((practice) => this._practiceCard(practice, practice.id === openPracticeId)),
+          practices.map((practice) => this._practiceCard(practice, this.open.has(practice.id))),
         ),
       );
     }
@@ -768,7 +826,7 @@ export class CountryPanel {
 
     parts.push(el('section.panel__section', noteChildren));
     this.body.replaceChildren(...parts);
-    this.body.scrollTop = 0;
+    this.body.scrollTop = scrollBack;
   }
 
   _practiceCard(practice, open) {
@@ -822,6 +880,8 @@ export class CountryPanel {
       const nowOpen = !card.classList.contains('is-open');
       card.classList.toggle('is-open', nowOpen);
       head.setAttribute('aria-expanded', String(nowOpen));
+      if (nowOpen) this.open.add(practice.id);
+      else this.open.delete(practice.id);
       if (this.current) this.current.openPractice = nowOpen ? practice.id : null;
     });
 

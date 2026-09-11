@@ -404,8 +404,9 @@ check(
 );
 check(
   'the framing paragraph is the one the host wrote',
-  /street vendors, domestic workers, home-based workers, waste pickers/.test(contextDefault.text) &&
-    /organized around the workers and barriers they target/.test(contextDefault.text),
+  /^Workers in the informal economy are largely locked out of social insurance/.test(
+    contextDefault.text.trim(),
+  ) && /organized around the workers and barriers they target/.test(contextDefault.text),
   contextDefault.text.slice(0, 80),
 );
 check(
@@ -418,6 +419,35 @@ check(
   contextDefault.stats.join(' | '),
 );
 check('no single-lens panel is shown unfiltered', contextDefault.lens === 0);
+
+/* replaceChildren stringifies non-Nodes, so a skipped conditional child used
+   to write the literal word "null" under the numbers. */
+const strayNull = await page.evaluate(() => {
+  const walker = document.createTreeWalker(document.getElementById('app'), NodeFilter.SHOW_TEXT);
+  const hits = [];
+  let node;
+  while ((node = walker.nextNode())) {
+    if (/(^|[\s(])null([\s).,]|$)/i.test((node.nodeValue || '').trim())) {
+      hits.push(`${node.parentElement?.className}: ${node.nodeValue.trim().slice(0, 40)}`);
+    }
+  }
+  return hits;
+});
+check('no stray "null" is rendered anywhere', strayNull.length === 0, strayNull.join(' | '));
+
+check(
+  'the fifth A is named Association',
+  contextDefault.barriers.includes('Association') &&
+    (await page.evaluate(() =>
+      [...document.querySelectorAll('.legend__name--full')].some((n) => n.textContent === 'Association'),
+    )),
+  contextDefault.barriers.join(' / '),
+);
+check(
+  'the framing paragraph does not list occupations',
+  !/street vendors/.test(contextDefault.text),
+  contextDefault.text.slice(0, 90),
+);
 
 /* Selecting a lens narrows the card to that barrier and what is on the map. */
 await page.locator('.legend__item[data-category="affordability"]').click();
@@ -1077,6 +1107,90 @@ const xss = await mobile.evaluate(() => ({
   shownAsText: [...document.querySelectorAll('.note__text')].some((n) => n.textContent.includes('<img')),
 }));
 check('note markup is escaped, not executed', !xss.fired && xss.images === 0 && xss.shownAsText);
+
+/**
+ * A background refresh must not move the reader.
+ *
+ * The notes backend polls, and every poll fired a store change that rebuilt
+ * the country panel — throwing whoever was reading it back to the top and
+ * collapsing the practice they had open. Worst on a phone, where the panel is
+ * a bottom sheet and almost everything is below the fold.
+ *
+ * Driven through the real mechanism: a second document on the same origin
+ * writes a note and broadcasts it, exactly as another device's tab would.
+ */
+await mobile.evaluate(() => {
+  document.querySelector('.practice__head')?.click();
+  document.getElementById('panel-body').scrollTop = 180;
+});
+await mobile.waitForTimeout(300);
+
+const panelScroll = await mobile.evaluate(() => {
+  const body = document.getElementById('panel-body');
+  return { top: body.scrollTop, room: body.scrollHeight - body.clientHeight };
+});
+
+/* A bare same-origin document, so the writer does not boot a second WebGL map. */
+const writer = await phone.newPage();
+await writer.goto(`http://localhost:${PORT}/config.js`, { waitUntil: 'domcontentloaded' });
+const writeNote = (a2, country, text) =>
+  writer.evaluate(
+    ([code, name, body]) => {
+      const key = 'wiego-map.notes.v1';
+      const notes = JSON.parse(localStorage.getItem(key) || '[]');
+      notes.push({
+        id: 'n_' + Math.random().toString(36).slice(2, 12),
+        a2: code,
+        country: name,
+        text: body,
+        author: 'Another phone',
+        category: null,
+        createdAt: Date.now(),
+        approved: true,
+        visitorId: 'v_other',
+      });
+      localStorage.setItem(key, JSON.stringify(notes));
+      new BroadcastChannel('wiego-map.notes').postMessage('changed');
+    },
+    [a2, country, text],
+  );
+
+await writeNote('ke', 'Kenya', 'A note about a country the reader is not looking at.');
+await mobile.waitForTimeout(900);
+const afterOther = await mobile.evaluate(() => ({
+  top: document.getElementById('panel-body').scrollTop,
+  open: document.querySelectorAll('.practice.is-open').length,
+}));
+check(
+  'the country panel has something to scroll on a phone',
+  panelScroll.room >= 40 && panelScroll.top > 0,
+  `${panelScroll.room}px of room, scrolled to ${panelScroll.top}`,
+);
+check(
+  'a note on another country does not disturb the open panel',
+  afterOther.top === panelScroll.top && afterOther.open >= 1,
+  `was ${panelScroll.top} (room ${panelScroll.room}), now ${JSON.stringify(afterOther)}`,
+);
+
+await writeNote('th', 'Thailand', 'A note that does belong on this country.');
+await mobile.waitForTimeout(900);
+const afterSame = await mobile.evaluate(() => ({
+  top: document.getElementById('panel-body').scrollTop,
+  open: document.querySelectorAll('.practice.is-open').length,
+  notes: document.querySelectorAll('#panel .note').length,
+  text: document.getElementById('panel-body').innerText,
+}));
+check(
+  'a note on this country arrives without scrolling the reader away',
+  afterSame.top === panelScroll.top && afterSame.open >= 1,
+  `was ${panelScroll.top}, now top ${afterSame.top}, ${afterSame.open} open`,
+);
+check(
+  'the new note is actually shown',
+  /does belong on this country/.test(afterSame.text),
+  `${afterSame.notes} notes`,
+);
+await writer.close();
 
 /* ---- 3. Controller ---- */
 
