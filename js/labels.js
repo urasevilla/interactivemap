@@ -138,25 +138,37 @@ export class LabelLayer {
     for (const entry of this.entries) {
       const isFeatured = entry.featured;
 
-      if (compact && zoom < (isFeatured ? COMPACT_FEATURED_ZOOM : COMPACT_PLAIN_ZOOM)) {
-        this._hide(entry);
-        continue;
-      }
+      /* Whatever is under the pointer is named, whether or not it carries a
+         practice and whether or not the zoom has earned it a chip yet. Most
+         of the map is countries with nothing mapped, and "what is this one?"
+         should not require zooming in until the name happens to appear. */
+      const isHovered = entry.record.key === map.hovered;
 
-      /* A filter dims the map; unrelated names would just add noise. */
-      if (filtered && isFeatured && !countryMatches(entry.record.a2, map.filter, map.workerFilter)) {
-        this._hide(entry);
-        continue;
-      }
-
-      if (!isFeatured) {
-        /* Plain labels appear as you zoom in, biggest countries first. The
-           threshold slides with area so the map fills gradually. */
-        const areaRank = Math.min(1, entry.area / 260);
-        const needed = (compact ? COMPACT_PLAIN_ZOOM : PLAIN_LABEL_ZOOM) + (1 - areaRank) * 0.42;
-        if (zoom < needed) {
+      if (!isHovered) {
+        if (compact && zoom < (isFeatured ? COMPACT_FEATURED_ZOOM : COMPACT_PLAIN_ZOOM)) {
           this._hide(entry);
           continue;
+        }
+
+        /* A filter dims the map; unrelated names would just add noise. */
+        if (
+          filtered &&
+          isFeatured &&
+          !countryMatches(entry.record.a2, map.filter, map.workerFilter)
+        ) {
+          this._hide(entry);
+          continue;
+        }
+
+        if (!isFeatured) {
+          /* Plain labels appear as you zoom in, biggest countries first. The
+             threshold slides with area so the map fills gradually. */
+          const areaRank = Math.min(1, entry.area / 260);
+          const needed = (compact ? COMPACT_PLAIN_ZOOM : PLAIN_LABEL_ZOOM) + (1 - areaRank) * 0.42;
+          if (zoom < needed) {
+            this._hide(entry);
+            continue;
+          }
         }
       }
 
@@ -171,7 +183,14 @@ export class LabelLayer {
         continue;
       }
 
-      candidates.push({ entry, x: screen.x, y: screen.y, priority: isFeatured ? 0 : 1 });
+      /* The hovered name is placed before anything else, so it always finds
+         a slot rather than giving way to a chip that was already there. */
+      candidates.push({
+        entry,
+        x: screen.x,
+        y: screen.y,
+        priority: isHovered ? -1 : isFeatured ? 0 : 1,
+      });
     }
 
     candidates.sort(

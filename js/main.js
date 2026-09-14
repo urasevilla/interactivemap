@@ -516,6 +516,12 @@ function startLoop() {
     return lowest;
   };
 
+  /* Whichever country the pointer is over, for the hover-label assertions. */
+  window.__mapHovered = () => map.hovered;
+
+  /* A country's current extrusion height, to prove it lies flat until used. */
+  window.__mapHeight = (key) => map.countries.get(key)?.height ?? null;
+
   /* Hide the practice pins, so a screenshot can judge the land underneath. */
   window.__mapPins = (visible) => {
     map.pinGroup.visible = visible;

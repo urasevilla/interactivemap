@@ -199,11 +199,14 @@ arrives on screen as Equal Earth and the extruded relief keeps one depth from
 edge to edge. `tools/check.mjs` asserts it by measuring 60°N and 60°S against
 the equator, at the home view and zoomed out.
 
-**Relief is proportional to the land.** Every country is an extruded solid,
-and a fixed wall height reads as depth on a continent but as a smear on an
-island — the Philippines at world zoom was a blur, because each island's wall
-stood as tall as the island is wide. Walls are capped at a fraction of their
-own ring's width, so Brazil keeps its relief and Luzon gets a sliver of it.
+**Countries lie flat until you touch them.** Every country is an extruded
+solid, and an extrusion shows a wall along every coast that the map's tilt
+projects seaward — at rest that read as a ragged dark skirt off India's west
+coast and off every island in the Philippines, a rendering artifact rather than
+depth. Height is an interaction signal now: the map rests flat, and a country
+lifts when hovered or selected, where the relief means something and only one
+country carries it. Walls are still capped at a fraction of their own ring's
+width, so a lifted archipelago does not bury its own islands.
 
 **A phone opens part-way in.** Fitting the whole projection to a 390px screen
 gives each country about four pixels, so a narrow viewport opens over the belt

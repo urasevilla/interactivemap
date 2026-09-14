@@ -336,7 +336,10 @@ export function buildContext(container) {
           el(
             'div',
             el('h3.context__lens-name', lens.short),
-            el('p.context__lens-text', lens.barrier),
+            /* Under a lens the card says what these practices do. The barrier
+               they answer is in the unfiltered list; repeating it beside a map
+               of the fixes reads as a complaint rather than an answer. */
+            el('p.context__lens-text', lens.approach),
           ),
         ),
         group ? el('p.context__filtered', `Filtered to ${group.label.toLowerCase()}.`) : null,

@@ -389,10 +389,82 @@ check(
   `Brazil base ${relief.brazil?.toFixed(2)}, Russia ${relief.russia?.toFixed(2)}`,
 );
 
+/**
+ * At rest every country lies flat.
+ *
+ * An extruded solid casts its coastal wall seaward under the map's tilt, which
+ * read as a ragged dark skirt off India's west coast rather than as depth.
+ * Height is an interaction signal now: flat until hovered or selected.
+ */
+const resting = await page.evaluate(() => ({
+  india: window.__mapHeight('in'),
+  brazil: window.__mapHeight('br'),
+  chad: window.__mapHeight('td'),
+}));
+check(
+  'countries lie flat until they are touched',
+  resting.india < 0.02 && resting.brazil < 0.02 && resting.chad < 0.02,
+  JSON.stringify(resting),
+);
+
+/* Hovering has to lift the country it names, or the 3D says nothing. */
+const hoverSpot = await page.evaluate(() => {
+  const point = window.__mapPoint(79, 21); // central India
+  const rect = document.getElementById('map').getBoundingClientRect();
+  return { x: rect.left + point.x, y: rect.top + point.y };
+});
+await page.mouse.move(hoverSpot.x, hoverSpot.y);
+await page.waitForTimeout(600);
+const hovered = await page.evaluate(() => ({
+  key: window.__mapHovered(),
+  height: window.__mapHeight('in'),
+}));
+check(
+  'hovering lifts the country under the pointer',
+  hovered.key === 'in' && hovered.height > 0.04,
+  JSON.stringify(hovered),
+);
+
+/**
+ * And names it, practice or not. Most of the map is countries with nothing
+ * mapped, and "what is this one?" should not need a zoom until the chip
+ * happens to appear.
+ */
+const plainSpot = await page.evaluate(() => {
+  const point = window.__mapPoint(19, 15); // Chad, no mapped practice
+  const rect = document.getElementById('map').getBoundingClientRect();
+  return { x: rect.left + point.x, y: rect.top + point.y };
+});
+await page.mouse.move(plainSpot.x, plainSpot.y);
+await page.waitForTimeout(600);
+const namedOnHover = await page.evaluate(() => ({
+  key: window.__mapHovered(),
+  hot: document.querySelector('.label--hot .label__name')?.textContent || '',
+  shown: [...document.querySelectorAll('.label')]
+    .filter((l) => l.style.display !== 'none')
+    .map((l) => l.querySelector('.label__name').textContent),
+}));
+check(
+  'hovering names a country that has no practice',
+  namedOnHover.key === 'td' &&
+    namedOnHover.hot === 'Chad' &&
+    namedOnHover.shown.includes('Chad'),
+  JSON.stringify({ key: namedOnHover.key, hot: namedOnHover.hot }),
+);
+
+/* Leaving the map puts it away again. */
+await page.mouse.move(hoverSpot.x, 5);
+await page.waitForTimeout(600);
+check(
+  'the hovered name goes away with the pointer',
+  await page.evaluate(() => !document.querySelector('.label--hot')),
+);
+
 /* --- Context: the whole framework unfiltered, one barrier under a lens --- */
 
 const contextDefault = await page.evaluate(() => ({
   barriers: [...document.querySelectorAll('.context__barrier-name')].map((n) => n.textContent),
+  barrierText: [...document.querySelectorAll('.context__barrier-text')].map((n) => n.textContent),
   text: document.querySelector('.context__text')?.textContent || '',
   stats: [...document.querySelectorAll('.stat__label')].map((n) => n.textContent),
   lens: document.querySelectorAll('.context__lens').length,
@@ -406,7 +478,7 @@ check(
   'the framing paragraph is the one the host wrote',
   /^Workers in the informal economy are largely locked out of social insurance/.test(
     contextDefault.text.trim(),
-  ) && /organized around the workers and barriers they target/.test(contextDefault.text),
+  ) && /organized by the workers and barriers they target:$/.test(contextDefault.text.trim()),
   contextDefault.text.slice(0, 80),
 );
 check(
@@ -458,12 +530,29 @@ const contextLens = await page.evaluate(() => ({
   barriers: document.querySelectorAll('.context__barrier').length,
   stats: [...document.querySelectorAll('.stat__value')].map((n) => Number(n.textContent)),
 }));
+/**
+ * Under a lens the card describes the practices, not the problem.
+ *
+ * The barrier belongs to the unfiltered list; repeating it beside a map of the
+ * fixes told a visitor what is wrong rather than what is being done about it.
+ */
 check(
-  'a selected lens swaps the card to that barrier alone',
-  contextLens.name === 'Affordability' &&
-    /out of reach for irregular, low, or seasonal incomes/.test(contextLens.text) &&
-    contextLens.barriers === 0,
+  'a selected lens swaps the card to that one lever alone',
+  contextLens.name === 'Affordability' && contextLens.barriers === 0,
   JSON.stringify(contextLens),
+);
+check(
+  'the lens describes the practices rather than the barrier',
+  /monotax|matching|subsidised|ramp-ups/i.test(contextLens.text) &&
+    !/don.t fit irregular, seasonal or low incomes/i.test(contextLens.text),
+  contextLens.text.slice(0, 110),
+);
+/* Captured before the lens was selected — the list is not on screen now. */
+check(
+  'the unfiltered list states the barriers',
+  contextDefault.barrierText.some((t) => /don.t fit irregular, seasonal or low incomes/.test(t)) &&
+    contextDefault.barrierText.some((t) => /no collective voice to negotiate coverage/.test(t)),
+  contextDefault.barrierText.join(' | ').slice(0, 120),
 );
 const affordabilityCount = countPractices('affordability', null);
 check(

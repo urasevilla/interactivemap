@@ -22,10 +22,23 @@ import {
 import { CATEGORY_BY_ID, FEATURED, categoriesFor, countryMatches } from './practices.js';
 
 /* Scene constants, in projection units (the equator is ~5.4 units wide). */
-const H_BASE = 0.028; // resting height of a country with no practice
-const H_FEATURED = 0.075; // resting height of a country that has one
-const H_HOVER = 1.7; // multiplier applied on hover
-const H_SELECT = 2.3; // multiplier applied on selection
+
+/**
+ * Countries lie flat until you touch them.
+ *
+ * An extruded solid shows a wall along every coast, and under the map's tilt
+ * that wall projects seaward: at rest it read as a ragged dark skirt hanging
+ * off India's west coast and off every island in the Philippines — a
+ * rendering artifact, not depth. Height is now an interaction signal rather
+ * than decoration. The resting values are just enough to clear the ocean
+ * plane without z-fighting and to keep a practice country a hair proud of its
+ * neighbours; the lift arrives on hover and selection, where it means
+ * something and where only one country carries it.
+ */
+const H_BASE = 0.004; // resting height of a country with no practice
+const H_FEATURED = 0.010; // resting height of a country that has one
+const H_HOVER = 0.055; // absolute height while hovered
+const H_SELECT = 0.085; // absolute height while selected
 
 /**
  * The camera is orthographic. A perspective camera looking at a tilted plane
@@ -99,6 +112,14 @@ const MIN_WALL_AREA = 5e-5;
  */
 const WALL_TO_RING_SIZE = 0.32;
 const MIN_WALL_FRACTION = 0.12;
+
+/**
+ * Walls are sized against the tallest a country ever stands, not its resting
+ * height — otherwise every ring would bake a full-height wall (they are all
+ * far larger than the resting height now) and the smear would come back the
+ * moment a small country was hovered.
+ */
+const WALL_REFERENCE = H_SELECT;
 
 const COL_LAND = new THREE.Color('#DCD2BE');
 const COL_LAND_NEUTRAL = new THREE.Color('#D3C9B6');
@@ -285,8 +306,7 @@ export class WorldMap {
         polygons,
         borderSegments,
         outlineSegments,
-        restHeight,
-        restHeight + 0.003,
+        restHeight + 0.0015,
       );
       if (!built) continue;
 
@@ -353,7 +373,7 @@ export class WorldMap {
    * Border segments for the merged line layer are collected as a side effect,
    * since the ring walk already has the vertices in hand.
    */
-  _extrude(polygons, borderSegments, outlineSegments, restHeight, borderZ) {
+  _extrude(polygons, borderSegments, outlineSegments, borderZ) {
     const positions = [];
     const normals = [];
     const indices = [];
@@ -413,7 +433,7 @@ export class WorldMap {
             const wallBase =
               1 -
               THREE.MathUtils.clamp(
-                (WALL_TO_RING_SIZE * ringSize) / restHeight,
+                (WALL_TO_RING_SIZE * ringSize) / WALL_REFERENCE,
                 MIN_WALL_FRACTION,
                 1,
               );
@@ -954,8 +974,10 @@ export class WorldMap {
       if (filtered && entry.featured && !this._matches(entry.record.a2)) {
         height = H_BASE;
       }
-      if (entry.key === this.hovered) height *= H_HOVER;
-      if (entry.key === this.selected) height *= H_SELECT;
+      /* Absolute, not a multiple of the resting height — at rest a country is
+         flat, so a multiplier would lift it by nothing. */
+      if (entry.key === this.hovered) height = Math.max(height, H_HOVER);
+      if (entry.key === this.selected) height = Math.max(height, H_SELECT);
       entry.targetHeight = height;
 
       const lit = entry.key === this.hovered || entry.key === this.selected;

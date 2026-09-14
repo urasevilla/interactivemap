@@ -31,7 +31,9 @@ export const CATEGORIES = [
   {
     id: 'affordability',
     barrier:
-      'Contributions indexed to formal salaries are out of reach for irregular, low, or seasonal incomes.',
+      'Contributions tied to formal salaries don’t fit irregular, seasonal or low incomes.',
+    approach:
+      'Contribution rates, schedules and entry costs are rebuilt around irregular earnings: flat monotax payments that fold tax and social security into one, government matching, subsidised rates for low earners, and phased ramp-ups to the full contribution.',
     label: 'Affordability',
     short: 'Affordability',
     blurb: 'Financial entry barriers reduced.',
@@ -43,7 +45,9 @@ export const CATEGORIES = [
   {
     id: 'access',
     barrier:
-      'Registration and enrollment systems assume a formal employer, ID, or fixed workplace informal workers don’t have.',
+      'Registration assumes a single and formal employer, ID, or fixed workplace.',
+    approach:
+      'Registration and collection are brought to where workers already are — one-stop shops, mobile and phone-based enrolment, union and cooperative agents acting for members, and paperwork that stops assuming a formal employer.',
     label: 'Access',
     short: 'Access',
     blurb: 'Outreach and registration simplified.',
@@ -55,7 +59,9 @@ export const CATEGORIES = [
   {
     id: 'adequacy',
     barrier:
-      'Even when workers get in, benefit levels and coverage often don’t match their real risks or needs.',
+      'Benefits often don’t match workers’ real risks or needs.',
+    approach:
+      'Benefit packages are reshaped around the risks these workers actually carry: health and maternity cover, injury and sickness pay, and entitlements that stay with the worker as they move between jobs.',
     label: 'Attractiveness & Adequacy',
     short: 'Adequacy',
     blurb: 'Meaningful, relevant benefits.',
@@ -67,7 +73,9 @@ export const CATEGORIES = [
   {
     id: 'awareness',
     barrier:
-      'Many eligible workers simply don’t know a scheme exists or how to use it.',
+      'Many eligible workers don’t know a scheme exists.',
+    approach:
+      'Schemes go out and explain themselves in the languages and channels workers use — peer educators, radio and messaging campaigns, and sustained financial-literacy work rather than one-off drives.',
     label: 'Awareness',
     short: 'Awareness',
     blurb: 'Proactive information and education.',
@@ -79,7 +87,9 @@ export const CATEGORIES = [
   {
     id: 'advocacy',
     barrier:
-      'Without a union or cooperative to organize through, informal workers have no collective voice to negotiate for coverage or hold schemes accountable.',
+      'Without a union or cooperative, workers have no collective voice to negotiate coverage.',
+    approach:
+      'Workers’ own organizations negotiate terms, sit on governing boards and act as the administrative bridge to the scheme, so informal workers help design what they are asked to join.',
     label: 'Association',
     short: 'Association',
     blurb: 'Collective bargaining and representation.',
@@ -122,7 +132,7 @@ export const FEATURED = (() => {
 export const CONTEXT = {
   title: 'Global Good Practices: Extending Social Insurance to Informal and Self-Employed Workers',
   standfirst:
-    'Workers in the informal economy are largely locked out of social insurance. Contributions are often unaffordable given irregular incomes, registration systems assume a formal employer, benefits rarely match real needs, and many workers simply don’t know what they’re entitled to. Countries are testing different fixes: matching contributions, mobile registration, portable benefits across jobs, and outreach through worker organizations. This map tracks such practices across countries, organized around the workers and barriers they target.',
+    'Workers in the informal economy are largely locked out of social insurance — contributions don’t fit irregular incomes, systems assume a formal employer, benefits miss real needs, and workers often don’t know what’s available or have no way to organize for it. Countries are testing fixes: matching contributions, mobile registration, portable benefits, worker-led outreach. This map tracks those practices, organized by the workers and barriers they target:',
   stats: [
     {
       value: '56%',
