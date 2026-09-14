@@ -173,7 +173,11 @@ map, a missing scheme name — is a hard error that writes nothing, rather than 
 silent drop that would leave a country quietly unlit at the booth.
 
 Columns it expects: `category`, `workers`, `country`, `agency`, `scheme`,
-`description`, `impact`, `sources`.
+`description`, `impact`, `sources`, `verification`.
+
+`sources` and `verification` are both optional, and a card simply omits
+whichever the current export leaves blank — the sheet has carried per-row
+sources in some versions and a verification status in others.
 
 `workers` drives the worker-group filter, and its permitted values are the
 labels in `WORKER_IDS` (`tools/import-practices.mjs`), kept in step with

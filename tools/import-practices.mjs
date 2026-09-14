@@ -102,6 +102,7 @@ const WORKER_IDS = {
  */
 const COUNTRY_ALIASES = {
   'India (Tamil Nadu)': 'India',
+  'United States (New York State)': 'United States of America',
   'Viet Nam': 'Vietnam',
   'Lao PDR': 'Laos',
   'Korea, Rep.': 'South Korea',
@@ -210,7 +211,11 @@ for (const [line, record] of records.entries()) {
   if (record.workers) facts.push(['Worker group', record.workers]);
   if (record.agency) facts.push(['Implementing agency', record.agency]);
   if (record.impact) facts.push(['Coverage & key features', record.impact]);
+  /* Both optional: the sheet has carried sources in some exports and a
+     verification status in others, and a booth card simply omits whichever
+     the current export does not provide. */
   if (record.sources) facts.push(['Source', record.sources]);
+  if (record.verification) facts.push(['Verification', record.verification]);
 
   practices.push({
     id: makeId(country.a2, record.scheme, taken),
@@ -226,6 +231,7 @@ for (const [line, record] of records.entries()) {
     impact: record.impact || null,
     agency: record.agency || null,
     sources: record.sources || null,
+    verification: record.verification || null,
     facts,
   });
 }
