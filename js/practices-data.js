@@ -4,7 +4,7 @@
  * Source:    data/source/good-practices.csv
  * Regenerate: npm run import
  *
- * 73 practices across 48 countries.
+ * 65 practices across 44 countries.
  */
 
 export const PRACTICES = [
@@ -24,8 +24,7 @@ export const PRACTICES = [
     "detail": "Unified monotax regime combining tax and social security into a single flat payment with a progressive, stepped contribution scale (25% in Year 1 to 100% in Year 4). The 2006 reform eased eligibility restrictions and admitted one-person businesses.",
     "impact": "ILO records annual registration growth of one-person businesses rising from 1.3% per year (2002–2006) to 6.5% per year (2007–2009), roughly 12,722 additional registrations. Covers about 23% of the target population.",
     "agency": "Banco de Previsión Social (BPS) & MIDES",
-    "sources": null,
-    "verification": "Partly verified",
+    "sources": "ILO ESS Document No. 42 (2013); ILO (2017) Innovations in extending social insurance coverage to independent workers; ILO WP 176; WIEGO Monotax Uruguay",
     "facts": [
       [
         "Worker group",
@@ -40,8 +39,8 @@ export const PRACTICES = [
         "ILO records annual registration growth of one-person businesses rising from 1.3% per year (2002–2006) to 6.5% per year (2007–2009), roughly 12,722 additional registrations. Covers about 23% of the target population."
       ],
       [
-        "Verification",
-        "Partly verified"
+        "Source",
+        "ILO ESS Document No. 42 (2013); ILO (2017) Innovations in extending social insurance coverage to independent workers; ILO WP 176; WIEGO Monotax Uruguay"
       ]
     ]
   },
@@ -59,10 +58,9 @@ export const PRACTICES = [
     "title": "Simples Nacional / MEI & Previdência Rural (Segurado Especial)",
     "summary": "Monotax mechanism consolidating federal, state and municipal taxes with social security into a single monthly payment.",
     "detail": "Monotax mechanism consolidating federal, state and municipal taxes with social security into a single monthly payment. Individual Micro Entrepreneurs (MEI/IME) pay a fixed monthly amount (about BRL 55.90 in 2018), with the social security component set at 5% of the minimum wage; micro and small enterprises pay a variable monotax of 4.00%–24.50% of turnover across five activity categories. Rural subsistence farmers (segurado especial) contribute a levy on the gross sales value of their production rather than on wages.",
-    "impact": "7.7 million Individual Micro Entrepreneurs and 5 million micro and small enterprises were registered under the regime in 2018, together 98% of all formally registered companies; the 5 million MSEs employed 10.6 million formal workers, 26.7% of total formal employment. Access to social security was the single largest stated motive for registering (32.2%). The share of individual micro-entrepreneurs registered rose from 33% in 2009 to 41.7% in 2015, and 4.9 million MSEs had applied to Simples Nacional by 2017. MEI registrations reached 11.5 million active by late 2024. Roughly one in four own-account workers is protected under the rural pension regime.",
+    "impact": "7.7 million Individual Micro Entrepreneurs and 5 million micro and small enterprises were registered under the regime in 2018, together 98% of all formally registered companies; the 5 million MSEs employed 10.6 million formal workers, 26.7% of total formal employment. Access to social security was the single largest stated motive for registering (32.2%). MEI registrations reached 11.5 million active by late 2024. Roughly one in four own-account workers is protected under the rural pension regime.",
     "agency": "Receita Federal & INSS",
-    "sources": null,
-    "verification": "Corrected",
+    "sources": "ILO (2019) The monotax regime in Brazil (wcms_715864); INSS (gov.br) Contribuição do Segurado Especial; Sebrae/Receita Federal 2024",
     "facts": [
       [
         "Worker group",
@@ -74,11 +72,11 @@ export const PRACTICES = [
       ],
       [
         "Coverage & key features",
-        "7.7 million Individual Micro Entrepreneurs and 5 million micro and small enterprises were registered under the regime in 2018, together 98% of all formally registered companies; the 5 million MSEs employed 10.6 million formal workers, 26.7% of total formal employment. Access to social security was the single largest stated motive for registering (32.2%). The share of individual micro-entrepreneurs registered rose from 33% in 2009 to 41.7% in 2015, and 4.9 million MSEs had applied to Simples Nacional by 2017. MEI registrations reached 11.5 million active by late 2024. Roughly one in four own-account workers is protected under the rural pension regime."
+        "7.7 million Individual Micro Entrepreneurs and 5 million micro and small enterprises were registered under the regime in 2018, together 98% of all formally registered companies; the 5 million MSEs employed 10.6 million formal workers, 26.7% of total formal employment. Access to social security was the single largest stated motive for registering (32.2%). MEI registrations reached 11.5 million active by late 2024. Roughly one in four own-account workers is protected under the rural pension regime."
       ],
       [
-        "Verification",
-        "Corrected"
+        "Source",
+        "ILO (2019) The monotax regime in Brazil (wcms_715864); INSS (gov.br) Contribuição do Segurado Especial; Sebrae/Receita Federal 2024"
       ]
     ]
   },
@@ -96,10 +94,9 @@ export const PRACTICES = [
     "title": "Mandatory Insurance for Self-Employed (Inversely Proportional Subsidies)",
     "summary": "Categorized contribution scale based on reference income brackets, where state matching subsidies are inversely proportional to worker income.",
     "detail": "Categorized contribution scale based on reference income brackets, where state matching subsidies are inversely proportional to worker income. The state covers the difference between the worker's contribution and the full rate, plus an additional 0.25% of wages. CCSS also deploys specialised inspectors dedicated to overseeing the registration of self-employed workers.",
-    "impact": "Between 2005 and 2009 self-employed registration for health insurance rose from 30.5% to 59.9%, and for pensions from 15.9% to 44.8%.",
+    "impact": "Self-employed pension coverage rose to 44.8% and health coverage to about 60% by 2009, from baselines of 15.9% and 30.5% respectively.",
     "agency": "Caja Costarricense de Seguro Social (CCSS)",
-    "sources": null,
-    "verification": "Verified",
+    "sources": "ILO ESS Document No. 42 (2013); ILO (2017) Innovations in extending social insurance coverage; ILO Social Protection Platform (Self-employed workers module)",
     "facts": [
       [
         "Worker group",
@@ -111,11 +108,11 @@ export const PRACTICES = [
       ],
       [
         "Coverage & key features",
-        "Between 2005 and 2009 self-employed registration for health insurance rose from 30.5% to 59.9%, and for pensions from 15.9% to 44.8%."
+        "Self-employed pension coverage rose to 44.8% and health coverage to about 60% by 2009, from baselines of 15.9% and 30.5% respectively."
       ],
       [
-        "Verification",
-        "Verified"
+        "Source",
+        "ILO ESS Document No. 42 (2013); ILO (2017) Innovations in extending social insurance coverage; ILO Social Protection Platform (Self-employed workers module)"
       ]
     ]
   },
@@ -133,10 +130,9 @@ export const PRACTICES = [
     "title": "Social Security Fund (SSF) Article 40",
     "summary": "Low flat-rate monthly contribution tiers (70, 100 or 300 THB per month) accompanied by matching state co-contributions for informal and gig workers, each tier buying a different benefit package.",
     "detail": "Low flat-rate monthly contribution tiers (70, 100 or 300 THB per month) accompanied by matching state co-contributions for informal and gig workers, each tier buying a different benefit package.",
-    "impact": "Enrolled millions of informal workers in absolute terms across agriculture, trade and transport — but ILO Working Paper 176 records that Article 40 still covers only around 1% of the workforce, against 3–4% for Article 39 (former employees continuing coverage).",
+    "impact": "Enrolled millions of informal workers across agriculture, trade and transport.",
     "agency": "Social Security Office (SSO)",
-    "sources": null,
-    "verification": "Partly verified",
+    "sources": "ILO WP 176; ASEAN Snapshot; ISSA Country Profile Thailand",
     "facts": [
       [
         "Worker group",
@@ -148,11 +144,11 @@ export const PRACTICES = [
       ],
       [
         "Coverage & key features",
-        "Enrolled millions of informal workers in absolute terms across agriculture, trade and transport — but ILO Working Paper 176 records that Article 40 still covers only around 1% of the workforce, against 3–4% for Article 39 (former employees continuing coverage)."
+        "Enrolled millions of informal workers across agriculture, trade and transport."
       ],
       [
-        "Verification",
-        "Partly verified"
+        "Source",
+        "ILO WP 176; ASEAN Snapshot; ISSA Country Profile Thailand"
       ]
     ]
   },
@@ -172,8 +168,7 @@ export const PRACTICES = [
     "detail": "Unified mandatory social insurance scheme for non-salaried workers allowing a gradual 3-year scale-up of contribution bases for new entrants.",
     "impact": "Reached 1.7 million affiliated self-employed members by 2017, up from 1.28 million in 2013.",
     "agency": "CASNOS",
-    "sources": null,
-    "verification": "Not re-verified",
+    "sources": "ILO WP 176",
     "facts": [
       [
         "Worker group",
@@ -188,8 +183,8 @@ export const PRACTICES = [
         "Reached 1.7 million affiliated self-employed members by 2017, up from 1.28 million in 2013."
       ],
       [
-        "Verification",
-        "Not re-verified"
+        "Source",
+        "ILO WP 176"
       ]
     ]
   },
@@ -209,8 +204,7 @@ export const PRACTICES = [
     "detail": "Voluntary pension savings mechanism supported by an annual state matching incentive for self-employed and gig workers, currently set at 15% of contributions up to RM 500 per year.",
     "impact": "Raises the effective return on savings for low-income gig workers and is paired with tax relief on voluntary contributions.",
     "agency": "Employees Provident Fund (EPF / KWSP)",
-    "sources": null,
-    "verification": "Corrected",
+    "sources": "EPF/KWSP i-Saraan official page (2026); ASEAN Snapshot; WIEGO Presentation",
     "facts": [
       [
         "Worker group",
@@ -225,8 +219,8 @@ export const PRACTICES = [
         "Raises the effective return on savings for low-income gig workers and is paired with tax relief on voluntary contributions."
       ],
       [
-        "Verification",
-        "Corrected"
+        "Source",
+        "EPF/KWSP i-Saraan official page (2026); ASEAN Snapshot; WIEGO Presentation"
       ]
     ]
   },
@@ -246,8 +240,7 @@ export const PRACTICES = [
     "detail": "Provides cash payouts and CPF top-ups for low-income self-employed citizens, paired with temporary state transition subsidies as contribution rates step up.",
     "impact": "Buffers lower-income self-employed workers against contribution shocks while building long-term balances.",
     "agency": "CPF Board & Ministry of Manpower (MOM)",
-    "sources": null,
-    "verification": "Not re-verified",
+    "sources": "ASEAN Snapshot",
     "facts": [
       [
         "Worker group",
@@ -262,8 +255,8 @@ export const PRACTICES = [
         "Buffers lower-income self-employed workers against contribution shocks while building long-term balances."
       ],
       [
-        "Verification",
-        "Not re-verified"
+        "Source",
+        "ASEAN Snapshot"
       ]
     ]
   },
@@ -280,11 +273,10 @@ export const PRACTICES = [
     "workersLabel": "Self-employed / own-account",
     "title": "REMPE Micro-Enterprise Regime",
     "summary": "Unified special tax regime for micro and small enterprises providing temporary tax reductions (30% in Year 1, 20% in Year 2) to incentivise formal social insurance registration.",
-    "detail": "Unified special tax regime for micro and small enterprises providing temporary tax reductions (30% in Year 1, 20% in Year 2) to incentivise formal social insurance registration. Micro and small businesses contribute 2.8% of annual sales towards all branches of social security and workers contribute 8%, with government matching subsidies making contributions affordable for informal workers.",
+    "detail": "Unified special tax regime for micro and small enterprises providing temporary tax reductions (30% in Year 1, 20% in Year 2) to incentivise formal social insurance registration. Independent workers contribute 19.5% across income categories.",
     "impact": "Independent-worker coverage under INPS went from zero to about 9% of the economically active population within roughly one year of introduction; associated with an annual reduction in informal employment.",
     "agency": "INPS / Commercial Registries",
-    "sources": null,
-    "verification": "Partly verified",
+    "sources": "ILO (2017) Innovations in extending social insurance coverage to independent workers; ILO WP 176; ILO Guidebook",
     "facts": [
       [
         "Worker group",
@@ -299,8 +291,8 @@ export const PRACTICES = [
         "Independent-worker coverage under INPS went from zero to about 9% of the economically active population within roughly one year of introduction; associated with an annual reduction in informal employment."
       ],
       [
-        "Verification",
-        "Partly verified"
+        "Source",
+        "ILO (2017) Innovations in extending social insurance coverage to independent workers; ILO WP 176; ILO Guidebook"
       ]
     ]
   },
@@ -320,8 +312,7 @@ export const PRACTICES = [
     "detail": "Unified simplified tax and contribution regime for small independent workers, combining income tax, VAT and social security into one flat monthly fee, with a subsidised social tier for vulnerable workers.",
     "impact": "Tripled registered micro-entrepreneurs and improved social insurance access for vulnerable workers.",
     "agency": "AFIP (now ARCA) / ANSES",
-    "sources": null,
-    "verification": "Not re-verified",
+    "sources": "ILO WP 176",
     "facts": [
       [
         "Worker group",
@@ -336,8 +327,8 @@ export const PRACTICES = [
         "Tripled registered micro-entrepreneurs and improved social insurance access for vulnerable workers."
       ],
       [
-        "Verification",
-        "Not re-verified"
+        "Source",
+        "ILO WP 176"
       ]
     ]
   },
@@ -353,12 +344,11 @@ export const PRACTICES = [
     "workers": "general",
     "workersLabel": "Informal economy (general)",
     "title": "NHIS Earmarked VAT Levy & Informal Flat-Rate Contributions",
-    "summary": "FINANCING BASIS: mixed — an earmarked 2.5% VAT levy (NHIL) alongside genuine flat-rate contributions from informal workers, with exemptions for indigents, children, the elderly and pregnant women.",
-    "detail": "FINANCING BASIS: mixed — an earmarked 2.5% VAT levy (NHIL) alongside genuine flat-rate contributions from informal workers, with exemptions for indigents, children, the elderly and pregnant women. Retained in scope because informal workers contribute directly and the levy subsidises their insurance cover, rather than funding a non-contributory assistance benefit.",
+    "summary": "Tax-financed health insurance system funded through an earmarked 2.5% VAT levy (NHIL) and flat-rate informal worker contributions with exemptions for indigents, children, the elderly and pregnant women.",
+    "detail": "Tax-financed health insurance system funded through an earmarked 2.5% VAT levy (NHIL) and flat-rate informal worker contributions with exemptions for indigents, children, the elderly and pregnant women.",
     "impact": "Active membership reached about 56% of the national population (over 18 million active members) by 2024–25, up from roughly 40% a decade earlier, substantially reducing out-of-pocket health expenditure.",
     "agency": "National Health Insurance Authority (NHIA)",
-    "sources": null,
-    "verification": "Verified – figure updated",
+    "sources": "NHIA/NHIS Ghana news releases (2024–25); ILO WP 176",
     "facts": [
       [
         "Worker group",
@@ -373,8 +363,8 @@ export const PRACTICES = [
         "Active membership reached about 56% of the national population (over 18 million active members) by 2024–25, up from roughly 40% a decade earlier, substantially reducing out-of-pocket health expenditure."
       ],
       [
-        "Verification",
-        "Verified – figure updated"
+        "Source",
+        "NHIA/NHIS Ghana news releases (2024–25); ILO WP 176"
       ]
     ]
   },
@@ -394,8 +384,7 @@ export const PRACTICES = [
     "detail": "Simplified turnover tax and contribution regime with reduced rates (1% for commercial activity, 2% for services) paired with state-backed micro-credit guarantees. Since the 2021 reform, compulsory health insurance (AMO) has been extended to non-salaried workers.",
     "impact": "Registered over 200,000 auto-entrepreneurs within three years of rollout; the AMO extension brings independent workers into compulsory health cover.",
     "agency": "CNSS & Ministry of Economy",
-    "sources": null,
-    "verification": "Partly verified",
+    "sources": "CNSS Maroc (couverture des travailleurs non salariés); ILO WP 176",
     "facts": [
       [
         "Worker group",
@@ -410,8 +399,8 @@ export const PRACTICES = [
         "Registered over 200,000 auto-entrepreneurs within three years of rollout; the AMO extension brings independent workers into compulsory health cover."
       ],
       [
-        "Verification",
-        "Partly verified"
+        "Source",
+        "CNSS Maroc (couverture des travailleurs non salariés); ILO WP 176"
       ]
     ]
   },
@@ -427,12 +416,11 @@ export const PRACTICES = [
     "workers": "self-employed",
     "workersLabel": "Self-employed / own-account",
     "title": "Voluntary Social Security Scheme for Self-Employed",
-    "summary": "Flexible contribution calculation options based on declared reference wage brackets for self-employed and informal workers under the National Social Security Fund (NSSF).",
-    "detail": "Flexible contribution calculation options based on declared reference wage brackets for self-employed and informal workers under the National Social Security Fund (NSSF).",
-    "impact": "Gradually expanding social security coverage outside formal wage employment, but field research finds uptake constrained. A study of 75 home-based workers in Vientiane Capital found significant disparities in coverage between groups of home-based workers, and identified three barriers: limited and irregular income against a fixed monthly premium; a perception that NSSF healthcare is of poor quality, which deters enrolment; and an information gap, with workers unaware that NSSF offers a wider range of benefits at lower cost than private insurance. Uncovered workers fall back on informal networks and family support during illness or business difficulty.",
+    "summary": "Flexible contribution calculation options based on declared reference wage brackets for self-employed and informal workers.",
+    "detail": "Flexible contribution calculation options based on declared reference wage brackets for self-employed and informal workers.",
+    "impact": "Gradually expanding social security coverage outside formal wage employment.",
     "agency": "Lao Social Security Organisation (LSSO)",
-    "sources": null,
-    "verification": "Partly verified",
+    "sources": "ASEAN Snapshot",
     "facts": [
       [
         "Worker group",
@@ -444,11 +432,11 @@ export const PRACTICES = [
       ],
       [
         "Coverage & key features",
-        "Gradually expanding social security coverage outside formal wage employment, but field research finds uptake constrained. A study of 75 home-based workers in Vientiane Capital found significant disparities in coverage between groups of home-based workers, and identified three barriers: limited and irregular income against a fixed monthly premium; a perception that NSSF healthcare is of poor quality, which deters enrolment; and an information gap, with workers unaware that NSSF offers a wider range of benefits at lower cost than private insurance. Uncovered workers fall back on informal networks and family support during illness or business difficulty."
+        "Gradually expanding social security coverage outside formal wage employment."
       ],
       [
-        "Verification",
-        "Partly verified"
+        "Source",
+        "ASEAN Snapshot"
       ]
     ]
   },
@@ -468,8 +456,7 @@ export const PRACTICES = [
     "detail": "Flexible income assessment policies permitting temporary opt-outs or scaled contribution rates for seasonal agricultural labourers during low-harvest periods.",
     "impact": "Protects seasonal workers from dropping out of coverage because of severe agricultural income volatility.",
     "agency": "Ministry of Labour",
-    "sources": null,
-    "verification": "Not re-verified",
+    "sources": "ILO Guidebook; ILO (2017)",
     "facts": [
       [
         "Worker group",
@@ -484,13 +471,13 @@ export const PRACTICES = [
         "Protects seasonal workers from dropping out of coverage because of severe agricultural income volatility."
       ],
       [
-        "Verification",
-        "Not re-verified"
+        "Source",
+        "ILO Guidebook; ILO (2017)"
       ]
     ]
   },
   {
-    "id": "in-tamil-nadu-domestic-workers",
+    "id": "in-domestic-workers-welfare-board",
     "country": "India",
     "a2": "in",
     "lonlat": [
@@ -500,13 +487,12 @@ export const PRACTICES = [
     "category": "affordability",
     "workers": "domestic",
     "workersLabel": "Domestic workers",
-    "title": "Tamil Nadu Domestic Workers Welfare Board",
-    "summary": "FINANCING BASIS: statutory cess plus government allocations — an earmarked sectoral levy, not general revenue and not worker social insurance contributions.",
-    "detail": "FINANCING BASIS: statutory cess plus government allocations — an earmarked sectoral levy, not general revenue and not worker social insurance contributions. Tamil Nadu pioneered state-level welfare boards for unorganised workers. The Board issues worker identity cards and provides educational stipends for children, maternity assistance and old-age pensions, with the cost carried by the levy rather than by workers' own wages.",
-    "impact": "Registered tens of thousands of domestic workers, pioneering organised welfare representation for the sector in South Asia.",
+    "title": "Domestic Workers Welfare Board & Rashtriya Swasthya Bima Yojana (RSBY)",
+    "summary": "Tamil Nadu pioneered state-level welfare boards for unorganised workers funded by tax cesses and government allocations.",
+    "detail": "Tamil Nadu pioneered state-level welfare boards for unorganised workers funded by tax cesses and government allocations. The Welfare Board issues worker identity cards and grants educational stipends for children, maternity assistance and old-age pensions. At national level, RSBY provided fully state-financed inpatient health insurance up to INR 30,000 per year using cashless smartcards.",
+    "impact": "RSBY covered 41 million informal households nationwide at its peak; the Tamil Nadu Welfare Board registered tens of thousands of domestic workers, pioneering organised welfare representation in South Asia.",
     "agency": "Tamil Nadu Domestic Workers Welfare Board / Ministry of Labour",
-    "sources": null,
-    "verification": "Corrected",
+    "sources": "WIEGO Tamil Nadu Policy Brief No. 23; ILO Social Protection Guide (2020); National Health Authority (PM-JAY)",
     "facts": [
       [
         "Worker group",
@@ -518,48 +504,11 @@ export const PRACTICES = [
       ],
       [
         "Coverage & key features",
-        "Registered tens of thousands of domestic workers, pioneering organised welfare representation for the sector in South Asia."
+        "RSBY covered 41 million informal households nationwide at its peak; the Tamil Nadu Welfare Board registered tens of thousands of domestic workers, pioneering organised welfare representation in South Asia."
       ],
       [
-        "Verification",
-        "Corrected"
-      ]
-    ]
-  },
-  {
-    "id": "se-voluntary-unemployment-insurance-for",
-    "country": "Sweden",
-    "a2": "se",
-    "lonlat": [
-      16.735,
-      62.825
-    ],
-    "category": "affordability",
-    "workers": "self-employed",
-    "workersLabel": "Self-employed / own-account",
-    "title": "Voluntary Unemployment Insurance for the Self-Employed — CAUTIONARY CASE",
-    "summary": "Voluntary unemployment insurance open to self-employed workers.",
-    "detail": "Voluntary unemployment insurance open to self-employed workers. Included as a cautionary case: the introduction of experience rating in 2007–08 triggered an adverse-selection spiral in which older and younger workers with the lowest expected claims left the fund, driving average premiums up by 300%. ILO Working Paper 176 concludes that counteracting adverse selection of this kind would require expensive subsidies.",
-    "impact": "A direct warning about risk-rating voluntary schemes for the self-employed: pricing to risk drove out the low-risk members whose participation made the pool affordable.",
-    "agency": "Unemployment insurance funds (a-kassa)",
-    "sources": null,
-    "verification": "Verified",
-    "facts": [
-      [
-        "Worker group",
-        "Self-employed / own-account"
-      ],
-      [
-        "Implementing agency",
-        "Unemployment insurance funds (a-kassa)"
-      ],
-      [
-        "Coverage & key features",
-        "A direct warning about risk-rating voluntary schemes for the self-employed: pricing to risk drove out the low-risk members whose participation made the pool affordable."
-      ],
-      [
-        "Verification",
-        "Verified"
+        "Source",
+        "WIEGO Tamil Nadu Policy Brief No. 23; ILO Social Protection Guide (2020); National Health Authority (PM-JAY)"
       ]
     ]
   },
@@ -576,11 +525,10 @@ export const PRACTICES = [
     "workersLabel": "Agricultural / rural workers",
     "title": "One-Stop Shops (OSS), Mobile Services & Herder Cooperatives",
     "summary": "Single-window delivery hubs providing 21 services, mobile units for remote nomadic herders, and non-cash contribution payments (livestock or raw materials) collected through herder cooperatives.",
-    "detail": "Single-window delivery hubs providing 21 services, mobile units for remote nomadic herders, and non-cash contribution payments (livestock or raw materials) collected through herder cooperatives. Mongolia also operates matching subsidies for informal workers' contributions, lowering the effective cost of enrolment alongside the administrative simplification.",
+    "detail": "Single-window delivery hubs providing 21 services, mobile units for remote nomadic herders, and non-cash contribution payments (livestock or raw materials) collected through herder cooperatives.",
     "impact": "One-stop shops used regularly by around 60% of the population; ILO-supported interventions raised herders' social insurance coverage by about 10% in target soums.",
     "agency": "General Authority for Social Insurance & MLSP",
-    "sources": null,
-    "verification": "Verified – figure updated",
+    "sources": "ILO Mongolia UN Joint Programme (Extending Social Protection to Herders); ILO WP 176; ILO Guidebook",
     "facts": [
       [
         "Worker group",
@@ -595,8 +543,8 @@ export const PRACTICES = [
         "One-stop shops used regularly by around 60% of the population; ILO-supported interventions raised herders' social insurance coverage by about 10% in target soums."
       ],
       [
-        "Verification",
-        "Verified – figure updated"
+        "Source",
+        "ILO Mongolia UN Joint Programme (Extending Social Protection to Herders); ILO WP 176; ILO Guidebook"
       ]
     ]
   },
@@ -616,8 +564,7 @@ export const PRACTICES = [
     "detail": "Mobile registration platform for rural agricultural women using voice activation to overcome illiteracy, and enabling contributions via airtime or mobile money, run as a social enterprise in partnership with CNSS.",
     "impact": "Enrolled thousands of previously unreached agricultural women before transitioning them into state schemes.",
     "agency": "Caisse Nationale de Sécurité Sociale (CNSS) / Ahmini",
-    "sources": null,
-    "verification": "Partly verified",
+    "sources": "FAO Social Protection (Advancing social protection for women farmers in Tunisia); Ashoka Fellow profile; ILO WP 176",
     "facts": [
       [
         "Worker group",
@@ -632,8 +579,8 @@ export const PRACTICES = [
         "Enrolled thousands of previously unreached agricultural women before transitioning them into state schemes."
       ],
       [
-        "Verification",
-        "Partly verified"
+        "Source",
+        "FAO Social Protection (Advancing social protection for women farmers in Tunisia); Ashoka Fellow profile; ILO WP 176"
       ]
     ]
   },
@@ -653,8 +600,7 @@ export const PRACTICES = [
     "detail": "Streamlined business and social security registration hubs located in high-density areas such as municipal markets, equipped with integrated IT systems.",
     "impact": "Social security coverage increased from 39.8% to 55.3% between 2016 and 2020.",
     "agency": "INPS",
-    "sources": null,
-    "verification": "Verified",
+    "sources": "ILO Social Protection Platform (Self-employed workers module); ILO WP 176; ILO Guidebook",
     "facts": [
       [
         "Worker group",
@@ -669,8 +615,8 @@ export const PRACTICES = [
         "Social security coverage increased from 39.8% to 55.3% between 2016 and 2020."
       ],
       [
-        "Verification",
-        "Verified"
+        "Source",
+        "ILO Social Protection Platform (Self-employed workers module); ILO WP 176; ILO Guidebook"
       ]
     ]
   },
@@ -690,8 +636,7 @@ export const PRACTICES = [
     "detail": "Individual metal savings boxes installed at transport terminals and workplaces let informal workers deposit PHP 10–20 a day; partner Informal Sector Groups (ISGs) collect the cash and remit monthly contributions to SSS, with a minimum monthly contribution of PHP 330. Supported by UMID smart cards. Piloted in late 2011 as 'TrikanSSSya' for tricycle drivers, rolled out nationwide as AlkanSSSya in 2012, with an e-AlkanSSSya variant for government workers from 2015. The model has since been extended to 4Ps conditional cash transfer households.",
     "impact": "122,387 members enrolled through 1,235 participating Informal Sector Groups, with PHP 167 million in contributions collected, as at end-2014. Members access the same SSS old-age, disability and survivor benefits as formal employees.",
     "agency": "Social Security System (SSS)",
-    "sources": null,
-    "verification": "Verified",
+    "sources": "ILO/GIZ discussion paper on the AlkanSSSya Programme (social-protection.org id 55687); SSS / Philippine SDG portal",
     "facts": [
       [
         "Worker group",
@@ -706,8 +651,8 @@ export const PRACTICES = [
         "122,387 members enrolled through 1,235 participating Informal Sector Groups, with PHP 167 million in contributions collected, as at end-2014. Members access the same SSS old-age, disability and survivor benefits as formal employees."
       ],
       [
-        "Verification",
-        "Verified"
+        "Source",
+        "ILO/GIZ discussion paper on the AlkanSSSya Programme (social-protection.org id 55687); SSS / Philippine SDG portal"
       ]
     ]
   },
@@ -727,8 +672,7 @@ export const PRACTICES = [
     "detail": "Centralised digital single-window portal that simplified registration for informal, gig, platform and street workers using Aadhaar-linked verification, now integrated with 15 government schemes.",
     "impact": "Over 318 million (31.89 crore) unorganised workers registered as of August 2026, providing a portable social security identity.",
     "agency": "Ministry of Labour and Employment",
-    "sources": null,
-    "verification": "Verified – figure updated",
+    "sources": "Ministry of Labour & Employment / PIB e-Shram five-year statement (Aug 2026); WIEGO Brief 8; SPACE Summary",
     "facts": [
       [
         "Worker group",
@@ -743,8 +687,8 @@ export const PRACTICES = [
         "Over 318 million (31.89 crore) unorganised workers registered as of August 2026, providing a portable social security identity."
       ],
       [
-        "Verification",
-        "Verified – figure updated"
+        "Source",
+        "Ministry of Labour & Employment / PIB e-Shram five-year statement (Aug 2026); WIEGO Brief 8; SPACE Summary"
       ]
     ]
   },
@@ -764,8 +708,7 @@ export const PRACTICES = [
     "detail": "Comprehensive mobile app enabling self-employed workers to register, change clinics, pay contributions via e-wallets and access digital health cards.",
     "impact": "Reduced physical branch visits substantially and improved voluntary contribution compliance.",
     "agency": "BPJS Kesehatan",
-    "sources": null,
-    "verification": "Not re-verified",
+    "sources": "SPACE Summary; ASEAN Snapshot",
     "facts": [
       [
         "Worker group",
@@ -780,8 +723,44 @@ export const PRACTICES = [
         "Reduced physical branch visits substantially and improved voluntary contribution compliance."
       ],
       [
-        "Verification",
-        "Not re-verified"
+        "Source",
+        "SPACE Summary; ASEAN Snapshot"
+      ]
+    ]
+  },
+  {
+    "id": "za-integrated-community-registration-outreach",
+    "country": "South Africa",
+    "a2": "za",
+    "lonlat": [
+      25.157,
+      -29.01
+    ],
+    "category": "access",
+    "workers": "agricultural",
+    "workersLabel": "Agricultural / rural workers",
+    "title": "Integrated Community Registration Outreach Programme (ICROP)",
+    "summary": "Fully equipped mobile one-stop service units — vehicles carrying modern technology — travel to remote rural and semi-urban communities to handle enrolment, biometric identification, smart card issuance, real-time database updates and access to seven welfare programmes including the Child Support Grant and disability grants.",
+    "detail": "Fully equipped mobile one-stop service units — vehicles carrying modern technology — travel to remote rural and semi-urban communities to handle enrolment, biometric identification, smart card issuance, real-time database updates and access to seven welfare programmes including the Child Support Grant and disability grants. SASSA leads, supported by Home Affairs, Health, Justice, Education and Agriculture. Mobile units were first dispatched in 2001 for Child Support Grant delivery; ICROP was formally launched in 2007 and became a government-wide programme in 2008 under the President's 'war on poverty' initiative.",
+    "impact": "Between 2007 and 2013 ICROP served over 730 wards and completed more than 320,000 Child Support Grant applications, with cumulative registrations rising from 47,381 (2008) to 327,135 (2013). The 2013–14 budget was about ZAR 4.5 billion (US$481 million). Over the same period the national poverty headcount ratio fell from 57.2% (2006) to 45.5% (2011).",
+    "agency": "SASSA & Department of Social Development",
+    "sources": "ILO Social Protection Platform, ICROP South Africa case study (RessourcePDF id 51861); ILO WP 176",
+    "facts": [
+      [
+        "Worker group",
+        "Agricultural / rural workers"
+      ],
+      [
+        "Implementing agency",
+        "SASSA & Department of Social Development"
+      ],
+      [
+        "Coverage & key features",
+        "Between 2007 and 2013 ICROP served over 730 wards and completed more than 320,000 Child Support Grant applications, with cumulative registrations rising from 47,381 (2008) to 327,135 (2013). The 2013–14 budget was about ZAR 4.5 billion (US$481 million). Over the same period the national poverty headcount ratio fell from 57.2% (2006) to 45.5% (2011)."
+      ],
+      [
+        "Source",
+        "ILO Social Protection Platform, ICROP South Africa case study (RessourcePDF id 51861); ILO WP 176"
       ]
     ]
   },
@@ -801,8 +780,7 @@ export const PRACTICES = [
     "detail": "Integrated multi-channel service delivery network combining physical offices, mobile units, call centres and web portals for one-stop social protection access.",
     "impact": "Reduced administrative overhead and travel time for informal and rural workers.",
     "agency": "Instituto de Previsión Social (IPS)",
-    "sources": null,
-    "verification": "Not re-verified",
+    "sources": "ILO Guidebook",
     "facts": [
       [
         "Worker group",
@@ -817,8 +795,8 @@ export const PRACTICES = [
         "Reduced administrative overhead and travel time for informal and rural workers."
       ],
       [
-        "Verification",
-        "Not re-verified"
+        "Source",
+        "ILO Guidebook"
       ]
     ]
   },
@@ -838,8 +816,7 @@ export const PRACTICES = [
     "detail": "Founded in 2005 by the CASC trade union in partnership with World Solidarity (WSM), AMUSSOL acts as a 'virtual employer': informal workers who have no legal employer pay monthly contributions to AMUSSOL, which channels them into the national social security treasury, allowing the workers to join the Dominican social security system as if formally employed. Members contribute 22.4% of income — 21.4% for social security and 1% for AMUSSOL's administration. Members include transport workers, street vendors, salon workers, micro-enterprise operators and domestic workers.",
     "impact": "About 57,970 titular affiliates plus dependents — roughly 60,000 people — covered as at end-2015, with access to family health insurance (85% hospital and 80% medical and pharmaceutical cover), workplace accident insurance and the pension system.",
     "agency": "AMUSSOL (Asociación Mutual de Servicios Solidarios)",
-    "sources": null,
-    "verification": "Verified",
+    "sources": "World Solidarity (WSM), AMUSSOL brochure; ILO Social Protection Platform (Self-employed workers module); ILO Guidebook",
     "facts": [
       [
         "Worker group",
@@ -854,8 +831,8 @@ export const PRACTICES = [
         "About 57,970 titular affiliates plus dependents — roughly 60,000 people — covered as at end-2015, with access to family health insurance (85% hospital and 80% medical and pharmaceutical cover), workplace accident insurance and the pension system."
       ],
       [
-        "Verification",
-        "Verified"
+        "Source",
+        "World Solidarity (WSM), AMUSSOL brochure; ILO Social Protection Platform (Self-employed workers module); ILO Guidebook"
       ]
     ]
   },
@@ -875,8 +852,7 @@ export const PRACTICES = [
     "detail": "Law 2450 (2003) regulates domestic work, mandating written contracts, 90 days of maternity leave and inclusion in the Comprehensive Pension System. To overcome access barriers for live-in care workers who cannot leave their employers during the day, public medical clinics were mandated to operate evening hours (17:00–21:00). Supported by women-led advocacy from FENATRAHOB.",
     "impact": "Removed a major time-conflict barrier preventing domestic workers from seeking medical care, and guaranteed healthcare and pension rights for indigenous domestic workers.",
     "agency": "Ministry of Labour / Ministry of Health / FENATRAHOB",
-    "sources": null,
-    "verification": "Partly verified",
+    "sources": "UN Women & ITUC Briefing Kit; ILO Social Protection Guide (2020); ILO Guidebook",
     "facts": [
       [
         "Worker group",
@@ -891,8 +867,8 @@ export const PRACTICES = [
         "Removed a major time-conflict barrier preventing domestic workers from seeking medical care, and guaranteed healthcare and pension rights for indigenous domestic workers."
       ],
       [
-        "Verification",
-        "Partly verified"
+        "Source",
+        "UN Women & ITUC Briefing Kit; ILO Social Protection Guide (2020); ILO Guidebook"
       ]
     ]
   },
@@ -912,8 +888,7 @@ export const PRACTICES = [
     "detail": "Following the Supreme Court's December 2018 ruling that excluding domestic workers from social security is unconstitutional, IMSS launched a dedicated pilot programme and smartphone application. The system replaced annual advance contribution requirements with flexible monthly online payments calculated on actual days worked and wages earned, and employers can register and pay in minutes. A 2022 reform to the Social Security Law converted the pilot into a permanent, compulsory regime.",
     "impact": "IMSS reported 11,947 domestic workers enrolled in the first eight months of the pilot (to December 2019), of whom 76% were women, against an eligible population of more than two million. The scheme became mandatory nationwide under the 2022 reform.",
     "agency": "Instituto Mexicano del Seguro Social (IMSS)",
-    "sources": null,
-    "verification": "Corrected",
+    "sources": "IMSS (Zoé Robledo) via Mexico News Daily, Dec 2019; SCJN ruling (Dec 2018); Cámara de Diputados 2022 IMSS Law reform; ILO Social Protection Reports",
     "facts": [
       [
         "Worker group",
@@ -928,8 +903,8 @@ export const PRACTICES = [
         "IMSS reported 11,947 domestic workers enrolled in the first eight months of the pilot (to December 2019), of whom 76% were women, against an eligible population of more than two million. The scheme became mandatory nationwide under the 2022 reform."
       ],
       [
-        "Verification",
-        "Corrected"
+        "Source",
+        "IMSS (Zoé Robledo) via Mexico News Daily, Dec 2019; SCJN ruling (Dec 2018); Cámara de Diputados 2022 IMSS Law reform; ILO Social Protection Reports"
       ]
     ]
   },
@@ -949,8 +924,7 @@ export const PRACTICES = [
     "detail": "Reduced the mandatory NSSF firm registration threshold from 8 workers down to 1 worker, and partnered with the IDEA union (tuk-tuk drivers and street vendors) to enrol informal economy members under a voluntary health insurance pilot.",
     "impact": "Extended employment injury and health protection to micro-enterprises and informal transport workers, though pilot uptake has been reported as slow.",
     "agency": "National Social Security Fund (NSSF)",
-    "sources": null,
-    "verification": "Partly verified",
+    "sources": "CamboJA News (NSSF informal worker pilot); Phnom Penh Post (IDEA); ASEAN Snapshot",
     "facts": [
       [
         "Worker group",
@@ -965,8 +939,8 @@ export const PRACTICES = [
         "Extended employment injury and health protection to micro-enterprises and informal transport workers, though pilot uptake has been reported as slow."
       ],
       [
-        "Verification",
-        "Partly verified"
+        "Source",
+        "CamboJA News (NSSF informal worker pilot); Phnom Penh Post (IDEA); ASEAN Snapshot"
       ]
     ]
   },
@@ -986,8 +960,7 @@ export const PRACTICES = [
     "detail": "Lowered the mandatory social insurance contract duration threshold from 3 months to 1 month, brought new categories (including part-time workers above an earnings threshold and business household owners) into the mandatory scheme, and established digital voluntary pension contribution channels with a new maternity allowance for voluntary contributors.",
     "impact": "Broadened mandatory baseline coverage to short-term, casual and seasonal labourers from 1 July 2025.",
     "agency": "Viet Nam Social Security (VSS)",
-    "sources": null,
-    "verification": "Verified – figure updated",
+    "sources": "Crowe Vietnam / EY Vietnam SI Law 2024 briefings; World Bank (Expanding Coverage in Vietnam's Voluntary SI Scheme, 2025); ASEAN Snapshot",
     "facts": [
       [
         "Worker group",
@@ -1002,8 +975,8 @@ export const PRACTICES = [
         "Broadened mandatory baseline coverage to short-term, casual and seasonal labourers from 1 July 2025."
       ],
       [
-        "Verification",
-        "Verified – figure updated"
+        "Source",
+        "Crowe Vietnam / EY Vietnam SI Law 2024 briefings; World Bank (Expanding Coverage in Vietnam's Voluntary SI Scheme, 2025); ASEAN Snapshot"
       ]
     ]
   },
@@ -1023,8 +996,7 @@ export const PRACTICES = [
     "detail": "Recruited local community assistants equipped with mobile smartphone applications to register informal and migrant worker families directly at their homes.",
     "impact": "Overcame digital literacy and geographic distance barriers in hill and mountain districts.",
     "agency": "Social Security Fund (SSF)",
-    "sources": null,
-    "verification": "Not re-verified",
+    "sources": "ILO Guidebook; WIEGO Policy Brief No. 20 (Kathmandu)",
     "facts": [
       [
         "Worker group",
@@ -1039,13 +1011,13 @@ export const PRACTICES = [
         "Overcame digital literacy and geographic distance barriers in hill and mountain districts."
       ],
       [
-        "Verification",
-        "Not re-verified"
+        "Source",
+        "ILO Guidebook; WIEGO Policy Brief No. 20 (Kathmandu)"
       ]
     ]
   },
   {
-    "id": "tl-simplified-contributory-registration-for",
+    "id": "tl-contributory-non-contributory-hybrid",
     "country": "Timor-Leste",
     "a2": "tl",
     "lonlat": [
@@ -1055,13 +1027,12 @@ export const PRACTICES = [
     "category": "access",
     "workers": "general",
     "workersLabel": "Informal economy (general)",
-    "title": "Simplified Contributory Registration for Self-Employed and Domestic Workers",
-    "summary": "Simplified registration framework opening the contributory social security scheme to self-employed and domestic workers.",
-    "detail": "Simplified registration framework opening the contributory social security scheme to self-employed and domestic workers.",
-    "impact": "Established an initial formal contributory social security coverage baseline in a young nation.",
+    "title": "Contributory & Non-Contributory Hybrid Registration",
+    "summary": "Simplified registration framework offering a hybrid contributory and non-contributory registration track open to self-employed and domestic workers.",
+    "detail": "Simplified registration framework offering a hybrid contributory and non-contributory registration track open to self-employed and domestic workers.",
+    "impact": "Established an initial formal social security coverage baseline in a young nation.",
     "agency": "Instituto Nacional de Segurança Social (INSS)",
-    "sources": null,
-    "verification": "Not re-verified",
+    "sources": "ASEAN Snapshot",
     "facts": [
       [
         "Worker group",
@@ -1073,11 +1044,11 @@ export const PRACTICES = [
       ],
       [
         "Coverage & key features",
-        "Established an initial formal contributory social security coverage baseline in a young nation."
+        "Established an initial formal social security coverage baseline in a young nation."
       ],
       [
-        "Verification",
-        "Not re-verified"
+        "Source",
+        "ASEAN Snapshot"
       ]
     ]
   },
@@ -1097,8 +1068,7 @@ export const PRACTICES = [
     "detail": "Accredited local informal worker associations and trade secretariats to act as authorised registration and collection intermediaries for self-employed workers.",
     "impact": "Decentralised enrolment away from formal state offices, increasing local trust.",
     "agency": "Caisse Nationale de Prévoyance Sociale (CNPS)",
-    "sources": null,
-    "verification": "Not re-verified",
+    "sources": "ILO Guidebook",
     "facts": [
       [
         "Worker group",
@@ -1113,8 +1083,8 @@ export const PRACTICES = [
         "Decentralised enrolment away from formal state offices, increasing local trust."
       ],
       [
-        "Verification",
-        "Not re-verified"
+        "Source",
+        "ILO Guidebook"
       ]
     ]
   },
@@ -1134,8 +1104,7 @@ export const PRACTICES = [
     "detail": "Deployed mobile regional teams equipped with laptops and power generators to run temporary registration clinics in rural agricultural markets.",
     "impact": "Brought social security registration directly to remote vanilla and coffee farmers.",
     "agency": "CNaPS",
-    "sources": null,
-    "verification": "Not re-verified",
+    "sources": "ILO Guidebook",
     "facts": [
       [
         "Worker group",
@@ -1150,8 +1119,8 @@ export const PRACTICES = [
         "Brought social security registration directly to remote vanilla and coffee farmers."
       ],
       [
-        "Verification",
-        "Not re-verified"
+        "Source",
+        "ILO Guidebook"
       ]
     ]
   },
@@ -1171,8 +1140,7 @@ export const PRACTICES = [
     "detail": "Ultra-simplified online declaration and payment portal for micro-entrepreneurs, with contributions levied as a flat percentage of declared turnover and no filing required in months with no revenue.",
     "impact": "Over 700,000 active auto-entrepreneurs within three years of the 2008 launch; coverage effectively reaches 100% of registered workers.",
     "agency": "URSSAF Caisse nationale (formerly ACOSS)",
-    "sources": null,
-    "verification": "Corrected",
+    "sources": "ILO (2017) Innovations in extending social insurance coverage to independent workers; URSSAF",
     "facts": [
       [
         "Worker group",
@@ -1187,8 +1155,8 @@ export const PRACTICES = [
         "Over 700,000 active auto-entrepreneurs within three years of the 2008 launch; coverage effectively reaches 100% of registered workers."
       ],
       [
-        "Verification",
-        "Corrected"
+        "Source",
+        "ILO (2017) Innovations in extending social insurance coverage to independent workers; URSSAF"
       ]
     ]
   },
@@ -1208,8 +1176,7 @@ export const PRACTICES = [
     "detail": "Introduced in 2006, CESU is a universal service voucher and digital portal allowing household employers to hire, declare and pay social security contributions in a single transaction. CNCESU auto-calculates contributions, debits employer accounts and generates official employment certificates. For multi-employer domestic workers, contributions from different households are consolidated into a single worker account. Households claim a 50% income tax credit on eligible personal-service expenditure, capped at €12,000 of expenses per year (a maximum credit of €6,000), with higher ceilings for households including a disabled member.",
     "impact": "Associated with one of the highest effective social security coverage rates for domestic workers globally; a large majority of household employers participate, and studies find a substantial share of CESU users had previously employed the worker undeclared.",
     "agency": "CNCESU / URSSAF / Ministry of Labour",
-    "sources": null,
-    "verification": "Corrected",
+    "sources": "economie.gouv.fr (crédit d'impôt services à la personne); ILO Social Protection Reports (2016, 2020); ESPAN Synthesis Report (2024)",
     "facts": [
       [
         "Worker group",
@@ -1224,8 +1191,8 @@ export const PRACTICES = [
         "Associated with one of the highest effective social security coverage rates for domestic workers globally; a large majority of household employers participate, and studies find a substantial share of CESU users had previously employed the worker undeclared."
       ],
       [
-        "Verification",
-        "Corrected"
+        "Source",
+        "economie.gouv.fr (crédit d'impôt services à la personne); ILO Social Protection Reports (2016, 2020); ESPAN Synthesis Report (2024)"
       ]
     ]
   },
@@ -1245,8 +1212,7 @@ export const PRACTICES = [
     "detail": "Introduced in 2004, the service voucher system restructured domestic work around a triangular employment model. The household is not the direct employer; domestic workers are hired on formal employment contracts by accredited service agencies. Households buy vouchers at a face value of roughly €9–10 per hour, with the state covering around two-thirds of the true cost. Since October 2014 voucher workers have had full social protection across all branches. Tax relief varies by region: Flanders 30%, Brussels-Capital 15%, Wallonia 10%, each on a limited number of vouchers.",
     "impact": "Employment grew from 62,000 workers in 2006 to around 150,000 by 2013–14 (roughly 100,000 full-time equivalents), across 2,000+ accredited agencies, with roughly 1 million users — about 11% of the population aged over 20.",
     "agency": "Accredited service agencies / ONEM-RVA / Regional governments",
-    "sources": null,
-    "verification": "Corrected",
+    "sources": "European Labour Authority, BE Service Vouchers fiche (2023); Journal of Social Policy, Subsidized Household Services and Informal Employment; ESPAN Synthesis Report (2024)",
     "facts": [
       [
         "Worker group",
@@ -1261,8 +1227,8 @@ export const PRACTICES = [
         "Employment grew from 62,000 workers in 2006 to around 150,000 by 2013–14 (roughly 100,000 full-time equivalents), across 2,000+ accredited agencies, with roughly 1 million users — about 11% of the population aged over 20."
       ],
       [
-        "Verification",
-        "Corrected"
+        "Source",
+        "European Labour Authority, BE Service Vouchers fiche (2023); Journal of Social Policy, Subsidized Household Services and Informal Employment; ESPAN Synthesis Report (2024)"
       ]
     ]
   },
@@ -1282,8 +1248,7 @@ export const PRACTICES = [
     "detail": "Law 18.065 (2006) and Decree 244/007 guarantee equal rights for domestic workers, including part-time and multi-employer registration. BPS operates a free smartphone app and multichannel platform (web services, video tutorials, chatbots) allowing employers to register and deregister workers, update payroll and pay contributions online or by bank debit; the system automatically determines salary components, calculates contributions and issues invoices. A specialised labour inspectorate conducts front-door residential interviews and may enter homes under court warrant. Sectoral minimum wages are negotiated in tripartite Wage Councils.",
     "impact": "Employer registration rose 67% and contributing jobs reached 76.4% between 2006 and 2018; contribution evasion fell by 60% over 2006–2017. ILO reports under-declaration to the social security administration falling from 22.6% (2006) to 8.7% (2019). Uruguay was the first country to ratify Convention No. 189 (2012).",
     "agency": "Banco de Previsión Social (BPS) / General Labour Inspectorate",
-    "sources": null,
-    "verification": "Corrected",
+    "sources": "ILO, BPS e-Formality: The Case in Uruguay (wcms_713585); ILO (2025) International experience on protecting rights of domestic workers",
     "facts": [
       [
         "Worker group",
@@ -1298,8 +1263,8 @@ export const PRACTICES = [
         "Employer registration rose 67% and contributing jobs reached 76.4% between 2006 and 2018; contribution evasion fell by 60% over 2006–2017. ILO reports under-declaration to the social security administration falling from 22.6% (2006) to 8.7% (2019). Uruguay was the first country to ratify Convention No. 189 (2012)."
       ],
       [
-        "Verification",
-        "Corrected"
+        "Source",
+        "ILO, BPS e-Formality: The Case in Uruguay (wcms_713585); ILO (2025) International experience on protecting rights of domestic workers"
       ]
     ]
   },
@@ -1319,8 +1284,7 @@ export const PRACTICES = [
     "detail": "Law 26.844 (2013) established compulsory coverage. The tax authority introduced a 'presumptive employment' model, legally assuming that households above defined income or asset thresholds employ a domestic worker unless proven otherwise, enabling central database auditing without physical home visits. Registration is simplified via online banking, the tax portal and telephone. Employers pay the full contribution for low-hour tiers and receive tax deductions. The 'Registradas' programme, launched in September 2021, co-finances 30–50% of a domestic worker's salary for six months.",
     "impact": "Registered domestic workers increased more than threefold, from 133,013 in 2005 to 434,760 in 2017. A targeted information-letter campaign to 173,000 households yielded an 8.9 percentage point increase in registration.",
     "agency": "ARCA (formerly AFIP) / ANSES / Ministry of Labour",
-    "sources": null,
-    "verification": "Partly verified",
+    "sources": "IDB Policy Brief (2022) Public Policies for Unlocking Paid Domestic Labor in LAC; ILO Social Protection Reports (2016, 2020)",
     "facts": [
       [
         "Worker group",
@@ -1335,8 +1299,8 @@ export const PRACTICES = [
         "Registered domestic workers increased more than threefold, from 133,013 in 2005 to 434,760 in 2017. A targeted information-letter campaign to 173,000 households yielded an 8.9 percentage point increase in registration."
       ],
       [
-        "Verification",
-        "Partly verified"
+        "Source",
+        "IDB Policy Brief (2022) Public Policies for Unlocking Paid Domestic Labor in LAC; ILO Social Protection Reports (2016, 2020)"
       ]
     ]
   },
@@ -1356,8 +1320,7 @@ export const PRACTICES = [
     "detail": "Under the General Law on Migration and Foreigners (Law 8.764, 2009), holding official social insurance certification with CCSS is a mandatory prerequisite for regularising or renewing migration status. CCSS operates state-subsidised contribution categories for low-income independent workers based on contributory capacity brackets, and provides medical, maternity, invalidity, old-age and survivor benefits equally to national and migrant care workers.",
     "impact": "Migrant domestic workers' social security and maternity coverage rates reached close to double those of national domestic workers, because of the mandatory immigration-regularisation link.",
     "agency": "Caja Costarricense de Seguro Social (CCSS) / Directorate of Migration",
-    "sources": null,
-    "verification": "Partly verified",
+    "sources": "ILO, Social Protection for Migrant Domestic Workers (2016); ILO Guide (2020)",
     "facts": [
       [
         "Worker group",
@@ -1372,8 +1335,8 @@ export const PRACTICES = [
         "Migrant domestic workers' social security and maternity coverage rates reached close to double those of national domestic workers, because of the mandatory immigration-regularisation link."
       ],
       [
-        "Verification",
-        "Partly verified"
+        "Source",
+        "ILO, Social Protection for Migrant Domestic Workers (2016); ILO Guide (2020)"
       ]
     ]
   },
@@ -1393,8 +1356,7 @@ export const PRACTICES = [
     "detail": "The 2019 Labour Code, in force from 1 January 2021, explicitly included domestic workers within the general legal definition of 'employee' and expanded the definition of 'employer' to include private households. Article 19 recognises part-time employment and multi-employer contracts while maintaining social insurance entitlements. Employers must pay an amount equivalent to social insurance and health insurance premiums directly to the worker or into the VSS system. Decree 145/2020 sets the implementing detail.",
     "impact": "Established formal legal equality for domestic workers in ASEAN labour law, providing a statutory foundation for coverage of agency-placed and independent domestic workers.",
     "agency": "Viet Nam Social Security (VSS) / MOLISA",
-    "sources": null,
-    "verification": "Verified – figure updated",
+    "sources": "ILO ASEAN Report (2024); Decree 145/2020/ND-CP; ESPAN Synthesis Report (2024)",
     "facts": [
       [
         "Worker group",
@@ -1409,8 +1371,8 @@ export const PRACTICES = [
         "Established formal legal equality for domestic workers in ASEAN labour law, providing a statutory foundation for coverage of agency-placed and independent domestic workers."
       ],
       [
-        "Verification",
-        "Verified – figure updated"
+        "Source",
+        "ILO ASEAN Report (2024); Decree 145/2020/ND-CP; ESPAN Synthesis Report (2024)"
       ]
     ]
   },
@@ -1430,8 +1392,7 @@ export const PRACTICES = [
     "detail": "Under Law No. 111/2022 and Government Decision 822/2022, Romania launched an online platform for domestic work tickets. Household beneficiaries purchase electronic tickets (15 lei, about €3, each) that automatically register unqualified domestic service providers, pay wages and remit social insurance contributions and income tax to the state. Income tax (10%) and the pension contribution (25%) are each applied to only 50% of earned income. Workers redeeming at least 85 tickets a month qualify for free health insurance, and beneficiaries buying 600+ tickets a year receive 75 free tickets.",
     "impact": "Targets the formalisation and digital social security registration of at least 60,000 previously unemployed or inactive people as domestic workers by 2026.",
     "agency": "National Employment Agency (ANOFM) / Ministry of Labour",
-    "sources": null,
-    "verification": "Corrected",
+    "sources": "European Commission / ESPN, Romania launches a system of service vouchers (docId 25954); European Commission (2024) Access for domestic workers to labour and social protection; Raț, C. (2018) Gaps in access to social protection for casual workers in Romania",
     "facts": [
       [
         "Worker group",
@@ -1446,8 +1407,8 @@ export const PRACTICES = [
         "Targets the formalisation and digital social security registration of at least 60,000 previously unemployed or inactive people as domestic workers by 2026."
       ],
       [
-        "Verification",
-        "Corrected"
+        "Source",
+        "European Commission / ESPN, Romania launches a system of service vouchers (docId 25954); European Commission (2024) Access for domestic workers to labour and social protection; Raț, C. (2018) Gaps in access to social protection for casual workers in Romania"
       ]
     ]
   },
@@ -1467,8 +1428,7 @@ export const PRACTICES = [
     "detail": "Mandatory expansion of social security to micro-enterprises with fewer than 5 workers, enforced through mobile inspection and registration teams.",
     "impact": "Registered tens of thousands of micro-firms and informal retail workers.",
     "agency": "Social Security Corporation (SSC)",
-    "sources": null,
-    "verification": "Not re-verified",
+    "sources": "ILO WP 176",
     "facts": [
       [
         "Worker group",
@@ -1483,8 +1443,8 @@ export const PRACTICES = [
         "Registered tens of thousands of micro-firms and informal retail workers."
       ],
       [
-        "Verification",
-        "Not re-verified"
+        "Source",
+        "ILO WP 176"
       ]
     ]
   },
@@ -1504,8 +1464,7 @@ export const PRACTICES = [
     "detail": "Agreements allowing associations, cooperatives and other membership organisations to register their independent worker members collectively with health promoter enterprises, so that affiliation and contribution collection run through the organisation rather than requiring each worker to enrol individually.",
     "impact": "Independent worker health insurance coverage stood at 27.5% in 2009, against 13.1% pension coverage, with independent workers making up 54% of total employment (about 10.1 million people).",
     "agency": "Health Promoter Enterprises (EPS) / Ministry of Health",
-    "sources": null,
-    "verification": "Verified",
+    "sources": "ILO ESS Document No. 42 (2013), Innovations in extending social insurance coverage to independent workers",
     "facts": [
       [
         "Worker group",
@@ -1520,82 +1479,8 @@ export const PRACTICES = [
         "Independent worker health insurance coverage stood at 27.5% in 2009, against 13.1% pension coverage, with independent workers making up 54% of total employment (about 10.1 million people)."
       ],
       [
-        "Verification",
-        "Verified"
-      ]
-    ]
-  },
-  {
-    "id": "at-auto-enrolment-with-opt",
-    "country": "Austria",
-    "a2": "at",
-    "lonlat": [
-      14.126,
-      47.586
-    ],
-    "category": "access",
-    "workers": "self-employed",
-    "workersLabel": "Self-employed / own-account",
-    "title": "Auto-Enrolment with Opt-Out for Self-Employed Unemployment Insurance — MIXED CASE",
-    "summary": "Unemployment insurance for the self-employed structured as auto-enrolment with a possibility of opting out, using an opt-in period after which the decision becomes binding either permanently or for a fixed duration.",
-    "detail": "Unemployment insurance for the self-employed structured as auto-enrolment with a possibility of opting out, using an opt-in period after which the decision becomes binding either permanently or for a fixed duration. Included as a mixed case: ILO Working Paper 176 records that take-up has nonetheless been low, because start-ups must commit to long-term costs before knowing whether the business will succeed.",
-    "impact": "Shows that a behavioural default is not sufficient on its own — where the commitment attached to the default is long and irreversible, self-employed workers opt out anyway.",
-    "agency": "Sozialversicherung der Selbständigen (SVS)",
-    "sources": null,
-    "verification": "Verified",
-    "facts": [
-      [
-        "Worker group",
-        "Self-employed / own-account"
-      ],
-      [
-        "Implementing agency",
-        "Sozialversicherung der Selbständigen (SVS)"
-      ],
-      [
-        "Coverage & key features",
-        "Shows that a behavioural default is not sufficient on its own — where the commitment attached to the default is long and irreversible, self-employed workers opt out anyway."
-      ],
-      [
-        "Verification",
-        "Verified"
-      ]
-    ]
-  },
-  {
-    "id": "la-lsso-mobile-application-first",
-    "country": "Laos",
-    "a2": "la",
-    "lonlat": [
-      104.009,
-      20.03
-    ],
-    "category": "access",
-    "workers": "general",
-    "workersLabel": "Informal economy (general)",
-    "title": "LSSO Mobile Application — First National Social Security App",
-    "summary": "Lao PDR's first social security mobile application, unveiled on 12 December 2025 at the Second National Symposium on Social Protection in Vientiane Capital and available on the App Store and Google Play from January 2026.",
-    "detail": "Lao PDR's first social security mobile application, unveiled on 12 December 2025 at the Second National Symposium on Social Protection in Vientiane Capital and available on the App Store and Google Play from January 2026. The app lets informal workers pay monthly contributions, check benefit eligibility, estimate benefit amounts and look up contribution, payment and claim records. Until its launch these services were available only by visiting an LSSO branch office or selected banks in person. Developed with support from the ILO–China Partnership Programme under South-South cooperation, with features to be expanded over four years to cover formal enterprise and public sector employees.",
-    "impact": "Targets informal, rural and self-employed workers who previously had limited practical access to social security services, removing the in-person branch visit as a precondition for contributing or claiming.",
-    "agency": "Lao Social Security Organisation (LSSO)",
-    "sources": null,
-    "verification": "Verified",
-    "facts": [
-      [
-        "Worker group",
-        "Informal economy (general)"
-      ],
-      [
-        "Implementing agency",
-        "Lao Social Security Organisation (LSSO)"
-      ],
-      [
-        "Coverage & key features",
-        "Targets informal, rural and self-employed workers who previously had limited practical access to social security services, removing the in-person branch visit as a precondition for contributing or claiming."
-      ],
-      [
-        "Verification",
-        "Verified"
+        "Source",
+        "ILO ESS Document No. 42 (2013), Innovations in extending social insurance coverage to independent workers"
       ]
     ]
   },
@@ -1615,8 +1500,7 @@ export const PRACTICES = [
     "detail": "Multi-channel communication campaign using television, radio, newspapers and workshops, paired with integrating social security education into the primary school curriculum.",
     "impact": "Created high public buy-in and foundational social security awareness among future workforce generations.",
     "agency": "INPS",
-    "sources": null,
-    "verification": "Not re-verified",
+    "sources": "ILO WP 176",
     "facts": [
       [
         "Worker group",
@@ -1631,8 +1515,8 @@ export const PRACTICES = [
         "Created high public buy-in and foundational social security awareness among future workforce generations."
       ],
       [
-        "Verification",
-        "Not re-verified"
+        "Source",
+        "ILO WP 176"
       ]
     ]
   },
@@ -1652,8 +1536,7 @@ export const PRACTICES = [
     "detail": "Launched in April 2017, Kader JKN recruits and trains peer-to-peer community agents who conduct door-to-door outreach, educate neighbours, register members and collect contributions, extending BPJS Kesehatan's reach beyond its own administrative capacity by mobilising community participation.",
     "impact": "BPJS Kesehatan increased its rate of contribution collection from individual informal sector members by about 13.9% following the programme's introduction.",
     "agency": "BPJS Kesehatan",
-    "sources": null,
-    "verification": "Verified",
+    "sources": "ISSA Good Practice 173421 (Kader JKN, BPJS Kesehatan); SPACE Summary; ASEAN Snapshot",
     "facts": [
       [
         "Worker group",
@@ -1668,8 +1551,8 @@ export const PRACTICES = [
         "BPJS Kesehatan increased its rate of contribution collection from individual informal sector members by about 13.9% following the programme's introduction."
       ],
       [
-        "Verification",
-        "Verified"
+        "Source",
+        "ISSA Good Practice 173421 (Kader JKN, BPJS Kesehatan); SPACE Summary; ASEAN Snapshot"
       ]
     ]
   },
@@ -1689,8 +1572,7 @@ export const PRACTICES = [
     "detail": "Tailored awareness campaigns using simplified pamphlets, mobile roadshows, radio broadcasts and seminars targeting construction micro and small enterprises and sawmillers.",
     "impact": "Reached 1,500+ construction workers; surveys reported 85–98% willingness to contribute once the mechanisms were explained.",
     "agency": "NAPSA & Workers Compensation Fund",
-    "sources": null,
-    "verification": "Not re-verified",
+    "sources": "ILO WP 176",
     "facts": [
       [
         "Worker group",
@@ -1705,8 +1587,8 @@ export const PRACTICES = [
         "Reached 1,500+ construction workers; surveys reported 85–98% willingness to contribute once the mechanisms were explained."
       ],
       [
-        "Verification",
-        "Not re-verified"
+        "Source",
+        "ILO WP 176"
       ]
     ]
   },
@@ -1726,8 +1608,7 @@ export const PRACTICES = [
     "detail": "Attached colourful, easy-to-read brochures detailing domestic workers' legal social security rights directly to monthly household electricity bills.",
     "impact": "Achieved near-universal household reach across all socio-economic strata.",
     "agency": "ANDE & Instituto de Previsión Social",
-    "sources": null,
-    "verification": "Not re-verified",
+    "sources": "ILO Guidebook",
     "facts": [
       [
         "Worker group",
@@ -1742,8 +1623,8 @@ export const PRACTICES = [
         "Achieved near-universal household reach across all socio-economic strata."
       ],
       [
-        "Verification",
-        "Not re-verified"
+        "Source",
+        "ILO Guidebook"
       ]
     ]
   },
@@ -1763,8 +1644,7 @@ export const PRACTICES = [
     "detail": "Integrated mandatory practical modules on social security rights, self-employed contributions and occupational health into technical and vocational secondary schools.",
     "impact": "Instilled early awareness of formal social insurance benefits among young people entering informal trades.",
     "agency": "ESSALUD & Ministry of Education",
-    "sources": null,
-    "verification": "Not re-verified",
+    "sources": "ILO Guidebook",
     "facts": [
       [
         "Worker group",
@@ -1779,8 +1659,8 @@ export const PRACTICES = [
         "Instilled early awareness of formal social insurance benefits among young people entering informal trades."
       ],
       [
-        "Verification",
-        "Not re-verified"
+        "Source",
+        "ILO Guidebook"
       ]
     ]
   },
@@ -1800,8 +1680,7 @@ export const PRACTICES = [
     "detail": "Community health fairs offering free ear, vision and blood pressure check-ups for informal artisans (jua kali), combining immediate health services with Mbao pension enrolment.",
     "impact": "Created immediate tangible value that attracted thousands of informal workers to pension briefings.",
     "agency": "NSSF Kenya / Mbao Pension Plan",
-    "sources": null,
-    "verification": "Not re-verified",
+    "sources": "ILO Guidebook",
     "facts": [
       [
         "Worker group",
@@ -1816,8 +1695,8 @@ export const PRACTICES = [
         "Created immediate tangible value that attracted thousands of informal workers to pension briefings."
       ],
       [
-        "Verification",
-        "Not re-verified"
+        "Source",
+        "ILO Guidebook"
       ]
     ]
   },
@@ -1837,8 +1716,7 @@ export const PRACTICES = [
     "detail": "Domestic workers are compulsorily covered by NAPSA under the National Pension Scheme Act No. 40 of 1996, and employers must register them within one month of the start of work. Contributions are 10% of gross monthly earnings, shared equally between employer and worker, subject to a minimum qualifying income. Statutory enforcement was paired with intensive media and door-to-door civic education campaigns framing registration as a legal and moral civic duty.",
     "impact": "Increased public awareness and employer compliance across urban centres, establishing NAPSA pension accounts for household care workers; NAPSA operates a dedicated reporting line for unregistered domestic workers.",
     "agency": "National Pension Scheme Authority (NAPSA) / Ministry of Labour",
-    "sources": null,
-    "verification": "Corrected",
+    "sources": "NAPSA FAQs on Domestic Workers (napsa.co.zm); National Pension Scheme Act No. 40 of 1996; ILO Social Protection Reports",
     "facts": [
       [
         "Worker group",
@@ -1853,8 +1731,8 @@ export const PRACTICES = [
         "Increased public awareness and employer compliance across urban centres, establishing NAPSA pension accounts for household care workers; NAPSA operates a dedicated reporting line for unregistered domestic workers."
       ],
       [
-        "Verification",
-        "Corrected"
+        "Source",
+        "NAPSA FAQs on Domestic Workers (napsa.co.zm); National Pension Scheme Act No. 40 of 1996; ILO Social Protection Reports"
       ]
     ]
   },
@@ -1874,8 +1752,7 @@ export const PRACTICES = [
     "detail": "Legal regime requiring contracting companies that account for more than 50% or 80% of a self-employed worker's income to co-contribute 7%–10% toward that worker's social security.",
     "impact": "Rebalanced financial obligations between client and worker, granting access to unemployment, sickness and occupational injury benefits.",
     "agency": "Instituto da Segurança Social (ISS)",
-    "sources": null,
-    "verification": "Partly verified",
+    "sources": "ILO WP 176; European Commission (2018) Gaps in access to social protection for economically dependent self-employed in Spain",
     "facts": [
       [
         "Worker group",
@@ -1890,8 +1767,8 @@ export const PRACTICES = [
         "Rebalanced financial obligations between client and worker, granting access to unemployment, sickness and occupational injury benefits."
       ],
       [
-        "Verification",
-        "Partly verified"
+        "Source",
+        "ILO WP 176; European Commission (2018) Gaps in access to social protection for economically dependent self-employed in Spain"
       ]
     ]
   },
@@ -1907,12 +1784,11 @@ export const PRACTICES = [
     "workers": "general",
     "workersLabel": "Informal economy (general)",
     "title": "Worker Welfare Funds & Cess-Based Financing",
-    "summary": "FINANCING BASIS: earmarked sectoral levy, not general revenue.",
-    "detail": "FINANCING BASIS: earmarked sectoral levy, not general revenue. Sector-specific welfare boards are funded by a statutory 1–2% cess on commercial construction project cost or on production value, providing health, accident, maternity and funeral benefits. Retained in scope as a levy that shifts cost onto the industry rather than a tax-financed assistance benefit — though note these are welfare funds rather than social insurance schemes proper.",
+    "summary": "Sector-specific welfare boards funded by a statutory 1–2% levy (cess) on commercial construction project cost or on production value, providing health, accident, maternity and funeral benefits.",
+    "detail": "Sector-specific welfare boards funded by a statutory 1–2% levy (cess) on commercial construction project cost or on production value, providing health, accident, maternity and funeral benefits.",
     "impact": "Decoupled benefit financing from direct worker wages, securing social protection for millions of casual workers.",
     "agency": "State Welfare Boards (Construction, Beedi and others)",
-    "sources": null,
-    "verification": "Not re-verified",
+    "sources": "ILO WP 176; ILO Guidebook",
     "facts": [
       [
         "Worker group",
@@ -1927,8 +1803,8 @@ export const PRACTICES = [
         "Decoupled benefit financing from direct worker wages, securing social protection for millions of casual workers."
       ],
       [
-        "Verification",
-        "Not re-verified"
+        "Source",
+        "ILO WP 176; ILO Guidebook"
       ]
     ]
   },
@@ -1948,8 +1824,7 @@ export const PRACTICES = [
     "detail": "Mandatory scheme for self-employed artists and writers in which the insured person pays 50% of contributions, commercial users of artistic work pay a levy covering about 30%, and the federal government subsidises the remaining 20%.",
     "impact": "Achieved comprehensive pension, health and long-term care coverage across self-employed creative professionals.",
     "agency": "Künstlersozialkasse (KSK)",
-    "sources": null,
-    "verification": "Verified",
+    "sources": "Künstlersozialkasse official guidance; UNESCO Policy Monitoring Platform; ILO WP 176; ILO Guidebook",
     "facts": [
       [
         "Worker group",
@@ -1964,8 +1839,8 @@ export const PRACTICES = [
         "Achieved comprehensive pension, health and long-term care coverage across self-employed creative professionals."
       ],
       [
-        "Verification",
-        "Verified"
+        "Source",
+        "Künstlersozialkasse official guidance; UNESCO Policy Monitoring Platform; ILO WP 176; ILO Guidebook"
       ]
     ]
   },
@@ -1985,8 +1860,7 @@ export const PRACTICES = [
     "detail": "Legislation creating a legal framework that requires digital platform operators to make CPF contributions toward platform workers' retirement and housing, and to provide work injury compensation insurance aligned with WICA standards, alongside a right to be represented by platform work associations.",
     "impact": "Decouples gig work protection from standard employment contracts, establishing risk-sharing between platforms and workers, with CPF contribution rates phased in over several years.",
     "agency": "Ministry of Manpower (MOM) & CPF Board",
-    "sources": null,
-    "verification": "Corrected",
+    "sources": "MOM press release, Commencement of Platform Workers Act from 1 Jan 2025; Allen & Gledhill briefing; ASEAN Snapshot",
     "facts": [
       [
         "Worker group",
@@ -2001,8 +1875,8 @@ export const PRACTICES = [
         "Decouples gig work protection from standard employment contracts, establishing risk-sharing between platforms and workers, with CPF contribution rates phased in over several years."
       ],
       [
-        "Verification",
-        "Corrected"
+        "Source",
+        "MOM press release, Commencement of Platform Workers Act from 1 Jan 2025; Allen & Gledhill briefing; ASEAN Snapshot"
       ]
     ]
   },
@@ -2022,8 +1896,7 @@ export const PRACTICES = [
     "detail": "Combines mandatory and voluntary occupational injury insurance for defined self-employed sectors with voluntary retirement savings, backed by government matching grants and bundled micro-insurance.",
     "impact": "Extends injury and disability coverage to higher-risk informal sectors such as transport, delivery and hawking.",
     "agency": "SOCSO (PERKESO)",
-    "sources": null,
-    "verification": "Not re-verified",
+    "sources": "ASEAN Snapshot; WIEGO Presentation",
     "facts": [
       [
         "Worker group",
@@ -2038,8 +1911,8 @@ export const PRACTICES = [
         "Extends injury and disability coverage to higher-risk informal sectors such as transport, delivery and hawking."
       ],
       [
-        "Verification",
-        "Not re-verified"
+        "Source",
+        "ASEAN Snapshot; WIEGO Presentation"
       ]
     ]
   },
@@ -2059,8 +1932,7 @@ export const PRACTICES = [
     "detail": "Tailored benefit packages for informal economy workers combining long-term pension savings with short-term protections such as weather index insurance against drought.",
     "impact": "High worker interest, attributed to the immediate relevance of climate and seasonal risk protection alongside pension savings.",
     "agency": "NAPSA",
-    "sources": null,
-    "verification": "Partly verified",
+    "sources": "ILO WP 176",
     "facts": [
       [
         "Worker group",
@@ -2075,8 +1947,8 @@ export const PRACTICES = [
         "High worker interest, attributed to the immediate relevance of climate and seasonal risk protection alongside pension savings."
       ],
       [
-        "Verification",
-        "Partly verified"
+        "Source",
+        "ILO WP 176"
       ]
     ]
   },
@@ -2096,8 +1968,7 @@ export const PRACTICES = [
     "detail": "Specialised social insurance branch for smallholder farmers and artisanal fishers, providing primary healthcare, maternity benefits and invalidity and old-age pensions, delivered through community-based dispensaries and financed on a solidarity basis.",
     "impact": "Protects rural agricultural and fishing families through a dedicated contributory branch with cross-subsidy from the general regime.",
     "agency": "Instituto Ecuatoriano de Seguridad Social (IESS)",
-    "sources": null,
-    "verification": "Partly verified",
+    "sources": "IESS Seguro Campesino; ILO, Protección social en el sector pesquero del Ecuador (2025)",
     "facts": [
       [
         "Worker group",
@@ -2112,8 +1983,8 @@ export const PRACTICES = [
         "Protects rural agricultural and fishing families through a dedicated contributory branch with cross-subsidy from the general regime."
       ],
       [
-        "Verification",
-        "Partly verified"
+        "Source",
+        "IESS Seguro Campesino; ILO, Protección social en el sector pesquero del Ecuador (2025)"
       ]
     ]
   },
@@ -2133,8 +2004,7 @@ export const PRACTICES = [
     "detail": "Voluntary digital defined-contribution pension scheme launched on 14 December 2018, open to all residents with a national ID, with government top-ups, bundled life insurance and tax incentives; savings can partly be used as loan collateral or withdrawn for education and housing. Paired with community-based health insurance (CBHI) driven by a large network of community health workers.",
     "impact": "Reached 317,595 members with over RWF 1.3 billion saved within its first year, and continued growing thereafter; CBHI health insurance coverage exceeds 80% of the population.",
     "agency": "Rwanda Social Security Board (RSSB)",
-    "sources": null,
-    "verification": "Partly verified",
+    "sources": "ISSA Good Practice 182218 (EjoHeza); World Bank EjoHeza case note; RSSB; SPACE Summary",
     "facts": [
       [
         "Worker group",
@@ -2149,8 +2019,8 @@ export const PRACTICES = [
         "Reached 317,595 members with over RWF 1.3 billion saved within its first year, and continued growing thereafter; CBHI health insurance coverage exceeds 80% of the population."
       ],
       [
-        "Verification",
-        "Partly verified"
+        "Source",
+        "ISSA Good Practice 182218 (EjoHeza); World Bank EjoHeza case note; RSSB; SPACE Summary"
       ]
     ]
   },
@@ -2159,8 +2029,8 @@ export const PRACTICES = [
     "country": "South Africa",
     "a2": "za",
     "lonlat": [
-      25.157,
-      -29.01
+      25.428,
+      -27.482
     ],
     "category": "adequacy",
     "workers": "domestic",
@@ -2170,8 +2040,7 @@ export const PRACTICES = [
     "detail": "Domestic workers were integrated into the Unemployment Insurance Fund in 2003. Employer and worker each contribute 1% of monthly wages. The scheme accommodates multi-employer domestic work through 'partial unemployment benefits' where a worker loses one household job while retaining another. Supported by neighbourhood labour inspection blitzes, a National Skills Fund training programme, and organising by SADSAWU. In November 2020 the Constitutional Court's judgment in Mahlangu v Minister of Labour struck down the exclusion of domestic workers from the Compensation for Occupational Injuries and Diseases Act, extending work-injury compensation to them.",
     "impact": "Approximately 680,000 domestic workers registered with UIF against about 1.01 million eligible (roughly 67%) as at 31 March 2019, with over 300,000 having received cash maternity and unemployment benefits.",
     "agency": "Department of Employment and Labour / Unemployment Insurance Fund (UIF)",
-    "sources": null,
-    "verification": "Corrected",
+    "sources": "GroundUp / Department of Employment and Labour UIF data (2019); Mahlangu v Minister of Labour [2020] ZACC 24 (SAFLII); UN Women & ITUC Briefing Kit",
     "facts": [
       [
         "Worker group",
@@ -2186,8 +2055,8 @@ export const PRACTICES = [
         "Approximately 680,000 domestic workers registered with UIF against about 1.01 million eligible (roughly 67%) as at 31 March 2019, with over 300,000 having received cash maternity and unemployment benefits."
       ],
       [
-        "Verification",
-        "Corrected"
+        "Source",
+        "GroundUp / Department of Employment and Labour UIF data (2019); Mahlangu v Minister of Labour [2020] ZACC 24 (SAFLII); UN Women & ITUC Briefing Kit"
       ]
     ]
   },
@@ -2207,8 +2076,7 @@ export const PRACTICES = [
     "detail": "Royal Decree-Law 16/2022 of 6 September 2022 reformed the SEEH following the Court of Justice of the EU's ruling in Case C-389/20 (24 February 2022), eliminating historical exclusions and granting domestic workers unemployment protection, occupational risk coverage and statutory sick pay. In-kind salary deductions are capped at 30% of the minimum wage. Spain has signed bilateral social security agreements with Morocco and Ecuador guaranteeing pension portability for migrant care workers, and ratified ILO Convention No. 189 on 28 February 2023.",
     "impact": "The reform affects approximately 373,000 registered domestic workers and safeguards pension portability for migrant care workers from Latin America and North Africa.",
     "agency": "Tesorería General de la Seguridad Social (TGSS) / Ministry of Inclusion",
-    "sources": null,
-    "verification": "Verified – figure updated",
+    "sources": "CJEU Case C-389/20; Royal Decree-Law 16/2022; ILO (2025) International experience on protecting rights of domestic workers; European Commission (2024) Access for domestic workers to labour and social protection",
     "facts": [
       [
         "Worker group",
@@ -2223,8 +2091,8 @@ export const PRACTICES = [
         "The reform affects approximately 373,000 registered domestic workers and safeguards pension portability for migrant care workers from Latin America and North Africa."
       ],
       [
-        "Verification",
-        "Verified – figure updated"
+        "Source",
+        "CJEU Case C-389/20; Royal Decree-Law 16/2022; ILO (2025) International experience on protecting rights of domestic workers; European Commission (2024) Access for domestic workers to labour and social protection"
       ]
     ]
   },
@@ -2244,8 +2112,7 @@ export const PRACTICES = [
     "detail": "Law No. 1493 of 8 July 2020 extended family and prenatal benefits to self-employed workers through CAMTI, the sickness, accident and maternity insurance fund for the self-employed. Benefits are of equal value to those in the employed workers' scheme, which had previously been the only route to family benefits. Implementation required identifying eligible beneficiaries among the self-employed, supporting them through file creation, and paying benefits from the law's effective date.",
     "impact": "Closed a benefit-branch gap between employed and self-employed workers, achieving parity of family benefits across employment status for the whole working population of the Principality.",
     "agency": "Caisses Sociales de Monaco (CSM) / CAMTI",
-    "sources": null,
-    "verification": "Verified",
+    "sources": "ISSA Good Practice 219088 (Caisses Sociales de Monaco); Law No. 1493 of 8 July 2020",
     "facts": [
       [
         "Worker group",
@@ -2260,8 +2127,8 @@ export const PRACTICES = [
         "Closed a benefit-branch gap between employed and self-employed workers, achieving parity of family benefits across employment status for the whole working population of the Principality."
       ],
       [
-        "Verification",
-        "Verified"
+        "Source",
+        "ISSA Good Practice 219088 (Caisses Sociales de Monaco); Law No. 1493 of 8 July 2020"
       ]
     ]
   },
@@ -2281,8 +2148,7 @@ export const PRACTICES = [
     "detail": "The 2007 Self-Employed Workers' Statute (Ley del Estatuto del Trabajo Autónomo) created the legal category of the economically dependent self-employed worker (trabajador autónomo económicamente dependiente, TRADE), defined principally by an economic test — the share of the worker's income derived from a single client — and attaching a set of employment-like protections to that status.",
     "impact": "Establishes statutory recognition of dependent self-employment. An EU case study nonetheless documents continuing gaps in this group's access to social protection, so the category's existence should not be read as evidence that the gap has been closed.",
     "agency": "Ministry of Inclusion, Social Security and Migration",
-    "sources": null,
-    "verification": "Partly verified",
+    "sources": "European Commission, DG EMPL (2018) Gaps in access to social protection for economically dependent self-employed in Spain; European Commission (2018) Access to social protection for workers and the self-employed",
     "facts": [
       [
         "Worker group",
@@ -2297,230 +2163,8 @@ export const PRACTICES = [
         "Establishes statutory recognition of dependent self-employment. An EU case study nonetheless documents continuing gaps in this group's access to social protection, so the category's existence should not be read as evidence that the gap has been closed."
       ],
       [
-        "Verification",
-        "Partly verified"
-      ]
-    ]
-  },
-  {
-    "id": "ar-packaging-bill-extended-producer",
-    "country": "Argentina",
-    "a2": "ar",
-    "lonlat": [
-      -66.911,
-      -34.251
-    ],
-    "category": "adequacy",
-    "workers": "general",
-    "workersLabel": "Informal economy (general)",
-    "title": "Packaging Bill — Extended Producer Responsibility for Inclusive Recycling",
-    "summary": "FINANCING BASIS: third-party producer levy, not state revenue.",
-    "detail": "FINANCING BASIS: third-party producer levy, not state revenue. A law arising from sustained pressure by organised waste workers requires packaging-producing companies to contribute directly to the financing of inclusive recycling systems. The revenue improves working conditions and occupational health and safety for informal waste pickers, and supports their access to the Social Monotributo and through it to national social protection.",
-    "impact": "Shifts part of the cost of protecting informal waste pickers onto the commercial actors whose packaging they handle, rather than onto the workers' own low and volatile earnings. Structurally the same co-contribution logic as Germany's KSK user levy, India's construction cess and Singapore's platform operator contributions.",
-    "agency": "National Government / waste picker organisations",
-    "sources": null,
-    "verification": "Partly verified",
-    "facts": [
-      [
-        "Worker group",
-        "Informal economy (general)"
-      ],
-      [
-        "Implementing agency",
-        "National Government / waste picker organisations"
-      ],
-      [
-        "Coverage & key features",
-        "Shifts part of the cost of protecting informal waste pickers onto the commercial actors whose packaging they handle, rather than onto the workers' own low and volatile earnings. Structurally the same co-contribution logic as Germany's KSK user levy, India's construction cess and Singapore's platform operator contributions."
-      ],
-      [
-        "Verification",
-        "Partly verified"
-      ]
-    ]
-  },
-  {
-    "id": "gh-informal-sector-pension-scheme",
-    "country": "Ghana",
-    "a2": "gh",
-    "lonlat": [
-      -0.946,
-      9.481
-    ],
-    "category": "adequacy",
-    "workers": "general",
-    "workersLabel": "Informal economy (general)",
-    "title": "Informal Sector Pension Scheme (2017) — CAUTIONARY CASE",
-    "summary": "A voluntary pension scheme established in 2017 by an informal workers' union for its own membership.",
-    "detail": "A voluntary pension scheme established in 2017 by an informal workers' union for its own membership. Included here as a cautionary case rather than a good practice: by March 2022 only 1,511 of the union's 185,000 members — under 1 per cent — had joined. WIEGO attributes the failure to low and volatile incomes, lack of awareness of the scheme, and distrust rooted in members' earlier negative experiences with financial and pension providers.",
-    "impact": "Demonstrates that worker-led ownership and voluntary design are not sufficient on their own. Absent affordability support, active awareness-building and a repaired trust relationship, uptake can stay below 1 per cent even within an organised and reachable membership.",
-    "agency": "Informal worker union (union-established voluntary scheme)",
-    "sources": null,
-    "verification": "Verified",
-    "facts": [
-      [
-        "Worker group",
-        "Informal economy (general)"
-      ],
-      [
-        "Implementing agency",
-        "Informal worker union (union-established voluntary scheme)"
-      ],
-      [
-        "Coverage & key features",
-        "Demonstrates that worker-led ownership and voluntary design are not sufficient on their own. Absent affordability support, active awareness-building and a repaired trust relationship, uptake can stay below 1 per cent even within an organised and reachable membership."
-      ],
-      [
-        "Verification",
-        "Verified"
-      ]
-    ]
-  },
-  {
-    "id": "us-black-car-fund-consumer",
-    "country": "United States of America",
-    "a2": "us",
-    "lonlat": [
-      -99.144,
-      39.526
-    ],
-    "category": "adequacy",
-    "workers": "platform",
-    "workersLabel": "Platform & gig workers",
-    "title": "Black Car Fund — Consumer Surcharge Financing Work-Injury Cover",
-    "summary": "A fund providing ride-sharing and for-hire vehicle drivers with protection against work-related injury, operating along the lines of a state workers' compensation scheme but financed by a small surcharge levied on the consumer rather than by contributions from the driver.",
-    "detail": "A fund providing ride-sharing and for-hire vehicle drivers with protection against work-related injury, operating along the lines of a state workers' compensation scheme but financed by a small surcharge levied on the consumer rather than by contributions from the driver. ILO Working Paper 176 highlights the design as potentially adaptable to assessing the employer's share of self-employment tax on consumers.",
-    "impact": "Provides work-injury cover to drivers who, as independent contractors, would otherwise fall outside workers' compensation, without loading the cost onto their own earnings.",
-    "agency": "New York Black Car Fund",
-    "sources": null,
-    "verification": "Partly verified",
-    "facts": [
-      [
-        "Worker group",
-        "Platform & gig workers"
-      ],
-      [
-        "Implementing agency",
-        "New York Black Car Fund"
-      ],
-      [
-        "Coverage & key features",
-        "Provides work-injury cover to drivers who, as independent contractors, would otherwise fall outside workers' compensation, without loading the cost onto their own earnings."
-      ],
-      [
-        "Verification",
-        "Partly verified"
-      ]
-    ]
-  },
-  {
-    "id": "ca-special-benefits-for-self",
-    "country": "Canada",
-    "a2": "ca",
-    "lonlat": [
-      -102.365,
-      57.934
-    ],
-    "category": "adequacy",
-    "workers": "self-employed",
-    "workersLabel": "Self-employed / own-account",
-    "title": "Special Benefits for Self-Employed Workers — MIXED CASE",
-    "summary": "A voluntary opt-in extending Employment Insurance special benefits — maternity, parental, sickness and care for a seriously ill family member — to self-employed workers.",
-    "detail": "A voluntary opt-in extending Employment Insurance special benefits — maternity, parental, sickness and care for a seriously ill family member — to self-employed workers. Included as a mixed case: an official evaluation found significant adverse selection, with claims skewed disproportionately towards maternity and parental benefits, membership concentrated in the 25–44 age group, and two thirds of voluntary members being women although women are only 43% of all self-employed workers. The scheme ran deficits as a result.",
-    "impact": "Demonstrates both the appeal of tailoring benefits to self-employed life-cycle risks and the fiscal consequence of doing so on a voluntary opt-in basis: those most likely to claim are those most likely to join.",
-    "agency": "Employment Insurance / Service Canada",
-    "sources": null,
-    "verification": "Verified",
-    "facts": [
-      [
-        "Worker group",
-        "Self-employed / own-account"
-      ],
-      [
-        "Implementing agency",
-        "Employment Insurance / Service Canada"
-      ],
-      [
-        "Coverage & key features",
-        "Demonstrates both the appeal of tailoring benefits to self-employed life-cycle risks and the fiscal consequence of doing so on a voluntary opt-in basis: those most likely to claim are those most likely to join."
-      ],
-      [
-        "Verification",
-        "Verified"
-      ]
-    ]
-  },
-  {
-    "id": "be-separate-mandatory-social-insurance",
-    "country": "Belgium",
-    "a2": "be",
-    "lonlat": [
-      4.91,
-      52.167
-    ],
-    "category": "adequacy",
-    "workers": "self-employed",
-    "workersLabel": "Self-employed / own-account",
-    "title": "Separate Mandatory Social Insurance Scheme for the Self-Employed",
-    "summary": "Belgium operates separate social insurance schemes for self-employed workers, distinct from the employee regime, cited in ILO Working Paper 176 as one of the country examples of a dedicated institutional track for the self-employed rather than an extension of the employee scheme.",
-    "detail": "Belgium operates separate social insurance schemes for self-employed workers, distinct from the employee regime, cited in ILO Working Paper 176 as one of the country examples of a dedicated institutional track for the self-employed rather than an extension of the employee scheme.",
-    "impact": "Illustrates the 'separate scheme' institutional model, as against extending an existing employee scheme — the alternative design choice running through several entries in this database.",
-    "agency": "INASTI / RSVZ (National Institute for the Social Security of the Self-Employed)",
-    "sources": null,
-    "verification": "Not re-verified",
-    "facts": [
-      [
-        "Worker group",
-        "Self-employed / own-account"
-      ],
-      [
-        "Implementing agency",
-        "INASTI / RSVZ (National Institute for the Social Security of the Self-Employed)"
-      ],
-      [
-        "Coverage & key features",
-        "Illustrates the 'separate scheme' institutional model, as against extending an existing employee scheme — the alternative design choice running through several entries in this database."
-      ],
-      [
-        "Verification",
-        "Not re-verified"
-      ]
-    ]
-  },
-  {
-    "id": "vn-voluntary-social-insurance-scheme",
-    "country": "Vietnam",
-    "a2": "vn",
-    "lonlat": [
-      104.032,
-      18.738
-    ],
-    "category": "adequacy",
-    "workers": "general",
-    "workersLabel": "Informal economy (general)",
-    "title": "Voluntary Social Insurance Scheme (2008) — CAUTIONARY CASE",
-    "summary": "A voluntary social insurance scheme established in 2008 for workers outside the mandatory regime.",
-    "detail": "A voluntary social insurance scheme established in 2008 for workers outside the mandatory regime. Included as a cautionary case: by 2019 it had only around 350,000 participants, just 1.3% of the total uninsured workforce. ILO Working Paper 176 attributes the weak uptake substantially to pricing — voluntary contributors faced a 22% contribution rate for old-age insurance against 8% for employees under the compulsory scheme.",
-    "impact": "Essential context for Viet Nam's two other entries in this database. The legal expansions of 2019 and 2024 were building on a voluntary scheme that had reached barely 1% of its target population, largely because it cost voluntary members nearly three times what employees paid.",
-    "agency": "Viet Nam Social Security (VSS)",
-    "sources": null,
-    "verification": "Verified",
-    "facts": [
-      [
-        "Worker group",
-        "Informal economy (general)"
-      ],
-      [
-        "Implementing agency",
-        "Viet Nam Social Security (VSS)"
-      ],
-      [
-        "Coverage & key features",
-        "Essential context for Viet Nam's two other entries in this database. The legal expansions of 2019 and 2024 were building on a voluntary scheme that had reached barely 1% of its target population, largely because it cost voluntary members nearly three times what employees paid."
-      ],
-      [
-        "Verification",
-        "Verified"
+        "Source",
+        "European Commission, DG EMPL (2018) Gaps in access to social protection for economically dependent self-employed in Spain; European Commission (2018) Access to social protection for workers and the self-employed"
       ]
     ]
   },
@@ -2540,8 +2184,7 @@ export const PRACTICES = [
     "detail": "Legal mechanism allowing rural cooperatives, unions and producer associations (minimum 50 members) to collectively negotiate contribution rates, collect fees and act as administrative intermediaries with CCSS.",
     "impact": "Empowered rural workers through collective bargaining, serving as a bridge between the state and dispersed rural populations.",
     "agency": "CCSS",
-    "sources": null,
-    "verification": "Not re-verified",
+    "sources": "ILO WP 176",
     "facts": [
       [
         "Worker group",
@@ -2556,8 +2199,8 @@ export const PRACTICES = [
         "Empowered rural workers through collective bargaining, serving as a bridge between the state and dispersed rural populations."
       ],
       [
-        "Verification",
-        "Not re-verified"
+        "Source",
+        "ILO WP 176"
       ]
     ]
   },
@@ -2577,8 +2220,7 @@ export const PRACTICES = [
     "detail": "The Social Security Act of 2018 requires that the tripartite Social Security Commission include a member representing informal sector workers, institutionalising their voice in scheme governance.",
     "impact": "Institutionalised informal workers' representation in national social security governance.",
     "agency": "Social Security Commission / SSS",
-    "sources": null,
-    "verification": "Partly verified",
+    "sources": "Republic Act No. 11199 (Social Security Act of 2018); WIEGO Presentation; ASEAN Snapshot",
     "facts": [
       [
         "Worker group",
@@ -2593,8 +2235,8 @@ export const PRACTICES = [
         "Institutionalised informal workers' representation in national social security governance."
       ],
       [
-        "Verification",
-        "Partly verified"
+        "Source",
+        "Republic Act No. 11199 (Social Security Act of 2018); WIEGO Presentation; ASEAN Snapshot"
       ]
     ]
   },
@@ -2614,8 +2256,7 @@ export const PRACTICES = [
     "detail": "Worker-driven collective scheme organised by Federation of Informal Workers' Organisations of Nigeria chapters that pools informal worker contributions, self-organises social insurance and advocates with public authorities.",
     "impact": "Created a trusted, grassroots alternative for informal workers in a low-trust, low-public-investment setting.",
     "agency": "FIWON Cooperative",
-    "sources": null,
-    "verification": "Not re-verified",
+    "sources": "FIWON / WIEGO Case Study",
     "facts": [
       [
         "Worker group",
@@ -2630,8 +2271,8 @@ export const PRACTICES = [
         "Created a trusted, grassroots alternative for informal workers in a low-trust, low-public-investment setting."
       ],
       [
-        "Verification",
-        "Not re-verified"
+        "Source",
+        "FIWON / WIEGO Case Study"
       ]
     ]
   },
@@ -2651,8 +2292,7 @@ export const PRACTICES = [
     "detail": "Grassroots waste pickers' trade union (KKPKP) advocated for municipal recognition, securing municipal budget subsidies for collective group health insurance for its members.",
     "impact": "Demonstrated how collective worker organisation and local government partnership can bridge urban protection gaps.",
     "agency": "KKPKP & Municipalities",
-    "sources": null,
-    "verification": "Not re-verified",
+    "sources": "WIEGO Doc 33; ILO Guidebook",
     "facts": [
       [
         "Worker group",
@@ -2667,8 +2307,8 @@ export const PRACTICES = [
         "Demonstrated how collective worker organisation and local government partnership can bridge urban protection gaps."
       ],
       [
-        "Verification",
-        "Not re-verified"
+        "Source",
+        "WIEGO Doc 33; ILO Guidebook"
       ]
     ]
   },
@@ -2688,8 +2328,7 @@ export const PRACTICES = [
     "detail": "Republic Act 10361, enacted following ratification of ILO Convention No. 189, establishes mandatory SSS, PhilHealth and Pag-IBIG coverage for all domestic workers with at least one month of service. Where the worker earns less than PHP 5,000 a month, the household employer must pay the full social security premium. The Act provides a minimum wage, written contracts in a language the worker understands, daily and weekly rest, and five days of service incentive leave. Supported by SUMAPI (the national domestic workers' organisation), barangay Kasambahay Desks and National Domestic Workers Day.",
     "impact": "Extended statutory entitlement to roughly 1.9 million domestic workers and set a legal benchmark for ASEAN, although effective registration remains low because of household privacy barriers to enforcement.",
     "agency": "SSS, PhilHealth, Pag-IBIG Fund, DOLE",
-    "sources": null,
-    "verification": "Corrected",
+    "sources": "Republic Act No. 10361; Republic Act No. 11210 (2019); UN Women & ITUC Briefing Kit; ILO ASEAN Report (2024)",
     "facts": [
       [
         "Worker group",
@@ -2704,8 +2343,8 @@ export const PRACTICES = [
         "Extended statutory entitlement to roughly 1.9 million domestic workers and set a legal benchmark for ASEAN, although effective registration remains low because of household privacy barriers to enforcement."
       ],
       [
-        "Verification",
-        "Corrected"
+        "Source",
+        "Republic Act No. 10361; Republic Act No. 11210 (2019); UN Women & ITUC Briefing Kit; ILO ASEAN Report (2024)"
       ]
     ]
   }
