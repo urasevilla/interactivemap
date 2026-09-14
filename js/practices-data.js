@@ -4,7 +4,7 @@
  * Source:    data/source/good-practices.csv
  * Regenerate: npm run import
  *
- * 62 practices across 43 countries.
+ * 65 practices across 44 countries.
  */
 
 export const PRACTICES = [
@@ -24,7 +24,7 @@ export const PRACTICES = [
     "detail": "Unified monotax regime combining tax and social security into a single flat payment with a progressive, stepped contribution scale (25% in Year 1 to 100% in Year 4). The 2006 reform eased eligibility restrictions and admitted one-person businesses.",
     "impact": "ILO records annual registration growth of one-person businesses rising from 1.3% per year (2002–2006) to 6.5% per year (2007–2009), roughly 12,722 additional registrations. Covers about 23% of the target population.",
     "agency": "Banco de Previsión Social (BPS) & MIDES",
-    "sources": "ILO WP 176; ILO (2017) Innovations in extending social insurance coverage to independent workers; WIEGO Monotax Uruguay",
+    "sources": "ILO ESS Document No. 42 (2013); ILO (2017) Innovations in extending social insurance coverage to independent workers; ILO WP 176; WIEGO Monotax Uruguay",
     "facts": [
       [
         "Worker group",
@@ -40,7 +40,7 @@ export const PRACTICES = [
       ],
       [
         "Source",
-        "ILO WP 176; ILO (2017) Innovations in extending social insurance coverage to independent workers; WIEGO Monotax Uruguay"
+        "ILO ESS Document No. 42 (2013); ILO (2017) Innovations in extending social insurance coverage to independent workers; ILO WP 176; WIEGO Monotax Uruguay"
       ]
     ]
   },
@@ -56,11 +56,11 @@ export const PRACTICES = [
     "workers": "agricultural",
     "workersLabel": "Agricultural / rural workers",
     "title": "Simples Nacional / MEI & Previdência Rural (Segurado Especial)",
-    "summary": "Monotax mechanism consolidating taxes into one flat monthly payment for micro-entrepreneurs (MEI contribution set at 5% of the minimum wage for social security).",
-    "detail": "Monotax mechanism consolidating taxes into one flat monthly payment for micro-entrepreneurs (MEI contribution set at 5% of the minimum wage for social security). Rural subsistence farmers (segurado especial) contribute a levy on the gross sales value of their production rather than on wages.",
-    "impact": "11.5 million MEI registrations active as of late 2024, of which over 90% are trading. Roughly one in four own-account workers is protected under the rural pension regime.",
+    "summary": "Monotax mechanism consolidating federal, state and municipal taxes with social security into a single monthly payment.",
+    "detail": "Monotax mechanism consolidating federal, state and municipal taxes with social security into a single monthly payment. Individual Micro Entrepreneurs (MEI/IME) pay a fixed monthly amount (about BRL 55.90 in 2018), with the social security component set at 5% of the minimum wage; micro and small enterprises pay a variable monotax of 4.00%–24.50% of turnover across five activity categories. Rural subsistence farmers (segurado especial) contribute a levy on the gross sales value of their production rather than on wages.",
+    "impact": "7.7 million Individual Micro Entrepreneurs and 5 million micro and small enterprises were registered under the regime in 2018, together 98% of all formally registered companies; the 5 million MSEs employed 10.6 million formal workers, 26.7% of total formal employment. Access to social security was the single largest stated motive for registering (32.2%). MEI registrations reached 11.5 million active by late 2024. Roughly one in four own-account workers is protected under the rural pension regime.",
     "agency": "Receita Federal & INSS",
-    "sources": "INSS (gov.br) Contribuição do Segurado Especial; Sebrae/Receita Federal 2024; ILO WP 176",
+    "sources": "ILO (2019) The monotax regime in Brazil (wcms_715864); INSS (gov.br) Contribuição do Segurado Especial; Sebrae/Receita Federal 2024",
     "facts": [
       [
         "Worker group",
@@ -72,11 +72,11 @@ export const PRACTICES = [
       ],
       [
         "Coverage & key features",
-        "11.5 million MEI registrations active as of late 2024, of which over 90% are trading. Roughly one in four own-account workers is protected under the rural pension regime."
+        "7.7 million Individual Micro Entrepreneurs and 5 million micro and small enterprises were registered under the regime in 2018, together 98% of all formally registered companies; the 5 million MSEs employed 10.6 million formal workers, 26.7% of total formal employment. Access to social security was the single largest stated motive for registering (32.2%). MEI registrations reached 11.5 million active by late 2024. Roughly one in four own-account workers is protected under the rural pension regime."
       ],
       [
         "Source",
-        "INSS (gov.br) Contribuição do Segurado Especial; Sebrae/Receita Federal 2024; ILO WP 176"
+        "ILO (2019) The monotax regime in Brazil (wcms_715864); INSS (gov.br) Contribuição do Segurado Especial; Sebrae/Receita Federal 2024"
       ]
     ]
   },
@@ -93,10 +93,10 @@ export const PRACTICES = [
     "workersLabel": "Self-employed / own-account",
     "title": "Mandatory Insurance for Self-Employed (Inversely Proportional Subsidies)",
     "summary": "Categorized contribution scale based on reference income brackets, where state matching subsidies are inversely proportional to worker income.",
-    "detail": "Categorized contribution scale based on reference income brackets, where state matching subsidies are inversely proportional to worker income. The state covers the difference between the worker's contribution and the full rate, plus an additional 0.25% of wages.",
+    "detail": "Categorized contribution scale based on reference income brackets, where state matching subsidies are inversely proportional to worker income. The state covers the difference between the worker's contribution and the full rate, plus an additional 0.25% of wages. CCSS also deploys specialised inspectors dedicated to overseeing the registration of self-employed workers.",
     "impact": "Self-employed pension coverage rose to 44.8% and health coverage to about 60% by 2009, from baselines of 15.9% and 30.5% respectively.",
     "agency": "Caja Costarricense de Seguro Social (CCSS)",
-    "sources": "ILO (2017) Innovations in extending social insurance coverage to independent workers; ILO Guidebook",
+    "sources": "ILO ESS Document No. 42 (2013); ILO (2017) Innovations in extending social insurance coverage; ILO Social Protection Platform (Self-employed workers module)",
     "facts": [
       [
         "Worker group",
@@ -112,7 +112,7 @@ export const PRACTICES = [
       ],
       [
         "Source",
-        "ILO (2017) Innovations in extending social insurance coverage to independent workers; ILO Guidebook"
+        "ILO ESS Document No. 42 (2013); ILO (2017) Innovations in extending social insurance coverage; ILO Social Protection Platform (Self-employed workers module)"
       ]
     ]
   },
@@ -600,7 +600,7 @@ export const PRACTICES = [
     "detail": "Streamlined business and social security registration hubs located in high-density areas such as municipal markets, equipped with integrated IT systems.",
     "impact": "Social security coverage increased from 39.8% to 55.3% between 2016 and 2020.",
     "agency": "INPS",
-    "sources": "ILO WP 176; ILO Guidebook",
+    "sources": "ILO Social Protection Platform (Self-employed workers module); ILO WP 176; ILO Guidebook",
     "facts": [
       [
         "Worker group",
@@ -616,7 +616,7 @@ export const PRACTICES = [
       ],
       [
         "Source",
-        "ILO WP 176; ILO Guidebook"
+        "ILO Social Protection Platform (Self-employed workers module); ILO WP 176; ILO Guidebook"
       ]
     ]
   },
@@ -632,11 +632,11 @@ export const PRACTICES = [
     "workers": "general",
     "workersLabel": "Informal economy (general)",
     "title": "AlkanSSSya Programme & UMID Smart Cards",
-    "summary": "Physical micro-contribution savings boxes installed at transport terminals and workplaces allowing informal workers to make small daily cash deposits, supported by UMID smart cards.",
-    "detail": "Physical micro-contribution savings boxes installed at transport terminals and workplaces allowing informal workers to make small daily cash deposits, supported by UMID smart cards. The model has since been extended to 4Ps (conditional cash transfer) households.",
-    "impact": "Registered and collected contributions from over 107,000 informal transport and other workers as reported in the mid-2010s; subsequently expanded through a DSWD–SSS partnership.",
+    "summary": "Individual metal savings boxes installed at transport terminals and workplaces let informal workers deposit PHP 10–20 a day; partner Informal Sector Groups (ISGs) collect the cash and remit monthly contributions to SSS, with a minimum monthly contribution of PHP 330.",
+    "detail": "Individual metal savings boxes installed at transport terminals and workplaces let informal workers deposit PHP 10–20 a day; partner Informal Sector Groups (ISGs) collect the cash and remit monthly contributions to SSS, with a minimum monthly contribution of PHP 330. Supported by UMID smart cards. Piloted in late 2011 as 'TrikanSSSya' for tricycle drivers, rolled out nationwide as AlkanSSSya in 2012, with an e-AlkanSSSya variant for government workers from 2015. The model has since been extended to 4Ps conditional cash transfer households.",
+    "impact": "122,387 members enrolled through 1,235 participating Informal Sector Groups, with PHP 167 million in contributions collected, as at end-2014. Members access the same SSS old-age, disability and survivor benefits as formal employees.",
     "agency": "Social Security System (SSS)",
-    "sources": "SSS / Philippine SDG portal AlkanSSSya; DAP Compendium of Innovations; ASEAN Snapshot",
+    "sources": "ILO/GIZ discussion paper on the AlkanSSSya Programme (social-protection.org id 55687); SSS / Philippine SDG portal",
     "facts": [
       [
         "Worker group",
@@ -648,11 +648,11 @@ export const PRACTICES = [
       ],
       [
         "Coverage & key features",
-        "Registered and collected contributions from over 107,000 informal transport and other workers as reported in the mid-2010s; subsequently expanded through a DSWD–SSS partnership."
+        "122,387 members enrolled through 1,235 participating Informal Sector Groups, with PHP 167 million in contributions collected, as at end-2014. Members access the same SSS old-age, disability and survivor benefits as formal employees."
       ],
       [
         "Source",
-        "SSS / Philippine SDG portal AlkanSSSya; DAP Compendium of Innovations; ASEAN Snapshot"
+        "ILO/GIZ discussion paper on the AlkanSSSya Programme (social-protection.org id 55687); SSS / Philippine SDG portal"
       ]
     ]
   },
@@ -740,11 +740,11 @@ export const PRACTICES = [
     "workers": "agricultural",
     "workersLabel": "Agricultural / rural workers",
     "title": "Integrated Community Registration Outreach Programme (ICROP)",
-    "summary": "Mobile outreach units equipped with satellite technology deployed to remote rural communities to register informal and agricultural workers for social protection.",
-    "detail": "Mobile outreach units equipped with satellite technology deployed to remote rural communities to register informal and agricultural workers for social protection.",
-    "impact": "Extended social protection access to millions of marginalised rural inhabitants.",
+    "summary": "Fully equipped mobile one-stop service units — vehicles carrying modern technology — travel to remote rural and semi-urban communities to handle enrolment, biometric identification, smart card issuance, real-time database updates and access to seven welfare programmes including the Child Support Grant and disability grants.",
+    "detail": "Fully equipped mobile one-stop service units — vehicles carrying modern technology — travel to remote rural and semi-urban communities to handle enrolment, biometric identification, smart card issuance, real-time database updates and access to seven welfare programmes including the Child Support Grant and disability grants. SASSA leads, supported by Home Affairs, Health, Justice, Education and Agriculture. Mobile units were first dispatched in 2001 for Child Support Grant delivery; ICROP was formally launched in 2007 and became a government-wide programme in 2008 under the President's 'war on poverty' initiative.",
+    "impact": "Between 2007 and 2013 ICROP served over 730 wards and completed more than 320,000 Child Support Grant applications, with cumulative registrations rising from 47,381 (2008) to 327,135 (2013). The 2013–14 budget was about ZAR 4.5 billion (US$481 million). Over the same period the national poverty headcount ratio fell from 57.2% (2006) to 45.5% (2011).",
     "agency": "SASSA & Department of Social Development",
-    "sources": "ILO WP 176",
+    "sources": "ILO Social Protection Platform, ICROP South Africa case study (RessourcePDF id 51861); ILO WP 176",
     "facts": [
       [
         "Worker group",
@@ -756,11 +756,11 @@ export const PRACTICES = [
       ],
       [
         "Coverage & key features",
-        "Extended social protection access to millions of marginalised rural inhabitants."
+        "Between 2007 and 2013 ICROP served over 730 wards and completed more than 320,000 Child Support Grant applications, with cumulative registrations rising from 47,381 (2008) to 327,135 (2013). The 2013–14 budget was about ZAR 4.5 billion (US$481 million). Over the same period the national poverty headcount ratio fell from 57.2% (2006) to 45.5% (2011)."
       ],
       [
         "Source",
-        "ILO WP 176"
+        "ILO Social Protection Platform, ICROP South Africa case study (RessourcePDF id 51861); ILO WP 176"
       ]
     ]
   },
@@ -812,11 +812,11 @@ export const PRACTICES = [
     "workers": "general",
     "workersLabel": "Informal economy (general)",
     "title": "Mutual Association of Solidarity Services",
-    "summary": "Non-governmental association acting as a 'virtual employer' to collect, consolidate and transfer social security contributions on behalf of informal worker associations.",
-    "detail": "Non-governmental association acting as a 'virtual employer' to collect, consolidate and transfer social security contributions on behalf of informal worker associations.",
-    "impact": "Enabled thousands of informal street vendors and transport workers to access formal health and pension systems.",
+    "summary": "Founded in 2005 by the CASC trade union in partnership with World Solidarity (WSM), AMUSSOL acts as a 'virtual employer': informal workers who have no legal employer pay monthly contributions to AMUSSOL, which channels them into the national social security treasury, allowing the workers to join the Dominican social security system as if formally employed.",
+    "detail": "Founded in 2005 by the CASC trade union in partnership with World Solidarity (WSM), AMUSSOL acts as a 'virtual employer': informal workers who have no legal employer pay monthly contributions to AMUSSOL, which channels them into the national social security treasury, allowing the workers to join the Dominican social security system as if formally employed. Members contribute 22.4% of income — 21.4% for social security and 1% for AMUSSOL's administration. Members include transport workers, street vendors, salon workers, micro-enterprise operators and domestic workers.",
+    "impact": "About 57,970 titular affiliates plus dependents — roughly 60,000 people — covered as at end-2015, with access to family health insurance (85% hospital and 80% medical and pharmaceutical cover), workplace accident insurance and the pension system.",
     "agency": "AMUSSOL (Asociación Mutual de Servicios Solidarios)",
-    "sources": "ILO Guidebook",
+    "sources": "World Solidarity (WSM), AMUSSOL brochure; ILO Social Protection Platform (Self-employed workers module); ILO Guidebook",
     "facts": [
       [
         "Worker group",
@@ -828,11 +828,11 @@ export const PRACTICES = [
       ],
       [
         "Coverage & key features",
-        "Enabled thousands of informal street vendors and transport workers to access formal health and pension systems."
+        "About 57,970 titular affiliates plus dependents — roughly 60,000 people — covered as at end-2015, with access to family health insurance (85% hospital and 80% medical and pharmaceutical cover), workplace accident insurance and the pension system."
       ],
       [
         "Source",
-        "ILO Guidebook"
+        "World Solidarity (WSM), AMUSSOL brochure; ILO Social Protection Platform (Self-employed workers module); ILO Guidebook"
       ]
     ]
   },
@@ -1392,7 +1392,7 @@ export const PRACTICES = [
     "detail": "Under Law No. 111/2022 and Government Decision 822/2022, Romania launched an online platform for domestic work tickets. Household beneficiaries purchase electronic tickets (15 lei, about €3, each) that automatically register unqualified domestic service providers, pay wages and remit social insurance contributions and income tax to the state. Income tax (10%) and the pension contribution (25%) are each applied to only 50% of earned income. Workers redeeming at least 85 tickets a month qualify for free health insurance, and beneficiaries buying 600+ tickets a year receive 75 free tickets.",
     "impact": "Targets the formalisation and digital social security registration of at least 60,000 previously unemployed or inactive people as domestic workers by 2026.",
     "agency": "National Employment Agency (ANOFM) / Ministry of Labour",
-    "sources": "European Commission / ESPN, Romania launches a system of service vouchers (docId 25954); ESPAN Synthesis Report (2024)",
+    "sources": "European Commission / ESPN, Romania launches a system of service vouchers (docId 25954); European Commission (2024) Access for domestic workers to labour and social protection; Raț, C. (2018) Gaps in access to social protection for casual workers in Romania",
     "facts": [
       [
         "Worker group",
@@ -1408,7 +1408,7 @@ export const PRACTICES = [
       ],
       [
         "Source",
-        "European Commission / ESPN, Romania launches a system of service vouchers (docId 25954); ESPAN Synthesis Report (2024)"
+        "European Commission / ESPN, Romania launches a system of service vouchers (docId 25954); European Commission (2024) Access for domestic workers to labour and social protection; Raț, C. (2018) Gaps in access to social protection for casual workers in Romania"
       ]
     ]
   },
@@ -1445,6 +1445,42 @@ export const PRACTICES = [
       [
         "Source",
         "ILO WP 176"
+      ]
+    ]
+  },
+  {
+    "id": "co-collective-registration-agreements-for",
+    "country": "Colombia",
+    "a2": "co",
+    "lonlat": [
+      -72.81,
+      5.442
+    ],
+    "category": "access",
+    "workers": "self-employed",
+    "workersLabel": "Self-employed / own-account",
+    "title": "Collective Registration Agreements for Independent Workers",
+    "summary": "Agreements allowing associations, cooperatives and other membership organisations to register their independent worker members collectively with health promoter enterprises, so that affiliation and contribution collection run through the organisation rather than requiring each worker to enrol individually.",
+    "detail": "Agreements allowing associations, cooperatives and other membership organisations to register their independent worker members collectively with health promoter enterprises, so that affiliation and contribution collection run through the organisation rather than requiring each worker to enrol individually.",
+    "impact": "Independent worker health insurance coverage stood at 27.5% in 2009, against 13.1% pension coverage, with independent workers making up 54% of total employment (about 10.1 million people).",
+    "agency": "Health Promoter Enterprises (EPS) / Ministry of Health",
+    "sources": "ILO ESS Document No. 42 (2013), Innovations in extending social insurance coverage to independent workers",
+    "facts": [
+      [
+        "Worker group",
+        "Self-employed / own-account"
+      ],
+      [
+        "Implementing agency",
+        "Health Promoter Enterprises (EPS) / Ministry of Health"
+      ],
+      [
+        "Coverage & key features",
+        "Independent worker health insurance coverage stood at 27.5% in 2009, against 13.1% pension coverage, with independent workers making up 54% of total employment (about 10.1 million people)."
+      ],
+      [
+        "Source",
+        "ILO ESS Document No. 42 (2013), Innovations in extending social insurance coverage to independent workers"
       ]
     ]
   },
@@ -1496,11 +1532,11 @@ export const PRACTICES = [
     "workers": "general",
     "workersLabel": "Informal economy (general)",
     "title": "Kader JKN (Social Insurance Activators) & SERTAKAN",
-    "summary": "Recruits and trains peer-to-peer community agents (Kader JKN) who conduct door-to-door outreach, educate neighbours, register members and collect contributions.",
-    "detail": "Recruits and trains peer-to-peer community agents (Kader JKN) who conduct door-to-door outreach, educate neighbours, register members and collect contributions.",
-    "impact": "Enhanced community trust, boosted voluntary compliance and reduced branch visits.",
+    "summary": "Launched in April 2017, Kader JKN recruits and trains peer-to-peer community agents who conduct door-to-door outreach, educate neighbours, register members and collect contributions, extending BPJS Kesehatan's reach beyond its own administrative capacity by mobilising community participation.",
+    "detail": "Launched in April 2017, Kader JKN recruits and trains peer-to-peer community agents who conduct door-to-door outreach, educate neighbours, register members and collect contributions, extending BPJS Kesehatan's reach beyond its own administrative capacity by mobilising community participation.",
+    "impact": "BPJS Kesehatan increased its rate of contribution collection from individual informal sector members by about 13.9% following the programme's introduction.",
     "agency": "BPJS Kesehatan",
-    "sources": "SPACE Summary; ASEAN Snapshot; ILO Guidebook",
+    "sources": "ISSA Good Practice 173421 (Kader JKN, BPJS Kesehatan); SPACE Summary; ASEAN Snapshot",
     "facts": [
       [
         "Worker group",
@@ -1512,11 +1548,11 @@ export const PRACTICES = [
       ],
       [
         "Coverage & key features",
-        "Enhanced community trust, boosted voluntary compliance and reduced branch visits."
+        "BPJS Kesehatan increased its rate of contribution collection from individual informal sector members by about 13.9% following the programme's introduction."
       ],
       [
         "Source",
-        "SPACE Summary; ASEAN Snapshot; ILO Guidebook"
+        "ISSA Good Practice 173421 (Kader JKN, BPJS Kesehatan); SPACE Summary; ASEAN Snapshot"
       ]
     ]
   },
@@ -1716,7 +1752,7 @@ export const PRACTICES = [
     "detail": "Legal regime requiring contracting companies that account for more than 50% or 80% of a self-employed worker's income to co-contribute 7%–10% toward that worker's social security.",
     "impact": "Rebalanced financial obligations between client and worker, granting access to unemployment, sickness and occupational injury benefits.",
     "agency": "Instituto da Segurança Social (ISS)",
-    "sources": "ILO WP 176",
+    "sources": "ILO WP 176; European Commission (2018) Gaps in access to social protection for economically dependent self-employed in Spain",
     "facts": [
       [
         "Worker group",
@@ -1732,7 +1768,7 @@ export const PRACTICES = [
       ],
       [
         "Source",
-        "ILO WP 176"
+        "ILO WP 176; European Commission (2018) Gaps in access to social protection for economically dependent self-employed in Spain"
       ]
     ]
   },
@@ -2040,7 +2076,7 @@ export const PRACTICES = [
     "detail": "Royal Decree-Law 16/2022 of 6 September 2022 reformed the SEEH following the Court of Justice of the EU's ruling in Case C-389/20 (24 February 2022), eliminating historical exclusions and granting domestic workers unemployment protection, occupational risk coverage and statutory sick pay. In-kind salary deductions are capped at 30% of the minimum wage. Spain has signed bilateral social security agreements with Morocco and Ecuador guaranteeing pension portability for migrant care workers, and ratified ILO Convention No. 189 on 28 February 2023.",
     "impact": "The reform affects approximately 373,000 registered domestic workers and safeguards pension portability for migrant care workers from Latin America and North Africa.",
     "agency": "Tesorería General de la Seguridad Social (TGSS) / Ministry of Inclusion",
-    "sources": "CJEU Case C-389/20; Royal Decree-Law 16/2022; ILO (2025) International experience on protecting rights of domestic workers; ESPAN Synthesis Report (2024)",
+    "sources": "CJEU Case C-389/20; Royal Decree-Law 16/2022; ILO (2025) International experience on protecting rights of domestic workers; European Commission (2024) Access for domestic workers to labour and social protection",
     "facts": [
       [
         "Worker group",
@@ -2056,7 +2092,79 @@ export const PRACTICES = [
       ],
       [
         "Source",
-        "CJEU Case C-389/20; Royal Decree-Law 16/2022; ILO (2025) International experience on protecting rights of domestic workers; ESPAN Synthesis Report (2024)"
+        "CJEU Case C-389/20; Royal Decree-Law 16/2022; ILO (2025) International experience on protecting rights of domestic workers; European Commission (2024) Access for domestic workers to labour and social protection"
+      ]
+    ]
+  },
+  {
+    "id": "mc-family-benefits-scheme-for",
+    "country": "Monaco",
+    "a2": "mc",
+    "lonlat": [
+      7.407,
+      43.753
+    ],
+    "category": "adequacy",
+    "workers": "self-employed",
+    "workersLabel": "Self-employed / own-account",
+    "title": "Family Benefits Scheme for Self-Employed Workers (Law No. 1493)",
+    "summary": "Law No. 1493 of 8 July 2020 extended family and prenatal benefits to self-employed workers through CAMTI, the sickness, accident and maternity insurance fund for the self-employed. Benefits are of equal value to those in the employed workers' scheme, which had previously been the only route to family benefits. Implementation required identifying eligible beneficiaries among the self-employed, supporting them through file creation, and paying benefits from the law's effective date.",
+    "detail": "Law No. 1493 of 8 July 2020 extended family and prenatal benefits to self-employed workers through CAMTI, the sickness, accident and maternity insurance fund for the self-employed. Benefits are of equal value to those in the employed workers' scheme, which had previously been the only route to family benefits. Implementation required identifying eligible beneficiaries among the self-employed, supporting them through file creation, and paying benefits from the law's effective date.",
+    "impact": "Closed a benefit-branch gap between employed and self-employed workers, achieving parity of family benefits across employment status for the whole working population of the Principality.",
+    "agency": "Caisses Sociales de Monaco (CSM) / CAMTI",
+    "sources": "ISSA Good Practice 219088 (Caisses Sociales de Monaco); Law No. 1493 of 8 July 2020",
+    "facts": [
+      [
+        "Worker group",
+        "Self-employed / own-account"
+      ],
+      [
+        "Implementing agency",
+        "Caisses Sociales de Monaco (CSM) / CAMTI"
+      ],
+      [
+        "Coverage & key features",
+        "Closed a benefit-branch gap between employed and self-employed workers, achieving parity of family benefits across employment status for the whole working population of the Principality."
+      ],
+      [
+        "Source",
+        "ISSA Good Practice 219088 (Caisses Sociales de Monaco); Law No. 1493 of 8 July 2020"
+      ]
+    ]
+  },
+  {
+    "id": "es-economically-dependent-self-employed",
+    "country": "Spain",
+    "a2": "es",
+    "lonlat": [
+      -3.292,
+      41.928
+    ],
+    "category": "adequacy",
+    "workers": "self-employed",
+    "workersLabel": "Self-employed / own-account",
+    "title": "Economically Dependent Self-Employed Status (TRADE, LETA 2007)",
+    "summary": "The 2007 Self-Employed Workers' Statute (Ley del Estatuto del Trabajo Autónomo) created the legal category of the economically dependent self-employed worker (trabajador autónomo económicamente dependiente, TRADE), defined principally by an economic test — the share of the worker's income derived from a single client — and attaching a set of employment-like protections to that status.",
+    "detail": "The 2007 Self-Employed Workers' Statute (Ley del Estatuto del Trabajo Autónomo) created the legal category of the economically dependent self-employed worker (trabajador autónomo económicamente dependiente, TRADE), defined principally by an economic test — the share of the worker's income derived from a single client — and attaching a set of employment-like protections to that status.",
+    "impact": "Establishes statutory recognition of dependent self-employment. An EU case study nonetheless documents continuing gaps in this group's access to social protection, so the category's existence should not be read as evidence that the gap has been closed.",
+    "agency": "Ministry of Inclusion, Social Security and Migration",
+    "sources": "European Commission, DG EMPL (2018) Gaps in access to social protection for economically dependent self-employed in Spain; European Commission (2018) Access to social protection for workers and the self-employed",
+    "facts": [
+      [
+        "Worker group",
+        "Self-employed / own-account"
+      ],
+      [
+        "Implementing agency",
+        "Ministry of Inclusion, Social Security and Migration"
+      ],
+      [
+        "Coverage & key features",
+        "Establishes statutory recognition of dependent self-employment. An EU case study nonetheless documents continuing gaps in this group's access to social protection, so the category's existence should not be read as evidence that the gap has been closed."
+      ],
+      [
+        "Source",
+        "European Commission, DG EMPL (2018) Gaps in access to social protection for economically dependent self-employed in Spain; European Commission (2018) Access to social protection for workers and the self-employed"
       ]
     ]
   },
