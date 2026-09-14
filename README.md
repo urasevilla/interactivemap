@@ -213,6 +213,13 @@ gives each country about four pixels, so a narrow viewport opens over the belt
 carrying most of the mapped practices and pinches out from there. Taps carry a
 few pixels of forgiveness, because a fingertip is wider than Singapore.
 
+**Label anchors are computed unwrapped.** A country whose outline crosses the
+antimeridian averages to a centroid nowhere near its land — Russia's came out
+in the Bering Sea, which failed the interior test and fell through to a grid
+search that parked "Russia" on St Petersburg; Fiji's landed in the Atlantic.
+`tools/build-index.mjs` accumulates a ±360° offset across each jump so the ring
+is one continuous run before any of it is measured.
+
 Natural Earth carries five polygons with no ISO code — Somaliland, Kosovo,
 Northern Cyprus, the Indian Ocean Territories and the Siachen Glacier. They are
 drawn as neutral land: no label, no flag, not in the country picker, so the map

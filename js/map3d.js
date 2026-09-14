@@ -1055,6 +1055,22 @@ export class WorldMap {
     this._needsRender = true;
   }
 
+  /**
+   * The country whose top face lies under a lon/lat, or null for open water.
+   * Rays straight down, so the camera's tilt cannot skew the answer.
+   */
+  countryAtLonLat(lon, lat) {
+    const [x, y] = project(lon, lat);
+    const ray = new THREE.Raycaster(
+      new THREE.Vector3(x, y, 5),
+      new THREE.Vector3(0, 0, -1),
+      0,
+      10,
+    );
+    const hits = ray.intersectObjects(this._pickables, false);
+    return hits.length ? hits[0].object.userData.key : null;
+  }
+
   /** Projects a lon/lat on the ocean plane to CSS pixels within the canvas. */
   lonLatToScreen(lon, lat, out = {}) {
     const [x, y] = project(lon, lat);

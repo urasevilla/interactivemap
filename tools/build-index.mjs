@@ -58,6 +58,35 @@ function outerRings(geometry) {
 /* Geometry helpers                                                    */
 /* ------------------------------------------------------------------ */
 
+/**
+ * Longitudes made continuous across the antimeridian.
+ *
+ * Russia's main ring runs east from 19°E all the way past 180°, and averaging
+ * those raw longitudes put its centroid at 193°E — the Bering Sea, outside the
+ * country. That failed the point-in-polygon test and fell through to a grid
+ * search over a bounding box spanning the entire globe, which parked the label
+ * "Russia" on St Petersburg. Fiji landed in the Atlantic the same way.
+ *
+ * Accumulating a ±360 offset at each jump makes the ring one continuous run,
+ * so area, centroid and the interior tests all agree. The anchor is wrapped
+ * back into [-180, 180] on the way out.
+ */
+function unwrapRing(ring) {
+  const out = [ring[0]];
+  let offset = 0;
+  for (let i = 1; i < ring.length; i++) {
+    const delta = ring[i][0] - ring[i - 1][0];
+    if (delta > 180) offset -= 360;
+    else if (delta < -180) offset += 360;
+    out.push(offset === 0 ? ring[i] : [ring[i][0] + offset, ring[i][1]]);
+  }
+  return out;
+}
+
+function wrapLongitude(lon) {
+  return ((((lon + 180) % 360) + 360) % 360) - 180;
+}
+
 /** Signed planar area in square degrees — only ever compared, never reported. */
 function ringArea(ring) {
   let sum = 0;
@@ -98,9 +127,12 @@ function pointInRing(pt, ring) {
  * that centroid falls outside it (crescent-shaped countries such as Vietnam or
  * Croatia). Falls back to a grid search over the ring's bounding box.
  */
-function labelAnchor(ring) {
+function labelAnchor(rawRing) {
+  /* Every test below runs in the unwrapped frame, so a ring that crosses the
+     antimeridian is treated as the one continuous shape it is. */
+  const ring = unwrapRing(rawRing);
   const centroid = ringCentroid(ring);
-  if (pointInRing(centroid, ring)) return centroid;
+  if (pointInRing(centroid, ring)) return [wrapLongitude(centroid[0]), centroid[1]];
 
   let minX = Infinity;
   let minY = Infinity;
@@ -128,7 +160,7 @@ function labelAnchor(ring) {
       }
     }
   }
-  return best;
+  return [wrapLongitude(best[0]), best[1]];
 }
 
 /* ------------------------------------------------------------------ */
@@ -235,7 +267,9 @@ for (let index = 0; index < topo.objects.countries.geometries.length; index++) {
   let largestArea = 0;
 
   for (const ring of rings) {
-    const a = ringArea(ring);
+    /* Measured unwrapped too: a ring spanning the antimeridian has a
+       meaningless shoelace area in raw longitudes. */
+    const a = ringArea(unwrapRing(ring));
     area += a;
     if (a > largestArea) {
       largestArea = a;
@@ -267,11 +301,39 @@ for (let index = 0; index < topo.objects.countries.geometries.length; index++) {
   });
 }
 
+/**
+ * One record per key, keeping the largest.
+ *
+ * Natural Earth carries a few outlying territories as separate features under
+ * their parent's ISO code — Ashmore and Cartier Islands under Australia's. Two
+ * records sharing a key meant two name chips and two picker entries resolving
+ * to the same country, hidden only because both anchors happened to land on
+ * the same spot. Uninhabited reefs with no area of their own are not what this
+ * map names, so the parent wins and the speck is dropped.
+ */
+function dropDuplicateKeys(records) {
+  const best = new Map();
+  const dropped = [];
+  for (const record of records) {
+    const held = best.get(record.key);
+    if (!held) best.set(record.key, record);
+    else if (record.area > held.area) {
+      best.set(record.key, record);
+      dropped.push(held);
+    } else dropped.push(record);
+  }
+  for (const record of dropped) {
+    console.log(`  dropped ${record.name} — shares the key "${record.key}"`);
+  }
+  return records.filter((record) => best.get(record.key) === record);
+}
+
 function round(n) {
   return Number(n.toFixed(3));
 }
 
-entries.sort((a, b) => a.name.localeCompare(b.name, 'en'));
+const named = dropDuplicateKeys(entries);
+named.sort((a, b) => a.name.localeCompare(b.name, 'en'));
 
 /* No build timestamp. The CI guard regenerates this file and fails on any
    diff, so a date stamp meant the guard failed every day after the day the
@@ -279,11 +341,11 @@ entries.sort((a, b) => a.name.localeCompare(b.name, 'en'));
    records when it was generated, and nothing reads the field. */
 const out = {
   source: 'Natural Earth 1:50m Admin 0 via world-atlas@2.0.2',
-  count: entries.length,
-  countries: entries,
+  count: named.length,
+  countries: named,
 };
 
 fs.writeFileSync(path.join(root, 'data/world-index.json'), JSON.stringify(out));
 
-const labelled = entries.filter((e) => !e.neutral).length;
-console.log(`world-index.json: ${entries.length} features (${labelled} named, ${entries.length - labelled} neutral)`);
+const labelled = named.filter((e) => !e.neutral).length;
+console.log(`world-index.json: ${named.length} features (${labelled} named, ${named.length - labelled} neutral)`);

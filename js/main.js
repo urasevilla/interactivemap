@@ -519,6 +519,17 @@ function startLoop() {
   /* Whichever country the pointer is over, for the hover-label assertions. */
   window.__mapHovered = () => map.hovered;
 
+  /**
+   * Which country the map actually draws under a record's label anchor —
+   * the key itself when the anchor sits on its own land. Proves a name is not
+   * floating in the sea or parked on a neighbour.
+   */
+  window.__mapCountryAt = (key) => {
+    const record = index.countries.find((c) => c.key === key);
+    if (!record) return null;
+    return map.countryAtLonLat(record.anchor[0], record.anchor[1]);
+  };
+
   /* A country's current extrusion height, to prove it lies flat until used. */
   window.__mapHeight = (key) => map.countries.get(key)?.height ?? null;
 

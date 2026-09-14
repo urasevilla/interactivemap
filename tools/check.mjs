@@ -199,6 +199,11 @@ const countPractices = (category, workers) =>
  * Counted by the category column, which leads every row and is never quoted,
  * so a description containing a newline cannot inflate the total.
  */
+/* The map draws what the index lists, so the label and dropdown counts are
+   read from it rather than pinned — one record per country, no duplicates. */
+const worldIndex = JSON.parse(fs.readFileSync(path.join(root, 'data/world-index.json'), 'utf8'));
+const namedCountries = worldIndex.countries.filter((c) => !c.neutral).length;
+
 const sourceCsv = fs.readFileSync(path.join(root, 'data/source/good-practices.csv'), 'utf8');
 const expectedSourceRows = sourceCsv
   .split('\n')
@@ -280,7 +285,35 @@ const scene = await page.evaluate(() => {
 
 check('WebGL context is live', scene.hasContext);
 check('canvas has real dimensions', scene.width > 100 && scene.height > 100, `${scene.width}x${scene.height}`);
-check('all 236 named countries have a label element', scene.labels === 236, `got ${scene.labels}`);
+check(
+  'every named country has a label element',
+  scene.labels === namedCountries,
+  `${scene.labels} labels for ${namedCountries} named countries`,
+);
+
+/* Two features sharing an ISO code meant two chips and two picker rows
+   resolving to the same country. */
+const duplicateKeys = worldIndex.countries.length - new Set(worldIndex.countries.map((c) => c.key)).size;
+check('no two features share a country key', duplicateKeys === 0, `${duplicateKeys} duplicates`);
+
+/**
+ * A label has to sit on the country it names.
+ *
+ * A ring crossing the antimeridian averages to a centroid nowhere near the
+ * land — Russia's came out in the Bering Sea, failed the interior test, and
+ * fell through to a grid search that put "Russia" on St Petersburg. Fiji
+ * landed in the Atlantic. Checked by asking the map which country the anchor
+ * is actually over.
+ */
+const anchorsLand = await page.evaluate(() => {
+  const check = (key) => window.__mapCountryAt(key);
+  return { ru: check('ru'), fj: check('fj'), us: check('us'), cl: check('cl'), in: check('in') };
+});
+check(
+  'each country name is anchored over its own country',
+  Object.entries(anchorsLand).every(([key, over]) => over === key),
+  JSON.stringify(anchorsLand),
+);
 check(
   'every practice country is labelled',
   scene.featuredLabels === expectedCountries,
@@ -478,7 +511,11 @@ check(
   'the framing paragraph is the one the host wrote',
   /^Workers in the informal economy are largely locked out of social insurance/.test(
     contextDefault.text.trim(),
-  ) && /organized by the workers and barriers they target:$/.test(contextDefault.text.trim()),
+  ) &&
+    /Countries are testing fixes: matching contributions, mobile registration/.test(
+      contextDefault.text,
+    ) &&
+    /organized by the workers and barriers they target:$/.test(contextDefault.text.trim()),
   contextDefault.text.slice(0, 80),
 );
 check(
@@ -609,7 +646,11 @@ if (SHOTS) await page.screenshot({ path: path.join(shotDir, '02-map.png') });
 await page.click('#picker-input');
 await page.waitForSelector('#picker-list:not([hidden])');
 const optionCount = await page.locator('.picker__option').count();
-check('the picker lists every selectable country', optionCount === 236, `got ${optionCount}`);
+check(
+  'the picker lists every selectable country',
+  optionCount === namedCountries,
+  `got ${optionCount} of ${namedCountries}`,
+);
 
 await page.fill('#picker-input', 'mongo');
 await page.waitForTimeout(160);
@@ -956,13 +997,13 @@ const pickerCounts = await mobile.evaluate(() => {
   };
 });
 check(
-  'the dropdown lists all 236 countries',
-  pickerCounts.total === 236,
-  `${pickerCounts.total} listed`,
+  'the dropdown lists every named country',
+  pickerCounts.total === namedCountries,
+  `${pickerCounts.total} listed of ${namedCountries}`,
 );
 check(
   'countries without a practice are in the dropdown',
-  pickerCounts.plain === 236 - expectedCountries,
+  pickerCounts.plain === namedCountries - expectedCountries,
   `${pickerCounts.plain} plain of ${pickerCounts.total}`,
 );
 

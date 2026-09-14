@@ -132,7 +132,7 @@ export const FEATURED = (() => {
 export const CONTEXT = {
   title: 'Global Good Practices: Extending Social Insurance to Informal and Self-Employed Workers',
   standfirst:
-    'Workers in the informal economy are largely locked out of social insurance — contributions don’t fit irregular incomes, systems assume a formal employer, benefits miss real needs, and workers often don’t know what’s available or have no way to organize for it. Countries are testing fixes: matching contributions, mobile registration, portable benefits, worker-led outreach. This map tracks those practices, organized by the workers and barriers they target:',
+    'Workers in the informal economy are largely locked out of social insurance. Countries are testing fixes: matching contributions, mobile registration, portable benefits, worker-led outreach. This map tracks those practices, organized by the workers and barriers they target:',
   stats: [
     {
       value: '56%',
