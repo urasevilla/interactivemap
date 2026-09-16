@@ -24,6 +24,26 @@ const VERSION = 1;
 const MAC_BYTES_CODE = 4; // 16-character typed code
 const MAC_BYTES_LINK = 16; // full-strength token for QR links
 
+/**
+ * A zero expiry means the pass never expires.
+ *
+ * Minute zero is 1 January 1970, which no live token could ever mean, so the
+ * field is free to carry the sentinel — no format change, and an old build
+ * reading a no-expiry token simply treats it as long expired rather than as
+ * valid forever, which is the safe way round.
+ */
+export const NO_EXPIRY = 0;
+
+/**
+ * Hours to an absolute expiry. Exactly zero means never — and only zero, so a
+ * negative lifetime still mints a token that is already expired rather than
+ * one that never expires, which is the difference between a test fixture and
+ * a permanent pass.
+ */
+function expiryFrom(hours) {
+  return hours === 0 ? NO_EXPIRY : Date.now() + hours * 3600_000;
+}
+
 let keyPromise = null;
 
 async function hmacKey(secret) {
@@ -159,7 +179,7 @@ function fromBase64Url(text) {
  * @param {number} hours   lifetime in hours
  */
 export async function issueBoothCode(secret, hours = 24) {
-  const expiresAt = Date.now() + hours * 3600_000;
+  const expiresAt = expiryFrom(hours);
   const payload = buildPayload(ROLE.BOOTH, expiresAt, 1);
   const mac = await sign(secret, payload, MAC_BYTES_CODE);
   const bytes = new Uint8Array(payload.length + mac.length);
@@ -170,9 +190,10 @@ export async function issueBoothCode(secret, hours = 24) {
 
 /**
  * Mints a guest token for the QR link. Longer MAC, since it is never typed.
+ * A lifetime of 0 mints a pass that never expires.
  */
 export async function issueGuestToken(secret, hours = 24) {
-  const expiresAt = Date.now() + hours * 3600_000;
+  const expiresAt = expiryFrom(hours);
   const payload = buildPayload(ROLE.GUEST, expiresAt, 4);
   const mac = await sign(secret, payload, MAC_BYTES_LINK);
   const bytes = new Uint8Array(payload.length + mac.length);
@@ -212,14 +233,17 @@ export async function verify(secret, input, { kind = 'auto' } = {}) {
 
   const { version, role, expiresAt } = readPayload(payload);
   if (version !== VERSION) return { ok: false, reason: 'version' };
-  if (Date.now() > expiresAt) return { ok: false, reason: 'expired', expiresAt };
+  if (expiresAt !== NO_EXPIRY && Date.now() > expiresAt) {
+    return { ok: false, reason: 'expired', expiresAt };
+  }
   if (role !== ROLE.BOOTH && role !== ROLE.GUEST) return { ok: false, reason: 'invalid' };
 
   return { ok: true, role, expiresAt };
 }
 
-/** "23h 14m" / "48m" / "expired" — for the countdown in the header. */
+/** "23h 14m" / "48m" / "no expiry" / "expired" — the countdown in the header. */
 export function formatRemaining(expiresAt) {
+  if (expiresAt === NO_EXPIRY) return 'no expiry';
   const ms = expiresAt - Date.now();
   if (ms <= 0) return 'expired';
   const totalMinutes = Math.floor(ms / 60000);

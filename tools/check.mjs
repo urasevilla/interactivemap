@@ -76,7 +76,9 @@ function toBase32(bytes) {
 function mintCode(secret, role, hours, nonceBytes, macBytes) {
   const payload = Buffer.alloc(5 + nonceBytes);
   payload[0] = (1 << 4) | role;
-  payload.writeUInt32BE(Math.floor((Date.now() + hours * 3600_000) / 60000), 1);
+  /* Must match js/tokens.js: exactly zero writes minute zero, the sentinel for
+     a pass that never expires. A negative lifetime still means long expired. */
+  payload.writeUInt32BE(hours === 0 ? 0 : Math.floor((Date.now() + hours * 3600_000) / 60000), 1);
   crypto.randomFillSync(payload, 5);
 
   const mac = crypto.createHmac('sha256', secret).update(payload).digest().subarray(0, macBytes);
@@ -153,6 +155,22 @@ function passphraseHash(phrase, salt = 'wiego-map') {
 
 const results = [];
 let failures = 0;
+
+/**
+ * The gate's error text, for a failure message.
+ *
+ * Read with a short timeout and a fallback: this only ever runs on a check
+ * that already failed, and a plain `textContent` there waits the full default
+ * timeout and then throws — taking the whole run down instead of reporting the
+ * one failed assertion.
+ */
+async function gateError(page) {
+  try {
+    return (await page.textContent('#gate-error', { timeout: 2000 })) || '(no message)';
+  } catch {
+    return '(the gate was not on screen)';
+  }
+}
 
 function check(name, condition, detail = '') {
   const ok = Boolean(condition);
@@ -851,11 +869,7 @@ try {
   await mobile.waitForSelector('#app:not([hidden])', { timeout: 20_000 });
   check('a QR guest token opens the map directly', true);
 } catch {
-  check(
-    'a QR guest token opens the map directly',
-    false,
-    `gate said: ${(await mobile.textContent('#gate-error')) || '(nothing)'}`,
-  );
+  check('a QR guest token opens the map directly', false, `gate said: ${await gateError(mobile)}`);
 }
 
 await mobile.waitForFunction(() => !document.getElementById('loading'), { timeout: 40_000 });
@@ -1386,7 +1400,7 @@ try {
 check(
   'a freshly issued code opens the display',
   boothOpened,
-  boothOpened ? '' : `gate said: ${await booth.textContent('#gate-error')}`,
+  boothOpened ? '' : `gate said: ${await gateError(booth)}`,
 );
 await boothContext.close();
 
@@ -1714,6 +1728,11 @@ check(
   /ownerPassphraseHash:\s*'[0-9a-f]{64}'/.test(shipped),
 );
 check(
+  'the visitor pass has no time limit',
+  /guestPassHours:\s*0\b/.test(shipped),
+  (/guestPassHours:[^,]*/.exec(shipped) || ['(missing)'])[0],
+);
+check(
   'live sync is configured',
   /apiKey:\s*'AIza[\w-]+'/.test(shipped) && /projectId:\s*'[\w-]+'/.test(shipped),
 );
@@ -1732,6 +1751,64 @@ await expiredPage.waitForTimeout(300);
 const expiredMessage = await expiredPage.textContent('#gate-error');
 check('an expired code is refused', await expiredPage.isHidden('#app'));
 check('the expiry message explains itself', /expired/i.test(expiredMessage || ''), expiredMessage);
+
+/**
+ * A pass with no expiry opens the map and shows no countdown.
+ *
+ * Removing the visitor pass's time limit must not amount to disabling the
+ * expiry check: the assertion above still refuses a genuinely expired code,
+ * and it runs through the same verifier.
+ */
+const foreverToken = mintCode(secret, 2, 0, 4, 16).toString('base64url');
+const forever = await browser.newContext({
+  viewport: { width: 390, height: 844 },
+  isMobile: true,
+  hasTouch: true,
+});
+await overrideConfig(forever, { firebase: null, guestPassHours: 0 });
+const foreverPage = await forever.newPage();
+watch(foreverPage);
+await foreverPage.goto(`http://localhost:${PORT}/#g=${foreverToken}`, {
+  waitUntil: 'domcontentloaded',
+});
+let foreverOpened = true;
+try {
+  await foreverPage.waitForSelector('#app:not([hidden])', { timeout: 20_000 });
+} catch {
+  foreverOpened = false;
+}
+check(
+  'a visitor pass with no expiry opens the map',
+  foreverOpened,
+  foreverOpened ? '' : `gate said: ${await gateError(foreverPage)}`,
+);
+
+if (foreverOpened) {
+  await foreverPage.waitForFunction(() => !document.getElementById('loading'), { timeout: 60_000 });
+  const chip = await foreverPage.evaluate(() => ({
+    role: document.body.dataset.role,
+    text: document.getElementById('session-chip')?.textContent?.trim() || '',
+    countdown: document.querySelectorAll('.session-chip__time').length,
+    stored: JSON.parse(localStorage.getItem('wiego-map.session.v1') || 'null'),
+  }));
+  check('it grants the visitor role', chip.role === 'guest', chip.role);
+  check(
+    'no countdown is shown for a pass that cannot run out',
+    chip.countdown === 0 && !/expire|\d+\s*[hm]\b/i.test(chip.text),
+    `chip read "${chip.text}"`,
+  );
+  check(
+    'the stored session records no expiry',
+    chip.stored?.expiresAt === 0,
+    String(chip.stored?.expiresAt),
+  );
+
+  /* It must survive a reload rather than be read back as long expired. */
+  await foreverPage.reload({ waitUntil: 'domcontentloaded' });
+  await foreverPage.waitForTimeout(1200);
+  check('a no-expiry session survives a reload', await foreverPage.isHidden('#gate'));
+}
+await forever.close();
 
 /* A code minted under a different secret must not work. */
 const forged = toBase32(mintCode('not-the-real-secret', 1, 24, 1, 4)).match(/.{1,4}/g).join('-');

@@ -46,8 +46,12 @@ window.WIEGO_MAP_CONFIG = {
   eventSecret: 'XM4JmBFDIuvIZQS-za85wbqy-wMQ8ds0CuFAnOgtQz4',
 
   // Default lifetimes, in hours. The controller can override per code.
+  //
+  // 0 means the pass never expires. A visitor pass with no expiry keeps
+  // working for as long as eventSecret does, so retire outstanding passes by
+  // rotating it — npm run secret — rather than by waiting them out.
   boothCodeHours: 24,
-  guestPassHours: 24,
+  guestPassHours: 0,
 
   /* ------------------------------------------------------------------ *
    * Presentation                                                        *

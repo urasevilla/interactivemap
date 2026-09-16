@@ -438,7 +438,10 @@ async function showQr() {
 
   /* Reuse the current pass until it is close to expiry, so the printed QR on
      the stand keeps working through the day. */
-  if (!lastGuestLink || lastGuestLink.expiresAt - Date.now() < 30 * 60_000) {
+  /* A pass that never expires is reused for the life of the page. */
+  const stale =
+    lastGuestLink && lastGuestLink.expiresAt && lastGuestLink.expiresAt - Date.now() < 30 * 60_000;
+  if (!lastGuestLink || stale) {
     const { token, expiresAt } = await issueGuestToken(CONFIG.eventSecret, CONFIG.guestPassHours);
     lastGuestLink = { url: `${siteUrl()}/#g=${token}`, expiresAt };
   }
@@ -476,10 +479,13 @@ function updateSessionChip() {
       className: `session-chip__dot${auth.role === 'guest' ? ' session-chip__dot--guest' : ''}`,
     }),
     document.createTextNode(labelFor[auth.role] || auth.role),
-    Object.assign(document.createElement('span'), {
-      className: 'session-chip__time',
-      textContent: formatRemaining(auth.expiresAt),
-    }),
+    /* No countdown where there is nothing to count down to. */
+    auth.expiresAt
+      ? Object.assign(document.createElement('span'), {
+          className: 'session-chip__time',
+          textContent: formatRemaining(auth.expiresAt),
+        })
+      : document.createTextNode(''),
   );
 }
 

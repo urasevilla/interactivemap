@@ -9,7 +9,8 @@ should do before each event.
 
 This repository is public, which is what lets GitHub Pages serve it on a free
 plan. The **content** is still gated: nobody sees the map without a display code
-or a visitor pass, and both expire.
+or a visitor pass. Display codes expire; visitor passes do not, unless you set
+`guestPassHours` in config.js.
 
 **Switch Pages on once, by hand.** Go to **Settings → Pages** and set
 **Source** to **GitHub Actions**. Nothing deploys until you do, and the workflow
@@ -213,6 +214,8 @@ rather than dropping those practices.
 
 1. On your own laptop, open the site and sign in as host.
 2. **Controller → Issue display code.** Pick a lifetime (24h is the default).
+   Visitor passes are separate and carry no time limit, so the printed QR keeps
+   working between days of a multi-day event.
 3. Walk to the projector machine, open the same URL, type the code. Press `F`
    for full screen.
 4. **Controller → Show visitor QR code.** Print it for the stand, or leave it

@@ -64,7 +64,10 @@ export class Auth extends EventTarget {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return;
       const session = JSON.parse(raw);
-      if (!session?.expiresAt || Date.now() > session.expiresAt) {
+      /* expiresAt 0 is a pass that never expires; anything else missing or
+         non-numeric is a session we cannot reason about, so drop it. */
+      const expiresAt = session?.expiresAt;
+      if (typeof expiresAt !== 'number' || (expiresAt !== 0 && Date.now() > expiresAt)) {
         localStorage.removeItem(STORAGE_KEY);
         return;
       }
@@ -224,7 +227,8 @@ export class Auth extends EventTarget {
 
   /** Called on a timer so an expiring session drops back to the gate. */
   checkExpiry() {
-    if (this.session && Date.now() > this.session.expiresAt) {
+    /* A zero expiry never falls due. */
+    if (this.session?.expiresAt && Date.now() > this.session.expiresAt) {
       this._commit(null);
       return true;
     }

@@ -39,11 +39,13 @@ target. Zoom with the wheel, pinch, the `+`/`−` buttons or a double-click.
 |---|---|---|
 | **Host** | Google sign-in, matched against a hashed address | Issue codes, moderate notes, export |
 | **Display** | Types a 16-character code | Full-screen presentation |
-| **Visitor** | Scans the QR code | Browse on their phone, add notes for 24 hours |
+| **Visitor** | Scans the QR code | Browse on their phone, add notes — no time limit |
 
-**Visitors write on the map.** A phone that scans the booth QR gets a
-time-limited pass, picks any country — mapped practice or not — and adds what
-they know.
+**Visitors write on the map.** A phone that scans the booth QR gets a pass,
+picks any country — mapped practice or not — and adds what they know. The pass
+does not expire (`guestPassHours: 0`); set a number of hours there if you want
+one that does. Either way, `npm run secret` retires every outstanding pass at
+once, which is how a pass with no expiry is taken back.
 
 **Nothing a visitor writes reaches the map unreviewed.** With
 `moderateContributions` on, a new note is stored but shown to nobody except its

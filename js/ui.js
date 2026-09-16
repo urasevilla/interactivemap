@@ -1244,9 +1244,12 @@ export function openQrSheet({ url, expiresAt, isController, onRegenerate }) {
           'Notes reach the map once the host approves them here.'
         : 'Scan to open this map on your phone and add what you know about any country.',
     ),
-    expiresAt
-      ? el('p.qr__expiry', `Visitor passes from this code last ${formatRemaining(expiresAt)} longer.`)
-      : null,
+    el(
+      'p.qr__expiry',
+      expiresAt
+        ? `Visitor passes from this code last ${formatRemaining(expiresAt)} longer.`
+        : 'Visitor passes from this code do not expire. Rotate the event secret to retire them.',
+    ),
     el(
       'div.qr__link',
       urlBox,
@@ -1452,7 +1455,9 @@ export function openControllerSheet({ auth, store, issueCode, issueGuestLink, cu
       el('h3.ctl__title', 'Visitor passes'),
       el(
         'p.ctl__hint',
-        `Print or project the QR code. Each phone that scans it gets a ${CONFIG.guestPassHours}-hour pass to browse the map and add notes.`,
+        CONFIG.guestPassHours > 0
+          ? `Print or project the QR code. Each phone that scans it gets a ${CONFIG.guestPassHours}-hour pass to browse the map and add notes.`
+          : 'Print or project the QR code. Each phone that scans it gets a pass to browse the map and add notes, with no time limit.',
       ),
       el(
         'div.ctl__row',
