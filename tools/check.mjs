@@ -426,67 +426,224 @@ const legendFit = await page.evaluate(() => {
 });
 check('the legend fits a 1600px booth screen', !legendFit.overflows);
 
+/* ---- The map shows no boundaries ---- */
+
 /**
- * Relief has to stay in proportion to the land it belongs to.
- *
- * Every ring used to get the same wall height, which reads as depth on a
- * continent and as a smear on an island: at world zoom the Philippines was a
- * blur because each island's wall stood as tall as the island is wide. Walls
- * are now capped at a fraction of their own ring's width, so an archipelago
- * keeps only a sliver of extrusion while a continent keeps all of it.
+ * WIEGO's disclaimer says the map implies no judgment on the legal status of
+ * any territory, and the map is built so it can say that: no border layer, no
+ * selection outline, no per-country tint, no extrusion. Every one of those
+ * existed a release ago and every one of them drew frontiers — the walls of an
+ * extruded solid are mostly its borders, and so was the ring that used to
+ * appear around a hovered country.
  */
-const relief = await page.evaluate(() => ({
-  philippines: window.__mapWallBase('ph'),
-  indonesia: window.__mapWallBase('id'),
-  brazil: window.__mapWallBase('br'),
-  russia: window.__mapWallBase('ru'),
-}));
+
+const layers = await page.evaluate(() => window.__mapLayers());
 check(
-  'an archipelago gets only a sliver of relief',
-  relief.philippines > 0.5 && relief.indonesia > 0.5,
-  `Philippines base ${relief.philippines?.toFixed(2)}, Indonesia ${relief.indonesia?.toFixed(2)}`,
+  'the scene holds no border layer',
+  layers.lines.length === 2 &&
+    layers.lines[0] === 'graticule' &&
+    layers.lines[1] === 'projection-boundary',
+  `line layers: ${layers.lines.join(', ') || 'none'}`,
 );
 check(
-  'a continent-sized country keeps its full relief',
-  relief.brazil < 0.05 && relief.russia < 0.05,
-  `Brazil base ${relief.brazil?.toFixed(2)}, Russia ${relief.russia?.toFixed(2)}`,
+  'land is drawn as one merged layer, not country by country',
+  layers.drawnCountryMeshes === 0,
+  `${layers.drawnCountryMeshes} country meshes drawn`,
+);
+check(
+  'all land is one material in one colour',
+  layers.landMaterials === 1 && layers.landColours.length === 1,
+  `${layers.landMaterials} materials, colours: ${layers.landColours.join(', ')}`,
 );
 
 /**
- * At rest every country lies flat.
+ * And no walls anywhere.
  *
- * An extruded solid casts its coastal wall seaward under the map's tilt, which
- * read as a ragged dark skirt off India's west coast rather than as depth.
- * Height is an interaction signal now: flat until hovered or selected.
+ * A wall belongs to the ring that raised it, and a country's rings are mostly
+ * its frontiers: extruding India drew a lit edge along the Pakistan border and
+ * a shadow beside it. `__mapWallBase` is the lowest point of a country's
+ * geometry in top-face units, so 1 means the country is a flat face and
+ * nothing else.
  */
+const wallBases = await page.evaluate(() =>
+  ['ph', 'id', 'br', 'ru', 'in', 'td'].map((key) => [key, window.__mapWallBase(key)]),
+);
+check(
+  'no country has side walls',
+  wallBases.every(([, base]) => base === 1),
+  JSON.stringify(wallBases.filter(([, base]) => base !== 1)),
+);
+
+/* Land sits flat on the ocean plane, and stays there. */
 const resting = await page.evaluate(() => ({
   india: window.__mapHeight('in'),
   brazil: window.__mapHeight('br'),
   chad: window.__mapHeight('td'),
 }));
 check(
-  'countries lie flat until they are touched',
+  'land lies flat on the ocean plane',
   resting.india < 0.02 && resting.brazil < 0.02 && resting.chad < 0.02,
   JSON.stringify(resting),
 );
 
-/* Hovering has to lift the country it names, or the 3D says nothing. */
+/**
+ * Every country is a marker, and the markers are where interaction shows.
+ *
+ * The land cannot carry it any more: lifting or tinting the country under the
+ * pointer traces its own outline, which is the border the map does not draw.
+ */
+const markerStats = await page.evaluate(() => window.__mapMarkerStats());
+check(
+  'every country on the map carries a marker',
+  markerStats.total === namedCountries,
+  `${markerStats.total} markers for ${namedCountries} countries`,
+);
+check(
+  'every practice country carries a practice marker',
+  markerStats.featured === expectedCountries,
+  `${markerStats.featured} practice markers for ${expectedCountries} countries`,
+);
+
+/**
+ * Areas under unresolved sovereignty questions are land and nothing else: no
+ * marker, no name, and nothing to select. Their polygons are still in the
+ * merged land layer — leaving them out would carve a hole, which marks the
+ * place out as plainly as naming it would.
+ */
+const disputed = worldIndex.countries.filter((c) => c.neutral).map((c) => c.key);
+const disputedState = await page.evaluate(
+  (keys) => ({
+    marked: keys.filter((key) => window.__mapMarkerStats().keys.includes(key)),
+    selectable: keys.filter((key) => window.__mapCountryAt(key) !== null),
+    named: [...document.querySelectorAll('.label__name')].map((n) => n.textContent),
+  }),
+  disputed,
+);
+check(
+  'disputed areas carry no marker and cannot be selected',
+  disputedState.marked.length === 0 && disputedState.selectable.length === 0,
+  JSON.stringify({ marked: disputedState.marked, selectable: disputedState.selectable }),
+);
+check(
+  'disputed areas are never labelled',
+  !worldIndex.countries
+    .filter((c) => c.neutral)
+    .some((c) => disputedState.named.includes(c.name)),
+  disputedState.named.filter((n) => /Kosovo|Cyprus|Somaliland|Siachen/.test(n)).join(', '),
+);
+
+/**
+ * And nothing on the map names a sea.
+ *
+ * Checked two ways, because a name's text and a name's position can each go
+ * wrong on their own. Every chip has to be a country out of the index — there
+ * is no other source of text over the map, so a sea or ocean label could only
+ * arrive as a new layer — and every chip on screen has to be standing on the
+ * land of the country it names, rather than over water or over a neighbour.
+ *
+ * (Not a word filter: Natural Earth really does have a country called
+ * "Br. Indian Ocean Ter.", and a regex for "Ocean" flagged it.)
+ */
+const knownNames = new Set(worldIndex.countries.filter((c) => !c.neutral).map((c) => c.name));
+check(
+  'every name on the map is a country out of the index',
+  disputedState.named.every((name) => knownNames.has(name)),
+  disputedState.named.filter((name) => !knownNames.has(name)).join(', '),
+);
+
+const shownAnchors = await page.evaluate(() =>
+  [...document.querySelectorAll('.label')]
+    .filter((el) => el.style.display !== 'none')
+    .map((el) => [el.dataset.key, window.__mapCountryAt(el.dataset.key)]),
+);
+check(
+  'every name on screen stands on its own land, not on water',
+  shownAnchors.length > 10 && shownAnchors.every(([key, over]) => over === key),
+  `${shownAnchors.length} shown; stray: ${JSON.stringify(
+    shownAnchors.filter(([key, over]) => over !== key),
+  )}`,
+);
+
+/* Hovering has to show on the marker, since it can no longer show on the land. */
 const hoverSpot = await page.evaluate(() => {
   const point = window.__mapPoint(79, 21); // central India
   const rect = document.getElementById('map').getBoundingClientRect();
   return { x: rect.left + point.x, y: rect.top + point.y };
 });
+const restScale = await page.evaluate(() => window.__mapMarkerScale('in'));
 await page.mouse.move(hoverSpot.x, hoverSpot.y);
 await page.waitForTimeout(600);
 const hovered = await page.evaluate(() => ({
   key: window.__mapHovered(),
   height: window.__mapHeight('in'),
+  scale: window.__mapMarkerScale('in'),
 }));
 check(
-  'hovering lifts the country under the pointer',
-  hovered.key === 'in' && hovered.height > 0.04,
-  JSON.stringify(hovered),
+  "hovering grows the country's marker",
+  hovered.key === 'in' && hovered.scale > restScale * 1.2,
+  JSON.stringify({ ...hovered, rest: restScale }),
 );
+check(
+  'hovering does not lift the land, which would outline the country',
+  hovered.height === resting.india,
+  `${hovered.height} vs ${resting.india}`,
+);
+
+/**
+ * And the disclaimer that all of the above exists to be able to make.
+ *
+ * Checked verbatim, because it is WIEGO's wording and not the repository's to
+ * paraphrase, and checked for being on screen, because it spent a release
+ * display:none on every width a phone has.
+ */
+const DISCLAIMER_TEXT =
+  'The boundaries, colors, denominations, and any other information shown on this map ' +
+  'do not imply, on the part of WIEGO, any judgment on the legal status of any territory, ' +
+  'or any endorsement or acceptance of such boundaries. The term "country" does not imply ' +
+  'any judgment on the legal or other status of any territorial entity.';
+
+/** Is the disclaimer readable — rendered, on screen, and not transparent? */
+const disclaimerProbe = () => {
+  const el = document.getElementById('disclaimer-text');
+  if (!el) return { text: '', visible: false, reason: 'missing' };
+  const style = getComputedStyle(el);
+  const box = el.getBoundingClientRect();
+  const parent = getComputedStyle(el.closest('.disclaimer'));
+  return {
+    text: el.textContent.trim(),
+    width: Math.round(box.width),
+    height: Math.round(box.height),
+    visible:
+      style.display !== 'none' &&
+      parent.display !== 'none' &&
+      style.visibility === 'visible' &&
+      Number(parent.opacity) > 0.5 &&
+      box.width > 60 &&
+      box.height > 8 &&
+      box.top >= 0 &&
+      box.bottom <= window.innerHeight + 1,
+  };
+};
+
+const disclaimerDesktop = await page.evaluate(disclaimerProbe);
+check(
+  "the map carries WIEGO's disclaimer word for word",
+  disclaimerDesktop.text === DISCLAIMER_TEXT,
+  disclaimerDesktop.text.slice(0, 90),
+);
+check(
+  'the disclaimer is visible on a booth screen',
+  disclaimerDesktop.visible,
+  JSON.stringify(disclaimerDesktop),
+);
+
+/* It shares the bottom edge with the map controls, and must not sit over them. */
+const footOverlap = await page.evaluate(() => {
+  const a = document.querySelector('.mapctl').getBoundingClientRect();
+  const b = document.querySelector('.disclaimer').getBoundingClientRect();
+  return a.right > b.left && a.left < b.right && a.bottom > b.top && a.top < b.bottom;
+});
+check('the disclaimer does not cover the map controls', !footOverlap);
 
 /**
  * And names it, practice or not. Most of the map is countries with nothing
@@ -906,6 +1063,25 @@ check('the phone layout does not scroll sideways', mobileLayout.bodyScrollWidth 
 check('the canvas fills the phone width', mobileLayout.canvasWidth === mobileLayout.innerWidth,
   `${mobileLayout.canvasWidth} vs ${mobileLayout.innerWidth}`);
 check('the context card starts collapsed on a phone', mobileLayout.contextCollapsed);
+
+/* The disclaimer used to be display:none below 960px — the one width where it
+   has to stack above the controls, and the width most visitors arrive on. */
+const disclaimerPhone = await mobile.evaluate(disclaimerProbe);
+check(
+  'the disclaimer is visible on a phone too',
+  disclaimerPhone.visible && disclaimerPhone.text === DISCLAIMER_TEXT,
+  JSON.stringify(disclaimerPhone),
+);
+const phoneFoot = await mobile.evaluate(() => {
+  const a = document.querySelector('.mapctl').getBoundingClientRect();
+  const b = document.querySelector('.disclaimer').getBoundingClientRect();
+  return { stacked: b.top >= a.bottom - 1, gap: Math.round(b.top - a.bottom) };
+});
+check(
+  'the disclaimer stacks below the controls on a phone',
+  phoneFoot.stacked,
+  JSON.stringify(phoneFoot),
+);
 
 check('the session is recognised as a visitor', mobileLayout.role === 'guest', mobileLayout.role);
 

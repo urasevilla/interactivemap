@@ -176,5 +176,13 @@ export function countryMatches(a2, category, workers) {
   );
 }
 
+/**
+ * WIEGO's map disclaimer, verbatim. Shown under the map on every screen size.
+ *
+ * The map is built to be able to say this: it draws land, not boundaries, and
+ * gives every country the same colour and the same marker, so there is no
+ * line, tint or label anywhere on it that could be read as a position on a
+ * frontier or on the status of a territory.
+ */
 export const DISCLAIMER =
-  'Boundaries and names shown do not imply official endorsement or acceptance. Base map: Natural Earth 1:50m Admin 0. Areas shown without a name or flag are subject to unresolved sovereignty questions and are drawn as neutral land.';
+  'The boundaries, colors, denominations, and any other information shown on this map do not imply, on the part of WIEGO, any judgment on the legal status of any territory, or any endorsement or acceptance of such boundaries. The term "country" does not imply any judgment on the legal or other status of any territorial entity.';

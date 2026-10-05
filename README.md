@@ -14,22 +14,32 @@ repository to GitHub Pages and it runs.
 
 ## What it does
 
-**A real map, not a picture of one.** Country borders come from Natural Earth
-1:50m — the same admin-0 dataset behind most published world maps — triangulated
-and extruded into WebGL geometry with Three.js. Every one of the 241 features is
-individually pickable. The projection is Equal Earth, so no country is inflated
-relative to another.
+**A real map, not a picture of one.** Land comes from Natural Earth 1:50m — the
+same admin-0 dataset behind most published world maps — triangulated into WebGL
+geometry with Three.js. Of its 241 features the map draws 240, and every
+country among them is individually pickable. The projection is Equal Earth, so
+no country is inflated relative to another.
 
-**The forty countries with a practice stand up out of the map**, coloured by
-their Five As category, named with a flag and a count. Everything else stays
-low and quiet in WIEGO's khaki.
+**It draws no boundaries.** Land is one surface in one colour, flat on the ocean
+plane: no border layer, no selection outline, no per-country tint, no extrusion.
+Each of those existed once and each of them drew frontiers — the walls of an
+extruded solid are mostly its borders, and so was the ring that used to appear
+around a hovered country. WIEGO's disclaimer sits under the map, and the map is
+built so it can make it.
 
-**Nothing is spelled out until you ask.** Clicking a country opens its panel;
-clicking a practice inside it opens the detail. That is the booth interaction —
-a visitor points at a country, you click it, and the story appears.
+**Every country is a marker.** The countries with a practice stand a pin in
+their Five As colour, named with a flag and a count; the rest get a plain dot in
+the land's own ink. The land says nothing now, so the marker is what says "this
+is a country, and you can open it" — and hovering or selecting shows on the
+marker and the name chip, never on the land.
+
+**Nothing is spelled out until you ask.** Clicking a country — its marker or
+its land — opens its panel; clicking a practice inside it opens the detail. That
+is the booth interaction: a visitor points at a country, you click it, and the
+story appears.
 
 **Find any country, however small.** Cabo Verde is four pixels wide at world
-zoom. The searchable picker lists all 236 named countries with their flags, with
+zoom. The searchable picker lists all 235 named countries with their flags, with
 practice countries grouped at the top, so nothing depends on hitting a tiny
 target. Zoom with the wheel, pinch, the `+`/`−` buttons or a double-click.
 
@@ -93,7 +103,7 @@ css/style.css         WIEGO palette, Lato, responsive down to a phone
 
 js/
   main.js             Bootstrap and wiring
-  map3d.js            Three.js scene: extrusion, picking, camera, pins
+  map3d.js            Three.js scene: land, markers, picking, camera
   geo.js              Equal Earth projection and TopoJSON decoding
   labels.js           DOM country labels, placement and collision
   ui.js               Legend, picker, country panel, sheets
@@ -211,18 +221,16 @@ foreshortens the far edge far harder than the near one, which across a whole
 world map reads as the projection itself being wrong — a northern hemisphere
 crushed into a band while South America stretches. A parallel projection
 foreshortens every part of the map by the same `cos(tilt)`, so Equal Earth
-arrives on screen as Equal Earth and the extruded relief keeps one depth from
-edge to edge. `tools/check.mjs` asserts it by measuring 60°N and 60°S against
-the equator, at the home view and zoomed out.
+arrives on screen as Equal Earth and the markers keep one depth from edge to
+edge. `tools/check.mjs` asserts it by measuring 60°N and 60°S against the
+equator, at the home view and zoomed out.
 
-**Countries lie flat until you touch them.** Every country is an extruded
-solid, and an extrusion shows a wall along every coast that the map's tilt
-projects seaward — at rest that read as a ragged dark skirt off India's west
-coast and off every island in the Philippines, a rendering artifact rather than
-depth. Height is an interaction signal now: the map rests flat, and a country
-lifts when hovered or selected, where the relief means something and only one
-country carries it. Walls are still capped at a fraction of their own ring's
-width, so a lifted archipelago does not bury its own islands.
+**Land is drawn once, merged.** Two coplanar meshes meeting along a shared arc
+can still show a hairline where they join, and a hairline along every frontier
+is the border layer back again — so every land polygon goes into one mesh with
+one material. The per-country meshes are still built, and still carry the keys
+the raycaster reads, but they are never drawn: they are what makes hovering name
+a country and tapping open one.
 
 **A phone opens part-way in.** Fitting the whole projection to a 390px screen
 gives each country about four pixels, so a narrow viewport opens over the belt
@@ -238,8 +246,12 @@ is one continuous run before any of it is measured.
 
 Natural Earth carries five polygons with no ISO code — Somaliland, Kosovo,
 Northern Cyprus, the Indian Ocean Territories and the Siachen Glacier. They are
-drawn as neutral land: no label, no flag, not in the country picker, so the map
-makes no claim either way. The standard disclaimer sits in the page footer.
+land here and nothing else: no marker, no label, no flag, not in the picker, and
+nothing to select, because every answer the map could give about them would be
+taking a side. Their polygons stay in the merged land layer all the same —
+leaving them out would carve a hole, which marks the place out as plainly as
+naming it would. Nothing names a sea, a gulf or a strait either; the only text
+over the map is a country chip, each anchored over its own land.
 
 ---
 

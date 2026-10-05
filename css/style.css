@@ -1014,14 +1014,43 @@ svg {
   opacity: 0.7;
 }
 
-.mapctl {
+/**
+ * The bottom chrome.
+ *
+ * The controls and the disclaimer used to be two absolutely positioned boxes
+ * sharing the bottom edge, which worked only because the disclaimer was hidden
+ * on a phone — the one size where it has to stack above the controls and where
+ * neither box can know how tall the other wrapped to. One flex row, turning
+ * into a column, lets them lay each other out instead.
+ */
+.mapfoot {
   position: absolute;
-  left: calc(16px + var(--sa-left));
-  bottom: calc(16px + var(--sa-bottom));
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 25;
   display: flex;
   align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 0 calc(16px + var(--sa-right)) calc(16px + var(--sa-bottom))
+    calc(16px + var(--sa-left));
+  /* The row spans the map; only the boxes in it should swallow a drag. */
+  pointer-events: none;
+}
+
+.mapfoot > * {
+  pointer-events: auto;
+}
+
+.mapctl {
+  display: flex;
+  align-items: flex-end;
   gap: 10px;
+  min-width: 0;
+  /* Never give way: squeezed against the disclaimer, the zoom buttons are the
+     first thing to be clipped. The disclaimer wraps instead. */
+  flex: 0 0 auto;
 }
 
 /* Worker group above country search: two ways of narrowing the same map,
@@ -1269,18 +1298,37 @@ svg {
 
 /* ---- Disclaimer + loading ---- */
 
+/**
+ * WIEGO's map disclaimer. Always on screen, at every size.
+ *
+ * It carries a backdrop rather than sitting as bare text on the map: the land
+ * is one flat colour now and the camera can put any part of it under here, so
+ * legibility cannot be left to whatever happens to be behind the words.
+ */
 .disclaimer {
-  position: absolute;
-  right: calc(14px + var(--sa-right));
-  bottom: calc(10px + var(--sa-bottom));
-  z-index: 15;
-  max-width: 460px;
+  flex: 0 1 auto;
+  max-width: 520px;
+  padding: 7px 10px;
+  border-radius: 9px;
+  background: rgba(250, 247, 240, 0.82);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   font-size: 10.5px;
   line-height: 1.42;
   color: var(--ink-3);
   text-align: right;
-  opacity: 0.8;
+  /* Reading it is the only thing to do with it; a drag over it should still
+     pan the map. */
   pointer-events: none;
+}
+
+.disclaimer__text {
+  margin: 0;
+}
+
+.disclaimer__source {
+  margin: 3px 0 0;
+  opacity: 0.72;
 }
 
 .loading {
@@ -2453,14 +2501,28 @@ svg {
     font-size: 18px;
   }
 
+  /* Stacked: controls, then the disclaimer along the bottom edge. Neither has
+     to reserve space for the other, which is what used to make this the one
+     size where the disclaimer could not be shown at all. */
+  .mapfoot {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 0 10px calc(10px + var(--sa-bottom));
+  }
+
   .disclaimer {
-    display: none;
+    /* Stacked, flex-basis is height: it must not shrink, or the last line of
+       the disclaimer is the thing that goes. */
+    flex: 0 0 auto;
+    max-width: none;
+    text-align: left;
+    font-size: 9.5px;
+    line-height: 1.38;
+    padding: 6px 9px;
   }
 
   .mapctl {
-    left: 10px;
-    right: 10px;
-    bottom: calc(10px + var(--sa-bottom));
     gap: 8px;
   }
 

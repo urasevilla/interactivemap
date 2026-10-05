@@ -161,49 +161,61 @@
           <div class="context__body" id="context-body"><!-- built by ui.js --></div>
         </section>
 
-        <!-- Map controls -->
-        <div class="mapctl">
-          <div class="mapctl__stack">
-          <!-- Which workers a practice targets. Built by ui.js. -->
-          <div class="workers" id="workers">
-            <span class="picker__label" id="workers-label">Worker group</span>
-            <div class="workers__chips" role="group" aria-labelledby="workers-label"></div>
-          </div>
+        <!-- Bottom chrome: the controls and the disclaimer share a row on a
+             booth screen and stack on a phone, so the disclaimer is visible at
+             every size without either one having to guess the other's height. -->
+        <div class="mapfoot">
 
-          <div class="picker" id="picker">
-            <label class="picker__label" for="picker-input">Find a country</label>
-            <div class="picker__field">
-              <img class="picker__flag" id="picker-flag" alt="" hidden />
-              <input
-                id="picker-input"
-                class="picker__input"
-                type="text"
-                role="combobox"
-                aria-expanded="false"
-                aria-autocomplete="list"
-                aria-controls="picker-list"
-                autocomplete="off"
-                placeholder="All countries…"
-              />
-              <button class="picker__clear" id="picker-clear" aria-label="Clear selection" hidden>&times;</button>
-              <button class="picker__caret" id="picker-caret" aria-label="Show all countries">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5z"/></svg>
+          <!-- Map controls -->
+          <div class="mapctl">
+            <div class="mapctl__stack">
+            <!-- Which workers a practice targets. Built by ui.js. -->
+            <div class="workers" id="workers">
+              <span class="picker__label" id="workers-label">Worker group</span>
+              <div class="workers__chips" role="group" aria-labelledby="workers-label"></div>
+            </div>
+
+            <div class="picker" id="picker">
+              <label class="picker__label" for="picker-input">Find a country</label>
+              <div class="picker__field">
+                <img class="picker__flag" id="picker-flag" alt="" hidden />
+                <input
+                  id="picker-input"
+                  class="picker__input"
+                  type="text"
+                  role="combobox"
+                  aria-expanded="false"
+                  aria-autocomplete="list"
+                  aria-controls="picker-list"
+                  autocomplete="off"
+                  placeholder="All countries…"
+                />
+                <button class="picker__clear" id="picker-clear" aria-label="Clear selection" hidden>&times;</button>
+                <button class="picker__caret" id="picker-caret" aria-label="Show all countries">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5z"/></svg>
+                </button>
+              </div>
+              <ul class="picker__list" id="picker-list" role="listbox" hidden></ul>
+            </div>
+            </div>
+
+            <div class="zoomctl" role="group" aria-label="Zoom">
+              <button class="zoomctl__btn" id="btn-zoom-in" aria-label="Zoom in">+</button>
+              <button class="zoomctl__btn" id="btn-zoom-out" aria-label="Zoom out">&minus;</button>
+              <button class="zoomctl__btn zoomctl__btn--wide" id="btn-reset" aria-label="Reset the view">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5V2L8 6l4 4V7a5 5 0 11-5 5H5a7 7 0 107-7z"/></svg>
               </button>
             </div>
-            <ul class="picker__list" id="picker-list" role="listbox" hidden></ul>
-          </div>
           </div>
 
-          <div class="zoomctl" role="group" aria-label="Zoom">
-            <button class="zoomctl__btn" id="btn-zoom-in" aria-label="Zoom in">+</button>
-            <button class="zoomctl__btn" id="btn-zoom-out" aria-label="Zoom out">&minus;</button>
-            <button class="zoomctl__btn zoomctl__btn--wide" id="btn-reset" aria-label="Reset the view">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5V2L8 6l4 4V7a5 5 0 11-5 5H5a7 7 0 107-7z"/></svg>
-            </button>
+          <div class="disclaimer" id="disclaimer">
+            <p class="disclaimer__text" id="disclaimer-text"></p>
+            <p class="disclaimer__source">
+              Base map: Natural Earth 1:50m land polygons, drawn without boundaries.
+            </p>
           </div>
-        </div>
 
-        <p class="disclaimer" id="disclaimer"></p>
+        </div><!-- /.mapfoot -->
 
         <div class="loading" id="loading">
           <div class="loading__spinner" aria-hidden="true"></div>

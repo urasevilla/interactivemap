@@ -389,7 +389,7 @@ export function buildContext(container) {
     toggle.setAttribute('aria-expanded', 'false');
   }
 
-  document.getElementById('disclaimer').textContent = DISCLAIMER;
+  document.getElementById('disclaimer-text').textContent = DISCLAIMER;
 
   return { setLens: render };
 }

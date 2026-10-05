@@ -10,7 +10,7 @@ import { Auth, ownerLabel } from './auth.js';
 import { createStore, makeNote } from './store.js';
 import { CONFIG, HAS_SECRET, siteUrl } from './config-loader.js';
 import { issueBoothCode, issueGuestToken, formatCode, formatRemaining, normalizeCode } from './tokens.js';
-import { FEATURED, PRACTICES } from './practices.js';
+import { FEATURED } from './practices.js';
 import {
   CountryPanel,
   CountryPicker,
@@ -211,19 +211,19 @@ async function boot() {
   const canvas = document.getElementById('map');
 
   map = new WorldMap(canvas, {
-    onSelect: (key, practiceId) => {
+    onSelect: (key) => {
       if (!key) {
         panel.close();
         picker.setSelection(null);
         return;
       }
-      selectCountry(key, practiceId, { fly: false });
+      selectCountry(key, null, { fly: false });
     },
   });
 
   map.resize();
   map.buildCountries(topo, index);
-  map.buildPins(PRACTICES);
+  map.buildMarkers();
 
   labels = new LabelLayer(document.getElementById('labels'), map);
   labels.build(index);
@@ -510,8 +510,8 @@ function startLoop() {
   /**
    * The lowest point of a country's geometry, in top-face units: 0 means its
    * walls run the full extrusion height, 1 means it is flat. tools/check.mjs
-   * uses it to prove an archipelago's relief stays in proportion to its
-   * islands rather than burying them.
+   * uses it to prove no country has walls at all — a wall belongs to the ring
+   * that raised it, and a country's rings are mostly its borders.
    */
   window.__mapWallBase = (key) => {
     const entry = map.countries.get(key);
@@ -539,9 +539,45 @@ function startLoop() {
   /* A country's current extrusion height, to prove it lies flat until used. */
   window.__mapHeight = (key) => map.countries.get(key)?.height ?? null;
 
-  /* Hide the practice pins, so a screenshot can judge the land underneath. */
-  window.__mapPins = (visible) => {
-    map.pinGroup.visible = visible;
+  /* Hide the markers, so a screenshot can judge the land underneath. */
+  window.__mapMarkers = (visible) => {
+    map.markerGroup.visible = visible;
+  };
+
+  /**
+   * What the map is made of, for the assertions that keep boundaries off it:
+   * every line layer in the scene by name, how many per-country land meshes
+   * are actually drawn (none — the merged layer draws them all), and how many
+   * distinct materials and colours the land is made of (one of each, so no
+   * tint can stop at a frontier).
+   */
+  window.__mapLayers = () => {
+    const lines = [];
+    const land = [];
+    map.scene.traverse((object) => {
+      if (object.isLine || object.isLineSegments) lines.push(object.name || object.type);
+      if (object.isMesh && object.material === map.landMaterial) land.push(object);
+    });
+    return {
+      lines: lines.sort(),
+      drawnCountryMeshes: land.filter((m) => m !== map.land && m.visible).length,
+      landMaterials: new Set(land.map((m) => m.material.uuid)).size,
+      landColours: [...new Set(land.map((m) => m.material.color.getHexString()))],
+    };
+  };
+
+  /** One marker per country, and which of them are on screen right now. */
+  window.__mapMarkerStats = () => ({
+    total: map.markers.length,
+    featured: map.markers.filter((m) => m.userData.featured).length,
+    visible: map.markers.filter((m) => m.visible).length,
+    keys: map.markers.map((m) => m.userData.key),
+  });
+
+  /** A marker's current scale, to prove hovering shows on the marker. */
+  window.__mapMarkerScale = (key) => {
+    const marker = map.markers.find((m) => m.userData.key === key);
+    return marker ? marker.scale.x : null;
   };
 
   window.__mapSample = (size = 48) => {

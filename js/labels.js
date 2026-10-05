@@ -18,8 +18,8 @@ const PLAIN_LABEL_ZOOM = 0.3;
 /**
  * Below this width the whole world is only ~190px tall, and fourteen name chips
  * cannot be placed anywhere near their own countries — they end up stacked in a
- * column that points at nothing. On a narrow screen the pins carry the map at
- * low zoom and the names arrive once there is room for them.
+ * column that points at nothing. On a narrow screen the markers carry the map
+ * at low zoom and the names arrive once there is room for them.
  */
 const COMPACT_WIDTH = 760; // kept in step with map3d.js's own COMPACT_WIDTH
 const COMPACT_FEATURED_ZOOM = 0.32;
@@ -60,6 +60,9 @@ export class LabelLayer {
 
       const el = document.createElement('div');
       el.className = `label ${featured ? 'label--featured' : 'label--plain'}`;
+      /* Which country this chip belongs to. tools/check.mjs reads it to ask
+         whether every name on screen is standing on its own land. */
+      el.dataset.key = record.key;
       el.style.opacity = '0';
       el.style.display = 'none';
 
@@ -219,10 +222,10 @@ export class LabelLayer {
 
       /* Featured labels step away from their anchor to find space, but only so
          far. A chip parked three rows from its country points at the wrong
-         place, which is worse than no chip: the country is still coloured and
-         still carries a pin, and the name returns as soon as zooming frees up
-         room. Ranking above means the countries with the most practices keep
-         their names when space is short. */
+         place, which is worse than no chip: the country still carries a marker
+         in its category's colour, and the name returns as soon as zooming
+         frees up room. Ranking above means the countries with the most
+         practices keep their names when space is short. */
       const step = height + COLLISION_PAD;
       const offsets = entry.featured ? [0, -step, step, -step * 2, step * 2] : [0];
 

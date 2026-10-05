@@ -143,11 +143,3 @@ export function projectRing(ring) {
   return out;
 }
 
-/** Shoelace area of a flat `[x0,y0,x1,y1,...]` ring; sign gives the winding. */
-export function flatRingArea(flat) {
-  let sum = 0;
-  for (let i = 0, n = flat.length / 2, j = n - 1; i < n; j = i++) {
-    sum += flat[j * 2] * flat[i * 2 + 1] - flat[i * 2] * flat[j * 2 + 1];
-  }
-  return sum / 2;
-}

@@ -1,10 +1,19 @@
 /**
  * The WebGL map.
  *
- * Every country is an extruded solid standing on the ocean plane. Geometry is
- * built once with its base at z = 0 and its top at z = 1, so a country's height
- * is just `mesh.scale.z` — which makes the lift animations a single number to
- * tween rather than a geometry rebuild.
+ * The basemap draws no borders. Land is one surface in one colour — plain
+ * polygons lying flat on the ocean plane — and every country arrives on it as
+ * a marker standing at its own anchor. Nothing in the rendering says where one
+ * country stops and the next begins, or tells a recognised state apart from an
+ * area whose sovereignty is unresolved, which is what the disclaimer under the
+ * map promises and what the extruded-and-outlined version it replaced could
+ * not keep: a solid shows a wall along every edge it owns, and a country's
+ * edges are mostly its frontiers.
+ *
+ * Countries are still separate meshes, but invisible ones. They exist so a ray
+ * can name the land under the pointer — hovering anywhere still says which
+ * country this is, tapping anywhere still opens it — while the single merged
+ * land mesh above them is what actually gets drawn.
  */
 import * as THREE from 'three';
 import {
@@ -13,7 +22,6 @@ import {
   project,
   projectRing,
   splitAtAntimeridian,
-  flatRingArea,
   WORLD_HALF_WIDTH,
   WORLD_HALF_HEIGHT,
   HOME_HALF_HEIGHT,
@@ -24,21 +32,23 @@ import { CATEGORY_BY_ID, FEATURED, categoriesFor, countryMatches } from './pract
 /* Scene constants, in projection units (the equator is ~5.4 units wide). */
 
 /**
- * Countries lie flat until you touch them.
+ * The one height land ever has.
  *
- * An extruded solid shows a wall along every coast, and under the map's tilt
- * that wall projects seaward: at rest it read as a ragged dark skirt hanging
- * off India's west coast and off every island in the Philippines — a
- * rendering artifact, not depth. Height is now an interaction signal rather
- * than decoration. The resting values are just enough to clear the ocean
- * plane without z-fighting and to keep a practice country a hair proud of its
- * neighbours; the lift arrives on hover and selection, where it means
- * something and where only one country carries it.
+ * Every land polygon sits here and stays here: high enough to clear the ocean
+ * plane without z-fighting, and that is the whole of its job. Relief, a lift on
+ * hover and a lift on selection all used to live on this axis, and each of them
+ * drew the hovered country's own outline in light and shadow — a border by
+ * another name. Interaction moved to the markers, which belong to countries
+ * rather than to their shapes.
  */
-const H_BASE = 0.004; // resting height of a country with no practice
-const H_FEATURED = 0.010; // resting height of a country that has one
-const H_HOVER = 0.055; // absolute height while hovered
-const H_SELECT = 0.085; // absolute height while selected
+const LAND_Z = 0.004;
+
+/** How far a marker floats above the land it stands on. */
+const MARKER_LIFT = 0.004;
+
+/** How much bigger a marker gets while it is hovered or selected. */
+const HOT_FEATURED = 1.3;
+const HOT_PLAIN = 2.1;
 
 /**
  * The camera is orthographic. A perspective camera looking at a tilted plane
@@ -46,8 +56,8 @@ const H_SELECT = 0.085; // absolute height while selected
  * world map that reads as the projection itself being wrong: the northern
  * hemisphere crushed into a band while South America stretches. A parallel
  * projection foreshortens every part of the map by the same cos(tilt), so
- * Equal Earth arrives on screen as Equal Earth, and the extruded relief keeps
- * a constant depth from one edge to the other.
+ * Equal Earth arrives on screen as Equal Earth, and the markers keep a
+ * constant depth from one edge to the other.
  *
  * VIEW_K is the only number tying the old distance scale to the new frustum:
  * the half-height of the view at distance 1. It is the tangent of the half
@@ -58,7 +68,7 @@ const H_SELECT = 0.085; // absolute height while selected
 const VIEW_K = Math.tan((38 * Math.PI) / 180 / 2);
 
 /** How far back the camera sits. Parallel projection, so this only has to
-    clear the tallest lifted country and stay inside the far plane. */
+    clear the tallest marker and stay inside the far plane. */
 const CAMERA_STANDOFF = 20;
 
 /**
@@ -92,40 +102,18 @@ const TAP_SLOP_MOUSE = 6;
 const TAP_SLOP_TOUCH = 14; // a finger on glass is never still
 
 /**
- * Rings below this projected area get no side walls at all. One projection
- * unit is roughly 7,400 km at the equator, so this is on the order of a couple
- * of thousand square kilometres — Cabo Verde's islands, Madeira, the Galápagos.
- */
-const MIN_WALL_AREA = 5e-5;
-
-/**
- * A wall is capped at this fraction of its own ring's width.
+ * One land colour, for every country and for every area between them.
  *
- * Relief used to be one height for every ring in a country, which reads as
- * depth on a continent and as a smear on an island: at world zoom the
- * Philippines was a blur, because each island's wall stood as tall as the
- * island is wide and buried the coastline under its own side. Scaling the wall
- * to sqrt(area) keeps Brazil's relief while letting Luzon's drop to about a
- * fifth of it, so an archipelago still reads as separate islands.
- *
- * The floor stops the largest of the wall-less rings from jumping to nothing.
+ * Deepened a shade from the old fill now that it is the only thing separating
+ * land from sea: the per-country tints and the coastal shading used to do that
+ * work, and both had to go with the borders.
  */
-const WALL_TO_RING_SIZE = 0.32;
-const MIN_WALL_FRACTION = 0.12;
-
-/**
- * Walls are sized against the tallest a country ever stands, not its resting
- * height — otherwise every ring would bake a full-height wall (they are all
- * far larger than the resting height now) and the smear would come back the
- * moment a small country was hovered.
- */
-const WALL_REFERENCE = H_SELECT;
-
-const COL_LAND = new THREE.Color('#DCD2BE');
-const COL_LAND_NEUTRAL = new THREE.Color('#D3C9B6');
+const COL_LAND = new THREE.Color('#D6CAB0');
 const COL_OCEAN = new THREE.Color('#F3EEE3');
-const COL_BORDER = new THREE.Color('#A99B84');
 const COL_COAST = new THREE.Color('#8C7F6B');
+
+/** A country with nothing mapped still gets a marker, in the land's own ink. */
+const COL_MARKER_PLAIN = new THREE.Color('#8A7C68');
 
 export class WorldMap {
   /**
@@ -133,7 +121,6 @@ export class WorldMap {
    * @param {object} opts
    * @param {(key:string|null)=>void} opts.onSelect  fired with a country key, or null when cleared
    * @param {(key:string|null)=>void} opts.onHover
-   * @param {(id:string)=>void}       opts.onPractice fired when a map pin is clicked
    */
   constructor(canvas, opts = {}) {
     this.canvas = canvas;
@@ -170,15 +157,15 @@ export class WorldMap {
     this.distance = 5;
     this.maxDistance = 6;
 
-    /* Countries are extruded solids, so each one shows a wall along its coast.
-       At the home view that wall reads as pleasing relief; at close zoom the
-       same wall is a smear trailing off the coastline, and on a small island it
-       is larger than the island. Shrinking the relief as the camera closes in
-       keeps the 3D at a constant, subtle size on screen. */
-    this.relief = 1;
+    this.countries = new Map(); // key -> { key, record, mesh, height, anchor, marker }
+    this.markers = [];
 
-    this.countries = new Map(); // key -> { mesh, record, restHeight, targetHeight, baseColor }
-    this.pins = [];
+    /* Markers hold a constant size on screen, so their scale tracks the
+       camera. Cached because a hover has to re-apply it without waiting for
+       the next distance change. */
+    this._featuredScale = 1;
+    this._plainScale = 1;
+
     this.hovered = null;
     this.selected = null;
     this.filter = null; // category id, or null for "show all"
@@ -244,7 +231,9 @@ export class WorldMap {
     this.ocean.renderOrder = 0;
     this.scene.add(this.ocean);
 
-    /* Graticule every 30°, curved by the projection. */
+    /* Graticule every 30°, curved by the projection. Parallels and meridians,
+       drawn through land and sea alike — the only lines left on the map, and
+       the only ones that give a flat, unbroken landmass any sense of scale. */
     const lines = [];
     const push = (a, b) => {
       lines.push(a[0], a[1], 0.0015, b[0], b[1], 0.0015);
@@ -271,6 +260,10 @@ export class WorldMap {
       gg,
       new THREE.LineBasicMaterial({ color: '#D9CDB6', transparent: true, opacity: 0.85 }),
     );
+    /* Named, along with the projection boundary below, because those two are
+       the only line layers this scene is allowed to hold — tools/check.mjs
+       asserts it, so a border layer cannot come back unnoticed. */
+    this.graticule.name = 'graticule';
     this.scene.add(this.graticule);
 
     /* Outline of the projection boundary. */
@@ -281,101 +274,99 @@ export class WorldMap {
     }
     const og = new THREE.BufferGeometry();
     og.setAttribute('position', new THREE.Float32BufferAttribute(outline, 3));
-    this.scene.add(new THREE.LineSegments(og, new THREE.LineBasicMaterial({ color: COL_COAST })));
+    const edge = new THREE.LineSegments(og, new THREE.LineBasicMaterial({ color: COL_COAST }));
+    edge.name = 'projection-boundary';
+    this.scene.add(edge);
   }
 
   /**
-   * Builds one extruded mesh per country plus a single merged border layer.
+   * Builds the land.
+   *
+   * One merged mesh carries every land polygon there is, including the ones
+   * under unresolved sovereignty questions: at a single colour and a single
+   * height, geometry cannot say where a country ends, and cannot mark a
+   * disputed area out from the land around it. Merged rather than drawn
+   * per country because two coplanar meshes meeting along a shared arc can
+   * still show a hairline where they join, and a hairline along every frontier
+   * is the border layer back again.
+   *
+   * The per-country meshes built alongside it are never drawn. They are the
+   * raycaster's map: invisible, in the scene so three keeps their world
+   * matrices current, and the reason hovering still names a country and
+   * tapping still opens one.
+   *
    * @param {object} topo   parsed countries-50m.json
    * @param {object} index  parsed world-index.json
    */
   buildCountries(topo, index) {
     const { arcs, geometries } = decodeTopology(topo);
-    const borderSegments = [];
+    const merged = { positions: [], normals: [], indices: [] };
+
+    /* One material, one colour, every country. Nothing here is per-country any
+       more, so nothing can read as a tint stopping at a frontier. */
+    this.landMaterial = new THREE.MeshStandardMaterial({
+      color: COL_LAND,
+      roughness: 0.9,
+      metalness: 0,
+    });
 
     for (const record of index.countries) {
       const geometry = geometries[record.i];
       if (!geometry) continue;
 
-      const polygons = polygonsOf(arcs, geometry);
-      const featured = FEATURED.has(record.a2);
-      const restHeight = featured ? H_FEATURED : H_BASE;
-
-      const outlineSegments = [];
-      const built = this._extrude(
-        polygons,
-        borderSegments,
-        outlineSegments,
-        restHeight + 0.0015,
-      );
+      const built = this._landFace(polygonsOf(arcs, geometry), merged);
       if (!built) continue;
 
-      const baseColor = featured
-        ? new THREE.Color(CATEGORY_BY_ID.get(categoriesFor(record.a2)[0]).color)
-        : record.neutral
-          ? COL_LAND_NEUTRAL.clone()
-          : COL_LAND.clone();
-
-      const material = new THREE.MeshStandardMaterial({
-        color: baseColor,
-        roughness: featured ? 0.55 : 0.88,
-        metalness: 0,
-        emissive: new THREE.Color('#000000'),
-        emissiveIntensity: 1,
-      });
-
-      const mesh = new THREE.Mesh(built, material);
-      mesh.scale.z = restHeight;
-      mesh.renderOrder = 1;
+      const mesh = new THREE.Mesh(built, this.landMaterial);
+      mesh.visible = false;
+      mesh.scale.z = LAND_Z;
       mesh.userData.key = record.key;
       this.scene.add(mesh);
+
+      /* An area whose sovereignty is unresolved is land here and nothing more:
+         no marker, no name, and nothing to select, because every answer the map
+         could give about it would be taking a side. Its polygons are already
+         in the merged layer above — leaving them out would carve a hole in the
+         land, which marks the place out just as plainly as naming it. */
+      if (record.neutral) continue;
 
       this.countries.set(record.key, {
         key: record.key,
         record,
         mesh,
-        material,
-        featured,
-        baseColor,
-        restHeight,
-        height: restHeight,
-        targetHeight: restHeight,
-        /* Authored at z = 1 so scaling z lands them on the top face. */
-        outlinePositions: new Float32Array(outlineSegments),
+        /* Constant: labels read it to sit just above the land. */
+        height: LAND_Z,
         anchor: project(record.anchor[0], record.anchor[1]),
+        marker: null,
       });
     }
 
-    const bg = new THREE.BufferGeometry();
-    bg.setAttribute('position', new THREE.Float32BufferAttribute(borderSegments, 3));
-    this.borders = new THREE.LineSegments(
-      bg,
-      new THREE.LineBasicMaterial({ color: COL_BORDER, transparent: true, opacity: 0.9 }),
-    );
-    this.borders.renderOrder = 2;
-    this.scene.add(this.borders);
+    const lg = new THREE.BufferGeometry();
+    lg.setAttribute('position', new THREE.Float32BufferAttribute(merged.positions, 3));
+    lg.setAttribute('normal', new THREE.Float32BufferAttribute(merged.normals, 3));
+    lg.setIndex(merged.indices);
+    lg.computeBoundingSphere();
 
-    /* Reusable outline for whichever country is hovered or selected. */
-    this._outline = new THREE.LineSegments(
-      new THREE.BufferGeometry(),
-      new THREE.LineBasicMaterial({ color: '#3B322D', transparent: true, opacity: 0.95 }),
-    );
-    this._outline.visible = false;
-    this._outline.renderOrder = 3;
-    this.scene.add(this._outline);
+    this.land = new THREE.Mesh(lg, this.landMaterial);
+    this.land.name = 'land';
+    this.land.scale.z = LAND_Z;
+    this.land.renderOrder = 1;
+    this.scene.add(this.land);
 
     this._pickables = [...this.countries.values()].map((c) => c.mesh);
     this._needsRender = true;
   }
 
   /**
-   * Triangulates a feature's top face and raises walls around every ring.
-   * Border segments for the merged line layer are collected as a side effect,
-   * since the ring walk already has the vertices in hand.
+   * Triangulates one feature's land, flat, into its own geometry and into the
+   * merged layer at the same time.
+   *
+   * The face is authored at z = 1 and placed by the mesh's z scale, which is
+   * what it has always been — so `__mapWallBase` still reads as "how far down
+   * does this country go", and the answer is now always "it does not".
    */
-  _extrude(polygons, borderSegments, outlineSegments, borderZ) {
+  _landFace(polygons, merged) {
     const positions = [];
-    const normals = [];
     const indices = [];
 
     for (const polygon of polygons) {
@@ -383,10 +374,7 @@ export class WorldMap {
          cannot be matched to a split outer ring reliably, so split rings are
          triangulated on their own with holes dropped. */
       const outerParts = splitAtAntimeridian(polygon[0]);
-      const groups =
-        outerParts.length === 1
-          ? [polygon]
-          : outerParts.map((part) => [part]);
+      const groups = outerParts.length === 1 ? [polygon] : outerParts.map((part) => [part]);
 
       for (const group of groups) {
         const flat = [];
@@ -401,150 +389,127 @@ export class WorldMap {
         const tri = window.earcut(flat, holeIndices.length ? holeIndices : null);
         if (!tri.length) continue;
 
-        /* Top face at z = 1. */
-        const topStart = positions.length / 3;
+        const start = positions.length / 3;
         for (let i = 0; i < flat.length / 2; i++) {
           positions.push(flat[i * 2], flat[i * 2 + 1], 1);
-          normals.push(0, 0, 1);
         }
-        for (let i = 0; i < tri.length; i++) indices.push(topStart + tri[i]);
-
-        /* Walls: one quad per edge, from z = 0 up to z = 1. */
-        let ringStart = 0;
-        const ringBounds = [...holeIndices, flat.length / 2];
-        for (let r = 0; r < ringBounds.length; r++) {
-          const ringEnd = ringBounds[r];
-          const count = ringEnd - ringStart;
-          if (count >= 3) {
-            const sub = flat.slice(ringStart * 2, ringEnd * 2);
-            const signedArea = flatRingArea(sub);
-            const outward = signedArea > 0 ? 1 : -1;
-
-            /* On an island smaller than the extrusion is tall, the wall is
-               wider than the land and reads as a coloured smear trailing into
-               the sea. Those get a flat top face and no sides; the missing
-               relief is imperceptible at that size. */
-            const tiny = Math.abs(signedArea) < MIN_WALL_AREA;
-
-            /* Everything else gets a wall in proportion to its own size, so an
-               island's relief cannot outgrow the island. The top edge stays at
-               z = 1; it is the base that rises. */
-            const ringSize = Math.sqrt(Math.abs(signedArea));
-            const wallBase =
-              1 -
-              THREE.MathUtils.clamp(
-                (WALL_TO_RING_SIZE * ringSize) / WALL_REFERENCE,
-                MIN_WALL_FRACTION,
-                1,
-              );
-
-            for (let i = 0; i < count; i++) {
-              const a = ringStart + i;
-              const b = ringStart + ((i + 1) % count);
-              const ax = flat[a * 2];
-              const ay = flat[a * 2 + 1];
-              const bx = flat[b * 2];
-              const by = flat[b * 2 + 1];
-
-              const ex = bx - ax;
-              const ey = by - ay;
-              const len = Math.hypot(ex, ey) || 1;
-              const nx = (ey / len) * outward;
-              const ny = (-ex / len) * outward;
-
-              if (!tiny) {
-                const base = positions.length / 3;
-                positions.push(ax, ay, wallBase, bx, by, wallBase, bx, by, 1, ax, ay, 1);
-                for (let k = 0; k < 4; k++) normals.push(nx, ny, 0);
-                indices.push(base, base + 1, base + 2, base, base + 2, base + 3);
-              }
-
-              /* The selection outline, collected here rather than recovered
-                 later by scanning the geometry for a z pattern — walls no
-                 longer start at z = 0, and tiny rings have none to scan. */
-              outlineSegments.push(ax, ay, 1, bx, by, 1);
-
-              /* The border layer is one merged object in world space, so each
-                 country's outline is emitted at that country's own resting
-                 height rather than at the local top face. */
-              borderSegments.push(ax, ay, borderZ, bx, by, borderZ);
-            }
-          }
-          ringStart = ringEnd;
-        }
+        for (let i = 0; i < tri.length; i++) indices.push(start + tri[i]);
       }
     }
 
     if (!positions.length) return null;
 
+    const offset = merged.positions.length / 3;
+    for (let i = 0; i < positions.length; i++) merged.positions.push(positions[i]);
+    /* Flat, so every normal is known without computing it. */
+    for (let i = 0; i < positions.length / 3; i++) merged.normals.push(0, 0, 1);
+    for (let i = 0; i < indices.length; i++) merged.indices.push(offset + indices[i]);
+
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-    geometry.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
     geometry.setIndex(indices);
     geometry.computeBoundingSphere();
     return geometry;
   }
 
-  /** Adds the practice pins. Call after {@link buildCountries}. */
-  buildPins(practices) {
+  /**
+   * Stands one marker on every country. Call after {@link buildCountries}.
+   *
+   * Every country, not only the ones carrying a practice: the land says nothing
+   * now, so the marker is the only thing on the map that says "this is a
+   * country, and you can open it". Countries with a practice stand a pin in
+   * their category's colour; the rest get a plain dot, held small enough that
+   * western Europe still reads as separate countries at the opening view.
+   *
+   * One marker per country rather than one per practice. A country with four
+   * practices used to carry four pins stacked on one anchor, which said more
+   * about the anchor than about the country, and the panel lists them all
+   * anyway once the marker is tapped.
+   */
+  buildMarkers() {
     const group = new THREE.Group();
-    this.pinGroup = group;
+    this.markerGroup = group;
     this.scene.add(group);
 
     const coneGeo = new THREE.ConeGeometry(0.020, 0.055, 18);
     const headGeo = new THREE.SphereGeometry(0.023, 20, 14);
     const ringGeo = new THREE.RingGeometry(0.029, 0.040, 28);
+    const dotGeo = new THREE.SphereGeometry(0.0085, 12, 8);
 
-    for (const practice of practices) {
-      const [x, y] = project(practice.lonlat[0], practice.lonlat[1]);
-      const color = new THREE.Color(CATEGORY_BY_ID.get(practice.category).color);
+    /* One material behind every dot, so fading them under a filter is a single
+       write rather than a hundred and ninety. */
+    this.plainMaterial = new THREE.MeshStandardMaterial({
+      color: COL_MARKER_PLAIN,
+      roughness: 0.5,
+      metalness: 0,
+      transparent: true,
+      opacity: 0.92,
+    });
 
-      const pin = new THREE.Group();
-      pin.position.set(x, y, H_FEATURED + 0.01);
+    for (const entry of this.countries.values()) {
+      const featured = FEATURED.has(entry.record.a2);
 
-      const material = new THREE.MeshStandardMaterial({
-        color,
-        roughness: 0.32,
-        metalness: 0.08,
-        emissive: color.clone().multiplyScalar(0.22),
-      });
+      const marker = new THREE.Group();
+      marker.position.set(entry.anchor[0], entry.anchor[1], LAND_Z + MARKER_LIFT);
 
-      const cone = new THREE.Mesh(coneGeo, material);
-      cone.rotation.x = Math.PI; // tip down
-      cone.position.z = 0.027;
-      pin.add(cone);
+      let material = this.plainMaterial;
+      let ring = null;
 
-      const head = new THREE.Mesh(headGeo, material);
-      head.position.z = 0.070;
-      pin.add(head);
-
-      const ring = new THREE.Mesh(
-        ringGeo,
-        new THREE.MeshBasicMaterial({
+      if (featured) {
+        const color = new THREE.Color(
+          CATEGORY_BY_ID.get(categoriesFor(entry.record.a2)[0]).color,
+        );
+        material = new THREE.MeshStandardMaterial({
           color,
-          transparent: true,
-          opacity: 0.4,
-          side: THREE.DoubleSide,
-          depthWrite: false,
-        }),
-      );
-      ring.position.z = 0.002;
-      pin.add(ring);
+          roughness: 0.32,
+          metalness: 0.08,
+          emissive: color.clone().multiplyScalar(0.22),
+        });
 
-      pin.userData = {
-        practiceId: practice.id,
-        a2: practice.a2,
-        category: practice.category,
-        workers: practice.workers,
-        ring,
+        const cone = new THREE.Mesh(coneGeo, material);
+        cone.rotation.x = Math.PI; // tip down
+        cone.position.z = 0.027;
+        marker.add(cone);
+
+        const head = new THREE.Mesh(headGeo, material);
+        head.position.z = 0.070;
+        marker.add(head);
+
+        ring = new THREE.Mesh(
+          ringGeo,
+          new THREE.MeshBasicMaterial({
+            color,
+            transparent: true,
+            opacity: 0.4,
+            side: THREE.DoubleSide,
+            depthWrite: false,
+          }),
+        );
+        ring.position.z = 0.002;
+        marker.add(ring);
+      } else {
+        marker.add(new THREE.Mesh(dotGeo, material));
+      }
+
+      marker.userData = {
+        key: entry.key,
+        a2: entry.record.a2,
+        featured,
         material,
-        baseZ: pin.position.z,
+        ring,
+        baseZ: marker.position.z,
+        hot: false,
       };
-      group.add(pin);
-      this.pins.push(pin);
+      group.add(marker);
+      this.markers.push(marker);
+      entry.marker = marker;
     }
 
-    this._pinPickables = this.pins.flatMap((p) => p.children.slice(0, 2));
+    /* A marker's solid parts are its target. The ground ring is decoration and
+       would make a fat invisible hit area around every pin. */
+    this._markerPickables = this.markers.flatMap((m) =>
+      m.userData.featured ? m.children.slice(0, 2) : m.children.slice(0, 1),
+    );
     this._needsRender = true;
   }
 
@@ -831,20 +796,22 @@ export class WorldMap {
     });
   }
 
+  /** The key of the country under the pointer, or null. */
   _pick() {
     this._raycaster.setFromCamera(this._pointer, this.camera);
 
-    const pinHits = this._pinPickables?.length
-      ? this._raycaster.intersectObjects(this._pinPickables, false)
+    /* Markers first: one stands on land it shares with nobody, but a dot on a
+       country three pixels wide is the only target that country has. */
+    const markerHits = this._markerPickables?.length
+      ? this._raycaster.intersectObjects(this._markerPickables, false)
       : [];
-    if (pinHits.length) {
-      const pin = pinHits[0].object.parent;
-      if (this._visiblePin(pin)) return { type: 'pin', pin };
+    for (const hit of markerHits) {
+      const marker = hit.object.parent;
+      if (marker.visible) return marker.userData.key;
     }
 
     const hits = this._raycaster.intersectObjects(this._pickables, false);
-    if (hits.length) return { type: 'country', key: hits[0].object.userData.key };
-    return null;
+    return hits.length ? hits[0].object.userData.key : null;
   }
 
   /**
@@ -881,42 +848,21 @@ export class WorldMap {
     return null;
   }
 
-  _visiblePin(pin) {
-    return pin.visible;
-  }
-
   _updateHover() {
-    const hit = this._pointer.x < -1.5 ? null : this._pick();
-    const key = hit?.type === 'country' ? hit.key : hit?.type === 'pin' ? this._keyForA2(hit.pin.userData.a2) : null;
+    const key = this._pointer.x < -1.5 ? null : this._pick();
 
     if (key !== this.hovered) {
       this.hovered = key;
-      this._refreshHeights();
-      this._refreshOutline();
+      this._refreshHighlight();
       this.opts.onHover?.(key);
     }
-    this.canvas.style.cursor = hit ? 'pointer' : '';
+    this.canvas.style.cursor = key ? 'pointer' : '';
   }
 
   _handleClick(coarse = false) {
-    const hit = this._pick() || (coarse ? this._pickNear() : null);
-    if (!hit) {
-      this.select(null);
-      this.opts.onSelect?.(null);
-      return;
-    }
-    if (hit.type === 'pin') {
-      const key = this._keyForA2(hit.pin.userData.a2);
-      this.select(key);
-      this.opts.onSelect?.(key, hit.pin.userData.practiceId);
-      return;
-    }
-    this.select(hit.key);
-    this.opts.onSelect?.(hit.key);
-  }
-
-  _keyForA2(a2) {
-    return a2; // country keys are the lowercase alpha-2 for every coded feature
+    const key = this._pick() || (coarse ? this._pickNear() : null) || null;
+    this.select(key);
+    this.opts.onSelect?.(key);
   }
 
   /* ---------------------------------------------------------------- */
@@ -926,8 +872,7 @@ export class WorldMap {
   select(key) {
     if (this.selected === key) return;
     this.selected = key && this.countries.has(key) ? key : null;
-    this._refreshHeights();
-    this._refreshOutline();
+    this._refreshHighlight();
   }
 
   /** Dims everything outside a category; pass null to clear. */
@@ -953,65 +898,48 @@ export class WorldMap {
    * meet leaves an empty map, which is the honest answer.
    */
   _applyFilters() {
-    for (const entry of this.countries.values()) {
-      if (!entry.featured) continue;
-      entry.material.color.copy(entry.baseColor);
-      if (!this._matches(entry.record.a2)) entry.material.color.lerp(COL_LAND, 0.72);
-    }
-    for (const pin of this.pins) {
-      pin.visible =
-        (!this.filter || pin.userData.category === this.filter) &&
-        (!this.workerFilter || pin.userData.workers === this.workerFilter);
-    }
-    this._refreshHeights();
-    this._needsRender = true;
-  }
+    const filtered = Boolean(this.filter || this.workerFilter);
 
-  _refreshHeights() {
-    for (const entry of this.countries.values()) {
-      let height = entry.restHeight;
-      const filtered = this.filter || this.workerFilter;
-      if (filtered && entry.featured && !this._matches(entry.record.a2)) {
-        height = H_BASE;
-      }
-      /* Absolute, not a multiple of the resting height — at rest a country is
-         flat, so a multiplier would lift it by nothing. */
-      if (entry.key === this.hovered) height = Math.max(height, H_HOVER);
-      if (entry.key === this.selected) height = Math.max(height, H_SELECT);
-      entry.targetHeight = height;
-
-      const lit = entry.key === this.hovered || entry.key === this.selected;
-      entry.material.emissive.setHex(lit ? 0x2a2118 : 0x000000);
+    for (const marker of this.markers) {
+      if (!marker.userData.featured) continue;
+      marker.visible = !filtered || this._matches(marker.userData.a2);
     }
+
+    /* The dots answer no filter, so they recede instead of vanishing. Every
+       country stays on the map and stays clickable, which is the only reason
+       they are there. */
+    if (this.plainMaterial) this.plainMaterial.opacity = filtered ? 0.3 : 0.92;
     this._needsRender = true;
   }
 
   /**
-   * Draws the bright ring around the hovered or selected country by lifting the
-   * relevant segments out of the merged border layer's source geometry. The
-   * per-country slice is cached on first use.
+   * Hover and selection show on the marker, never on the land.
+   *
+   * Lifting or tinting the country under the pointer traced its own outline in
+   * light and shadow — which is the border this map does not draw. The signal
+   * moved to the marker, which grows and brightens, and to the name chip,
+   * which labels.js already paints hot. Both are about the country; neither is
+   * about its shape.
    */
-  _refreshOutline() {
-    const key = this.selected || this.hovered;
-    const entry = key ? this.countries.get(key) : null;
-    this._outlineEntry = entry || null;
-    if (!entry) {
-      this._outline.visible = false;
-      this._needsRender = true;
-      return;
+  _refreshHighlight() {
+    for (const marker of this.markers) {
+      const data = marker.userData;
+      const hot = data.key === this.hovered || data.key === this.selected;
+      if (hot === data.hot) continue;
+      data.hot = hot;
+      if (data.featured) {
+        data.material.emissive.copy(data.material.color).multiplyScalar(hot ? 0.7 : 0.22);
+      }
+      this._applyMarkerScale(marker);
     }
-
-    const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute('position', new THREE.BufferAttribute(entry.outlinePositions, 3));
-    this._outline.geometry.dispose();
-    this._outline.geometry = geometry;
-    this._outline.visible = entry.outlinePositions.length > 0;
-    /* Positions are authored at z = 1, so scaling z lands them on the country's
-       top face — which is itself animating as the country lifts. */
-    this._outline.scale.z = entry.height;
-    this._outline.position.z = 0.004;
-    this._outline.material.color.set(entry.featured ? '#2E2621' : '#5E514D');
     this._needsRender = true;
+  }
+
+  /** Marker size: the camera's scale, times the hover bump if it has one. */
+  _applyMarkerScale(marker) {
+    const data = marker.userData;
+    const base = data.featured ? this._featuredScale : this._plainScale;
+    marker.scale.setScalar(base * (data.hot ? (data.featured ? HOT_FEATURED : HOT_PLAIN) : 1));
   }
 
   /* ---------------------------------------------------------------- */
@@ -1088,8 +1016,7 @@ export class WorldMap {
   }
 
   update() {
-    const dt = Math.min(this._clock.getDelta(), 0.05);
-    const t = this._clock.elapsedTime;
+    const t = this._clock.getElapsedTime();
 
     if (this._fly) {
       const p = Math.min(1, (performance.now() - this._fly.start) / this._fly.duration);
@@ -1102,49 +1029,39 @@ export class WorldMap {
       if (p >= 1) this._fly = null;
     }
 
-    /* Relief follows the camera: full at the whole-world view, flattened close
-       in. Measured against the world fit rather than the home view so a phone,
-       which opens part-way in, gets the same relief at the same map scale. */
-    const relief = THREE.MathUtils.clamp(this.distance / this.worldDistance, 0.12, 1);
-    const reliefChanged = Math.abs(relief - this.relief) > 1e-4;
-    if (reliefChanged) {
-      this.relief = relief;
-      this.borders.scale.z = relief;
+    /* Land is flat and stays flat, so there is no relief left to scale with
+       the camera and nothing for a label to climb. */
+    this.renderHeightScale = 1;
+
+    /* Markers hold a constant size on screen. The dots are held to a tighter
+       range than the pins: grown like a pin, at the opening view they would
+       merge into one blob across western Europe and one across the Gulf. */
+    const featuredScale = THREE.MathUtils.clamp(this.distance * 0.3, 0.55, 1.8);
+    const plainScale = THREE.MathUtils.clamp(this.distance * 0.18, 0.45, 0.95);
+    if (
+      Math.abs(featuredScale - this._featuredScale) > 1e-4 ||
+      Math.abs(plainScale - this._plainScale) > 1e-4
+    ) {
+      this._featuredScale = featuredScale;
+      this._plainScale = plainScale;
+      for (const marker of this.markers) this._applyMarkerScale(marker);
       this._needsRender = true;
     }
 
-    /* Height tweens. */
-    const k = 1 - Math.exp(-dt * 11);
-    for (const entry of this.countries.values()) {
-      const settling = Math.abs(entry.height - entry.targetHeight) > 1e-5;
-      if (settling) {
-        entry.height += (entry.targetHeight - entry.height) * k;
-        this._needsRender = true;
-      }
-      if (settling || reliefChanged) entry.mesh.scale.z = entry.height * relief;
-    }
-
-    /* Labels read renderHeight, so they sit on the flattened top face too. */
-    this.renderHeightScale = relief;
-    if (this._outlineEntry) this._outline.scale.z = this._outlineEntry.height * relief;
-
-    /* Pin bob and ground-ring pulse. Pins are scaled with camera distance so a
-       practice marker stays the same size on screen at every zoom level. */
-    /* Pins are the only practice marker left on a phone at world zoom, where
-       the name chips are suppressed, so the floor here matters. */
-    const pinScale = THREE.MathUtils.clamp(this.distance * 0.30, 0.55, 1.8);
-    for (let i = 0; i < this.pins.length; i++) {
-      const pin = this.pins[i];
-      if (!pin.visible) continue;
-      pin.scale.setScalar(pinScale);
-      /* Sit on the flattened land rather than floating above where it was. */
-      pin.position.z =
-        pin.userData.baseZ * relief + Math.sin(t * 1.7 + i * 0.7) * 0.012 * pinScale;
+    /* Bob and ground-ring pulse, on the practice markers only. Two hundred
+       bobbing dots would be noise, and holding them still costs nothing. */
+    let animated = 0;
+    for (let i = 0; i < this.markers.length; i++) {
+      const marker = this.markers[i];
+      if (!marker.userData.featured || !marker.visible) continue;
+      marker.position.z =
+        marker.userData.baseZ + Math.sin(t * 1.7 + i * 0.7) * 0.012 * featuredScale;
       const pulse = 1 + Math.sin(t * 2.1 + i * 0.9) * 0.16;
-      pin.userData.ring.scale.setScalar(pulse);
-      pin.userData.ring.material.opacity = 0.42 - (pulse - 1) * 0.7;
+      marker.userData.ring.scale.setScalar(pulse);
+      marker.userData.ring.material.opacity = 0.42 - (pulse - 1) * 0.7;
+      animated++;
     }
-    if (this.pins.length) this._needsRender = true;
+    if (animated) this._needsRender = true;
 
     this.renderer.render(this.scene, this.camera);
     this._needsRender = false;

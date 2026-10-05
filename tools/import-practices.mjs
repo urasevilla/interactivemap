@@ -102,6 +102,7 @@ const WORKER_IDS = {
  */
 const COUNTRY_ALIASES = {
   'India (Tamil Nadu)': 'India',
+  'United States (New York State)': 'United States of America',
   'Viet Nam': 'Vietnam',
   'Lao PDR': 'Laos',
   'Korea, Rep.': 'South Korea',
