@@ -103,9 +103,21 @@ const TYPES = {
   '.png': 'image/png',
 };
 
-function serve() {
+/**
+ * Serves the repository, optionally under a path prefix.
+ *
+ * The prefix exists to prove the site is indifferent to where it is mounted:
+ * GitHub Pages serves it from /interactivemap/ and Netlify from the root of a
+ * domain, and the same commit has to work at both. Any path that stops being
+ * relative shows up here as a 404 rather than at a booth.
+ */
+function serve(port = PORT, prefix = '') {
   const server = http.createServer((req, res) => {
-    const url = decodeURIComponent(req.url.split('?')[0]);
+    let url = decodeURIComponent(req.url.split('?')[0]);
+    if (prefix) {
+      if (!url.startsWith(prefix)) return res.writeHead(404).end('outside the mount point');
+      url = url.slice(prefix.length - 1);
+    }
     let file = path.join(root, url === '/' ? 'index.html' : url);
     if (!file.startsWith(root)) return res.writeHead(403).end();
     fs.readFile(file, (error, body) => {
@@ -114,7 +126,7 @@ function serve() {
       res.end(body);
     });
   });
-  return new Promise((resolve) => server.listen(PORT, () => resolve(server)));
+  return new Promise((resolve) => server.listen(port, () => resolve(server)));
 }
 
 /* ------------------------------------------------------------------ */
@@ -1816,6 +1828,85 @@ await expiredPage.fill('#gate-code', forged);
 await expiredPage.click('#gate-code-submit');
 await expiredPage.waitForTimeout(300);
 check('a code from another secret is refused', await expiredPage.isHidden('#app'));
+
+/* ---- 8. The same commit serves from any mount point ---- */
+
+/**
+ * GitHub Pages serves this from /interactivemap/ and Netlify from the root of
+ * a domain. Nothing in the repository should care: every asset reference is
+ * relative, there is no <base> tag, and no absolute link to either origin.
+ *
+ * Mounted under a prefix, a path that had become root-absolute asks for
+ * /css/style.css instead of /interactivemap/css/style.css and 404s — which is
+ * what this catches, in the direction the booth would actually notice.
+ */
+const MOUNT = '/interactivemap/';
+const mounted = await serve(PORT + 1, MOUNT);
+const mountContext = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+await overrideConfig(mountContext, { firebase: null });
+const mountPage = await mountContext.newPage();
+
+const missed = [];
+mountPage.on('response', (res) => {
+  if (res.status() >= 400) missed.push(`${res.status()} ${res.url()}`);
+});
+mountPage.on('requestfailed', (req) => {
+  if (!/gsi\/client|fonts\.googleapis|fonts\.gstatic|oauth2/.test(req.url())) {
+    missed.push(`failed ${req.url()}`);
+  }
+});
+
+await mountPage.addInitScript(() => {
+  localStorage.setItem(
+    'wiego-map.session.v1',
+    JSON.stringify({ role: 'controller', email: 'host@example.com', name: 'Host', expiresAt: 0 }),
+  );
+});
+await mountPage.goto(`http://localhost:${PORT + 1}${MOUNT}`, { waitUntil: 'domcontentloaded' });
+await mountPage.waitForSelector('#app:not([hidden])', { timeout: 20_000 }).catch(() => {});
+await mountPage
+  .waitForFunction(() => !document.getElementById('loading'), { timeout: 60_000 })
+  .catch(() => {});
+await mountPage.waitForTimeout(1200);
+
+const mountState = await mountPage.evaluate(() => ({
+  styled: getComputedStyle(document.body).fontFamily.includes('Lato'),
+  mapBuilt: Boolean(window.__mapView),
+  labels: document.querySelectorAll('.label').length,
+  flag: document.querySelector('.label__flag')?.naturalWidth ?? 0,
+}));
+
+check('nothing 404s when the site is served under a subpath', missed.length === 0, missed.slice(0, 4).join(' | '));
+check('its stylesheet still applies under a subpath', mountState.styled);
+check(
+  'its geometry and flags still load under a subpath',
+  mountState.mapBuilt && mountState.labels > 0 && mountState.flag > 0,
+  JSON.stringify(mountState),
+);
+
+await mountContext.close();
+mounted.close();
+
+/* Static guard: a root-absolute asset reference works only at a root domain,
+   and an absolute link to one host's origin works only on that host. */
+const sources = ['index.html', 'css/style.css', ...fs.readdirSync(path.join(root, 'js')).map((f) => `js/${f}`)];
+const notPortable = [];
+for (const file of sources) {
+  const text = fs.readFileSync(path.join(root, file), 'utf8');
+  for (const [pattern, why] of [
+    [/(?:src|href)=["']\/(?!\/)/g, 'root-absolute reference'],
+    [/url\(\s*["']?\/(?!\/)/g, 'root-absolute url()'],
+    [/<base\b/gi, '<base> tag'],
+    [/["'`][^"'`]*\.github\.io[^"'`]*["'`]/g, 'hardcoded Pages origin'],
+  ]) {
+    if (pattern.test(text)) notPortable.push(`${file}: ${why}`);
+  }
+}
+check(
+  'no source hardcodes a mount point or an origin',
+  notPortable.length === 0,
+  notPortable.join(' | '),
+);
 
 /* ---- Report ---- */
 

@@ -183,6 +183,20 @@ labels in `WORKER_IDS` (`tools/import-practices.mjs`), kept in step with
 the importer refuses a row naming a group it does not know, so a whole class of
 workers cannot go missing from the filter unnoticed.
 
+## Hosting
+
+The repository is the site: no build step, no bundler, no output directory.
+Every asset path is relative and there is no `<base>` tag, so the same commit
+serves correctly from a root domain and from a subpath. GitHub Pages publishes
+it at `/interactivemap/` via `.github/workflows/pages.yml`; Netlify publishes it
+at a domain root via `netlify.toml`. Neither needs a flag, a rewrite, or a
+different build.
+
+`npm run check` holds that invariant: it mounts the site under a path prefix,
+fails on any request that 404s, and rejects a root-absolute reference or a
+hardcoded origin in the source. See `docs/SETUP.md` § 1 for the setup of each,
+including the one thing a move does break — the Google OAuth origin list.
+
 ## Map notes
 
 **Two lenses, one map.** The Five As filter (what barrier a practice

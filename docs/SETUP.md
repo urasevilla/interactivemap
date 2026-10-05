@@ -68,6 +68,45 @@ Because the source is public, two things are worth keeping out of it:
 
 ---
 
+### Publishing on Netlify instead, or as well
+
+The site works unchanged from the root of a domain or from a subpath, because
+every asset path in it is relative and there is no `<base>` tag. Both hosts can
+serve the same commit, and `npm run check` proves it on each run by mounting the
+site under a prefix and failing on any 404.
+
+1. **Netlify → Add new site → Import an existing project → GitHub**, and pick
+   `urasevilla/interactivemap`.
+2. Leave the build settings alone. `netlify.toml` already sets them:
+   publish directory `.` and an empty build command.
+3. Deploy. Every push to `main` redeploys, the same trigger Pages uses.
+
+**If the page loads but the stylesheet, scripts and images 404,** the paths are
+not the cause — check the deploy instead:
+
+- **Deploys → the deploy → Deploy log**, and look at what was uploaded. A
+  publish directory pointing anywhere but the repository root serves `index.html`
+  and nothing beside it.
+- A drag-and-dropped folder rather than a linked repository usually arrives
+  without its subdirectories. Link the repository.
+- **Site configuration → Build & deploy** should show the values from
+  `netlify.toml`. If it shows a build command Netlify guessed from
+  `package.json`, the `netlify.toml` is not being read — confirm it is at the
+  repository root on the deployed branch.
+
+**Two things need the new origin added, or they break quietly:**
+
+- **Google sign-in.** Add the Netlify origin to **Authorised JavaScript
+  origins** (§3). Until you do, the host cannot sign in from the new domain and
+  only the passphrase fallback works.
+- **The Firebase API key,** if you restricted it by HTTP referrer. An
+  unrestricted key needs nothing.
+
+The QR code derives its URL from whatever address the page is open at, so it
+points at the right host automatically. Set `publicUrl` in `config.js` only if
+you want printed codes to send phones to one host while you present from the
+other.
+
 ## 2. Rotate the event secret
 
 `config.js` ships with a secret so the site works out of the box. Change it
@@ -90,11 +129,15 @@ one Google account. Wire it up once:
 
 1. Open <https://console.cloud.google.com/apis/credentials>
 2. **Create credentials → OAuth client ID → Web application**
-3. Under **Authorised JavaScript origins** add your Pages origin, with no path:
+3. Under **Authorised JavaScript origins** add every origin the site is served
+   from, with no path. One line each:
    ```
    https://urasevilla.github.io
+   https://your-site.netlify.app
    ```
-   Add `http://localhost:8080` too if you want to test locally.
+   Add `http://localhost:8080` too if you want to test locally. Google matches
+   the origin exactly, so a site on two hosts needs both lines — this is the
+   step that breaks when you move the site and change nothing else.
 4. Under **OAuth consent screen → Test users**, add the address you will sign in
    with. In Testing mode Google refuses anyone not on that list, even with a
    valid client ID — this is the step most people miss.

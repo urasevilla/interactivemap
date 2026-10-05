@@ -1,0 +1,75 @@
+# Netlify deploy.
+#
+# This site has no build step: the repository is the site. Every asset path in
+# it is relative, so the same commit serves correctly from a root domain and
+# from a subpath — which is how Netlify and GitHub Pages can both publish it
+# without a flag or a rewrite anywhere.
+#
+# Nothing here changes a path. It pins the two settings that, left to Netlify's
+# framework auto-detection, are the usual reason a deploy serves index.html and
+# then 404s every stylesheet, script and image beside it: a publish directory
+# that is not the repository root, and an inferred build command that runs and
+# publishes somewhere else.
+
+[build]
+  # The site is the checkout. There is no dist/ or public/ to point at.
+  publish = "."
+
+  # Deliberately empty. package.json exists only for the local tooling — the
+  # spreadsheet import, the Playwright checks, the dev server — and none of it
+  # runs or is needed to serve the site. Leaving this unset lets Netlify infer
+  # a build from package.json's presence.
+  command = ""
+
+[build.environment]
+  # Only read if someone later adds a build; pinned so it cannot drift.
+  NODE_VERSION = "20"
+
+# ------------------------------------------------------------------ #
+# Headers                                                             #
+# ------------------------------------------------------------------ #
+
+[[headers]]
+  for = "/*"
+
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# config.js carries the event secret, the host account digest and the Firebase
+# project, and the host edits it between events. A cached copy would keep a
+# rotated secret alive on a visitor's phone — exactly the thing rotation is
+# meant to prevent — so it is always revalidated.
+[[headers]]
+  for = "/config.js"
+
+  [headers.values]
+    Cache-Control = "no-cache"
+
+# The country geometry, the vendored Three.js build and the flag set are large
+# and change only when the repository does. A booth on conference wifi reloads
+# far faster for having them cached, and a deploy busts the cache by changing
+# the file.
+[[headers]]
+  for = "/data/*"
+
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+[[headers]]
+  for = "/vendor/*"
+
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+[[headers]]
+  for = "/assets/*"
+
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+# No catch-all redirect to index.html on purpose. This is a single page whose
+# only routing is a `#g=` hash, which never reaches the server, so a SPA
+# fallback would buy nothing and would turn every genuine 404 — a missing flag,
+# a renamed data file — into a silently served HTML page that fails later and
+# harder.
