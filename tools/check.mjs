@@ -252,10 +252,27 @@ function watch(page) {
   page.on('console', (message) => {
     if (message.type() === 'error') consoleErrors.push(message.text());
   });
-  page.on('pageerror', (error) => pageErrors.push(error.message));
+  page.on('pageerror', (error) => {
+    /* Same rule as below: an exception thrown inside a third party's bundle is
+       not the repository's. Google's sign-in script arrives half-served through
+       this sandbox's proxy and then throws `gis is not defined` from its own
+       code — one stack frame, at accounts.google.com, nothing of ours in it.
+       An error with no stack to attribute is kept rather than waved through. */
+    const stack = error.stack || '';
+    if (!stack || stack.includes('http://localhost:')) pageErrors.push(error.message);
+  });
   page.on('requestfailed', (request) => {
-    /* Google's sign-in script is expected to be unreachable in this sandbox. */
-    if (!/gsi\/client|fonts\.googleapis|fonts\.gstatic|oauth2/.test(request.url())) {
+    /* Only the app's own assets. Everything the repository ships is served from
+       this test server, so a failure anywhere else is a third party — Google's
+       sign-in endpoints, which this sandbox reaches through a proxy that
+       refuses them, and the webfonts. One of those aborting says nothing about
+       the booth, which has to work with all of them blocked and is tested for
+       exactly that further down.
+
+       This replaced a list of four Google URL fragments that had already gone
+       stale: it knew `gsi/client` but not `gsi/button`, so an aborted sign-in
+       button failed the whole run with every check passing. */
+    if (request.url().startsWith('http://localhost:')) {
       failedRequests.push(`${request.url()} — ${request.failure()?.errorText}`);
     }
   });
@@ -2022,14 +2039,28 @@ const mountContext = await browser.newContext({ viewport: { width: 1280, height:
 await overrideConfig(mountContext, { firebase: null });
 const mountPage = await mountContext.newPage();
 
+/**
+ * Only the site's own requests count.
+ *
+ * A mount-point bug always shows up as a request to this server: a path that
+ * had become root-absolute asks for `localhost:PORT/css/style.css` instead of
+ * `localhost:PORT/interactivemap/css/style.css`. A third-party origin cannot
+ * express that bug at all, so watching one only imports its reachability into
+ * the result — and this sandbox reaches Google's sign-in endpoints through a
+ * proxy that answers 403. The old filter named four Google URL fragments and
+ * missed `gsi/button` and `ssl.gstatic.com/_/gsi/`, while the response handler
+ * beside it filtered nothing, so a proxied 403 on the sign-in button was
+ * reported as a 404 in the repository.
+ */
+const origin = `http://localhost:${PORT + 1}`;
 const missed = [];
 mountPage.on('response', (res) => {
-  if (res.status() >= 400) missed.push(`${res.status()} ${res.url()}`);
+  if (res.url().startsWith(origin) && res.status() >= 400) {
+    missed.push(`${res.status()} ${res.url()}`);
+  }
 });
 mountPage.on('requestfailed', (req) => {
-  if (!/gsi\/client|fonts\.googleapis|fonts\.gstatic|oauth2/.test(req.url())) {
-    missed.push(`failed ${req.url()}`);
-  }
+  if (req.url().startsWith(origin)) missed.push(`failed ${req.url()}`);
 });
 
 await mountPage.addInitScript(() => {
