@@ -104,6 +104,7 @@ const COUNTRY_ALIASES = {
   'India (Tamil Nadu)': 'India',
   'United States (New York State)': 'United States of America',
   'Viet Nam': 'Vietnam',
+  'Brunei Darussalam': 'Brunei',
   'Lao PDR': 'Laos',
   'Korea, Rep.': 'South Korea',
   'Russian Federation': 'Russia',
@@ -133,12 +134,52 @@ function makeId(a2, scheme, taken) {
 }
 
 /**
+ * Where the first sentence of a description ends.
+ *
+ * The sheet cites statutes by number — "Under Law No. 111/2022, Romania
+ * launched an online platform…" — and the full stop in "No." does not end a
+ * sentence. Reading it as one gave Romania a thirteen-character first sentence,
+ * which then fell through the length guard in {@link summarize} and put the
+ * whole 594-character paragraph on the collapsed card. Monaco and Cambodia
+ * failed the same way.
+ *
+ * Deliberately not a general abbreviation list: this is the only abbreviation
+ * in the corpus, and it only ever appears before a number, so a guess at the
+ * rest would be untested code pretending to be careful.
+ */
+const FIRST_SENTENCE = /^(.+?[.!?])(?<!\bNos?\.)(\s|$)/i;
+
+/**
+ * The sheet annotates some rows with a `FINANCING BASIS: …` lead-in — how the
+ * scheme is paid for, written at the front of the description.
+ *
+ * It is a fact about the scheme rather than a description of it, and leaving it
+ * in place put it in two wrong places at once. It became the card's one-line
+ * summary, where a visitor reads "FINANCING BASIS: matching grant." and learns
+ * nothing about the practice; and where the lead-in was itself short it defeated
+ * {@link summarize}, so Malaysia's whole 625-character description landed on the
+ * collapsed card. Lifted into its own labelled fact, beside the other
+ * structured columns. The text is moved, never rewritten.
+ */
+function splitFinancingBasis(description) {
+  const match = /^FINANCING BASIS:\s*(.+?[.!?])(?:\s+|$)/.exec(description);
+  if (!match) return { basis: null, description };
+
+  const rest = description.slice(match[0].length).trim();
+  /* A row that is nothing but its financing basis keeps it where it is: an
+     empty description is a hard error below, and rightly so. */
+  if (!rest) return { basis: null, description };
+
+  return { basis: match[1], description: rest };
+}
+
+/**
  * A one-line summary for the collapsed card. The sheet's description is often a
  * single dense sentence, so take the first sentence and let the full text carry
  * the rest rather than truncating mid-clause.
  */
 function summarize(description) {
-  const match = /^(.+?[.!?])(\s|$)/.exec(description);
+  const match = FIRST_SENTENCE.exec(description);
   const first = match ? match[1] : description;
   return first.length > 40 || !description.includes('.') ? first : description;
 }
@@ -194,6 +235,8 @@ for (const [line, record] of records.entries()) {
     continue;
   }
 
+  const { basis, description } = splitFinancingBasis(record.description);
+
   const nth = seenPerCountry.get(country.key) || 0;
   seenPerCountry.set(country.key, nth + 1);
 
@@ -210,6 +253,7 @@ for (const [line, record] of records.entries()) {
   const facts = [];
   if (record.workers) facts.push(['Worker group', record.workers]);
   if (record.agency) facts.push(['Implementing agency', record.agency]);
+  if (basis) facts.push(['Financing basis', basis]);
   if (record.impact) facts.push(['Coverage & key features', record.impact]);
   if (record.sources) facts.push(['Source', record.sources]);
 
@@ -222,8 +266,8 @@ for (const [line, record] of records.entries()) {
     workers,
     workersLabel: record.workers,
     title: record.scheme,
-    summary: summarize(record.description),
-    detail: record.description,
+    summary: summarize(description),
+    detail: description,
     impact: record.impact || null,
     agency: record.agency || null,
     sources: record.sources || null,

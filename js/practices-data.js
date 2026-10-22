@@ -4,7 +4,7 @@
  * Source:    data/source/good-practices.csv
  * Regenerate: npm run import
  *
- * 75 practices across 48 countries.
+ * 81 practices across 51 countries.
  */
 
 export const PRACTICES = [
@@ -20,11 +20,11 @@ export const PRACTICES = [
     "workers": "self-employed",
     "workersLabel": "Self-employed / own-account",
     "title": "Monotributo & Monotributo Social MIDES",
-    "summary": "Unified monotax regime combining tax and social security into a single flat payment with a progressive, stepped contribution scale (25% in Year 1 to 100% in Year 4).",
-    "detail": "Unified monotax regime combining tax and social security into a single flat payment with a progressive, stepped contribution scale (25% in Year 1 to 100% in Year 4). The 2006 reform eased eligibility restrictions and admitted one-person businesses.",
-    "impact": "ILO records annual registration growth of one-person businesses rising from 1.3% per year (2002–2006) to 6.5% per year (2007–2009), roughly 12,722 additional registrations. Covers about 23% of the target population.",
+    "summary": "Established in 2001 and reformed in 2006, the monotax combines contributions and taxes into one simplified payment for sole proprietors and small businesses, at a contribution rate 43% below the general regime.",
+    "detail": "Established in 2001 and reformed in 2006, the monotax combines contributions and taxes into one simplified payment for sole proprietors and small businesses, at a contribution rate 43% below the general regime. The 2006 reform eased eligibility and admitted one-person businesses. Covers old-age pensions, sickness, maternity and paternity, work injury and child and family benefits, with optional health cover, but NO unemployment benefit; pensions are calculated on a notional salary base rather than declared earnings. The Social Monotax for vulnerable households phases contributions in at 25%, 50% and 75% over three years. A business account is automatically inactivated after two months of non-payment, which caps arrears.",
+    "impact": "Monotax contributors rose from 2,566 in December 2006 to 49,420 in December 2022, about 12.2% annual growth, and the regime covers an estimated 40% of self-employed workers without employees. ILO separately records annual registration growth of one-person businesses rising from 1.3% a year (2002–2006) to 6.5% a year (2007–2009).",
     "agency": "Banco de Previsión Social (BPS) & MIDES",
-    "sources": "ILO ESS Document No. 42 (2013); ILO (2017) Innovations in extending social insurance coverage to independent workers; ILO WP 176; WIEGO Monotax Uruguay",
+    "sources": "ISSA (2026), Contribution Subsidies Worldwide: Practical Lessons for Social Security Institutions, drawing on the 2025 ISSA–ILO compendium of 41 country experiences; ILO ESS Document No. 42 (2013); ILO (2017) Innovations in extending social insurance coverage; ILO Working Paper 176 (2026)",
     "facts": [
       [
         "Worker group",
@@ -35,12 +35,16 @@ export const PRACTICES = [
         "Banco de Previsión Social (BPS) & MIDES"
       ],
       [
+        "Financing basis",
+        "contribution-rate reduction integrated with tax collection."
+      ],
+      [
         "Coverage & key features",
-        "ILO records annual registration growth of one-person businesses rising from 1.3% per year (2002–2006) to 6.5% per year (2007–2009), roughly 12,722 additional registrations. Covers about 23% of the target population."
+        "Monotax contributors rose from 2,566 in December 2006 to 49,420 in December 2022, about 12.2% annual growth, and the regime covers an estimated 40% of self-employed workers without employees. ILO separately records annual registration growth of one-person businesses rising from 1.3% a year (2002–2006) to 6.5% a year (2007–2009)."
       ],
       [
         "Source",
-        "ILO ESS Document No. 42 (2013); ILO (2017) Innovations in extending social insurance coverage to independent workers; ILO WP 176; WIEGO Monotax Uruguay"
+        "ISSA (2026), Contribution Subsidies Worldwide: Practical Lessons for Social Security Institutions, drawing on the 2025 ISSA–ILO compendium of 41 country experiences; ILO ESS Document No. 42 (2013); ILO (2017) Innovations in extending social insurance coverage; ILO Working Paper 176 (2026)"
       ]
     ]
   },
@@ -56,11 +60,11 @@ export const PRACTICES = [
     "workers": "agricultural",
     "workersLabel": "Agricultural / rural workers",
     "title": "Simples Nacional / MEI & Previdência Rural (Segurado Especial)",
-    "summary": "Monotax mechanism consolidating federal, state and municipal taxes with social security into a single monthly payment.",
-    "detail": "Monotax mechanism consolidating federal, state and municipal taxes with social security into a single monthly payment. Individual Micro Entrepreneurs (MEI/IME) pay a fixed monthly amount (about BRL 55.90 in 2018), with the social security component set at 5% of the minimum wage; micro and small enterprises pay a variable monotax of 4.00%–24.50% of turnover across five activity categories. Rural subsistence farmers (segurado especial) contribute a levy on the gross sales value of their production rather than on wages.",
-    "impact": "7.7 million Individual Micro Entrepreneurs and 5 million micro and small enterprises were registered under the regime in 2018, together 98% of all formally registered companies; the 5 million MSEs employed 10.6 million formal workers, 26.7% of total formal employment. Access to social security was the single largest stated motive for registering (32.2%). The share of individual micro-entrepreneurs registered rose from 33% in 2009 to 41.7% in 2015, and 4.9 million MSEs had applied to Simples Nacional by 2017. MEI registrations reached 11.5 million active by late 2024. Roughly one in four own-account workers is protected under the rural pension regime.",
+    "summary": "Monotax mechanism consolidating federal, state and municipal taxes with social security into a single monthly payment, introduced in 2006, with the SIMEI track for individual microentrepreneurs added in 2009.",
+    "detail": "Monotax mechanism consolidating federal, state and municipal taxes with social security into a single monthly payment, introduced in 2006, with the SIMEI track for individual microentrepreneurs added in 2009. Microentrepreneurs contribute 5% of the minimum wage towards social security against 20% under the general regime. Micro and small enterprises pay a variable monotax of 4.00%–24.50% of turnover across five activity categories. Rural subsistence farmers (segurado especial) contribute 1.3% of gross production sales (1.2% social security plus 0.1% occupational risk).",
+    "impact": "Businesses registered under the regime rose from 4.3 million in 2010 to 22.6 million in 2023, and Simples revenue reached 1.21% of GDP. The share of individual micro-entrepreneurs registered rose from 33% (2009) to 41.7% (2015); 11.5 million MEI registrations were active by late 2024. SUSTAINABILITY CAVEAT: ISSA reports a projected 75-year deficit of USD 87.1 billion on the SIMEI segment, and the steep jump from SIMEI to the general regime has been linked to 'fiscal dwarfism' — firms staying small to avoid crossing the threshold.",
     "agency": "Receita Federal & INSS",
-    "sources": "ILO Working Paper 176 — McClanahan, Seglah, Sibun & Sengupta (2026), Inclusive Social Insurance: Exploring Real Solutions to Reach the Self-Employed; ILO (2019) The monotax regime in Brazil (wcms_715864); INSS (gov.br) Contribuição do Segurado Especial; Sebrae/Receita Federal 2024",
+    "sources": "ISSA (2026), Contribution Subsidies Worldwide: Practical Lessons for Social Security Institutions, drawing on the 2025 ISSA–ILO compendium of 41 country experiences; ILO (2019) The monotax regime in Brazil (wcms_715864); ILO Working Paper 176 (2026); INSS (gov.br); Sebrae/Receita Federal 2024",
     "facts": [
       [
         "Worker group",
@@ -71,12 +75,16 @@ export const PRACTICES = [
         "Receita Federal & INSS"
       ],
       [
+        "Financing basis",
+        "contribution-rate reduction integrated with tax collection."
+      ],
+      [
         "Coverage & key features",
-        "7.7 million Individual Micro Entrepreneurs and 5 million micro and small enterprises were registered under the regime in 2018, together 98% of all formally registered companies; the 5 million MSEs employed 10.6 million formal workers, 26.7% of total formal employment. Access to social security was the single largest stated motive for registering (32.2%). The share of individual micro-entrepreneurs registered rose from 33% in 2009 to 41.7% in 2015, and 4.9 million MSEs had applied to Simples Nacional by 2017. MEI registrations reached 11.5 million active by late 2024. Roughly one in four own-account workers is protected under the rural pension regime."
+        "Businesses registered under the regime rose from 4.3 million in 2010 to 22.6 million in 2023, and Simples revenue reached 1.21% of GDP. The share of individual micro-entrepreneurs registered rose from 33% (2009) to 41.7% (2015); 11.5 million MEI registrations were active by late 2024. SUSTAINABILITY CAVEAT: ISSA reports a projected 75-year deficit of USD 87.1 billion on the SIMEI segment, and the steep jump from SIMEI to the general regime has been linked to 'fiscal dwarfism' — firms staying small to avoid crossing the threshold."
       ],
       [
         "Source",
-        "ILO Working Paper 176 — McClanahan, Seglah, Sibun & Sengupta (2026), Inclusive Social Insurance: Exploring Real Solutions to Reach the Self-Employed; ILO (2019) The monotax regime in Brazil (wcms_715864); INSS (gov.br) Contribuição do Segurado Especial; Sebrae/Receita Federal 2024"
+        "ISSA (2026), Contribution Subsidies Worldwide: Practical Lessons for Social Security Institutions, drawing on the 2025 ISSA–ILO compendium of 41 country experiences; ILO (2019) The monotax regime in Brazil (wcms_715864); ILO Working Paper 176 (2026); INSS (gov.br); Sebrae/Receita Federal 2024"
       ]
     ]
   },
@@ -200,11 +208,11 @@ export const PRACTICES = [
     "workers": "platform",
     "workersLabel": "Platform & gig workers",
     "title": "EPF i-Saraan Voluntary Retirement Scheme",
-    "summary": "Voluntary pension savings mechanism supported by an annual state matching incentive for self-employed and gig workers, currently set at 15% of contributions up to RM 500 per year.",
-    "detail": "Voluntary pension savings mechanism supported by an annual state matching incentive for self-employed and gig workers, currently set at 15% of contributions up to RM 500 per year.",
-    "impact": "Raises the effective return on savings for low-income gig workers and is paired with tax relief on voluntary contributions.",
+    "summary": "Voluntary pension savings for self-employed and gig workers, with the state matching 15% of the worker's voluntary contribution up to an annual cap (RM 500 since 1 January 2024, raised from RM 250 then RM 300) and a lifetime cap.",
+    "detail": "Voluntary pension savings for self-employed and gig workers, with the state matching 15% of the worker's voluntary contribution up to an annual cap (RM 500 since 1 January 2024, raised from RM 250 then RM 300) and a lifetime cap. Crucially, EPF partnered with gig platforms including Grab and GoGet to deduct and remit contributions automatically, embedding payment in a transaction the worker was already making rather than relying on them to initiate it. Related schemes include PERKESO's SESSS for the self-employed, and EPF's i-Suri and PERKESO's SKSSR for women outside the labour force.",
+    "impact": "Take-up grew 24-fold between 2017 and 2022 following the platform partnerships — but even so only about 10% of Malaysia's self-employed workers had registered by 2022. ISSA draws the general lesson from this case that opening eligibility is not enough: uptake rises when contributions are embedded in existing payment channels.",
     "agency": "Employees Provident Fund (EPF / KWSP)",
-    "sources": "EPF/KWSP i-Saraan official page (2026); ASEAN Snapshot; WIEGO Presentation",
+    "sources": "ISSA (2026), Contribution Subsidies Worldwide: Practical Lessons for Social Security Institutions, drawing on the 2025 ISSA–ILO compendium of 41 country experiences; EPF/KWSP i-Saraan official page; ASEAN Snapshot",
     "facts": [
       [
         "Worker group",
@@ -215,12 +223,16 @@ export const PRACTICES = [
         "Employees Provident Fund (EPF / KWSP)"
       ],
       [
+        "Financing basis",
+        "matching grant."
+      ],
+      [
         "Coverage & key features",
-        "Raises the effective return on savings for low-income gig workers and is paired with tax relief on voluntary contributions."
+        "Take-up grew 24-fold between 2017 and 2022 following the platform partnerships — but even so only about 10% of Malaysia's self-employed workers had registered by 2022. ISSA draws the general lesson from this case that opening eligibility is not enough: uptake rises when contributions are embedded in existing payment channels."
       ],
       [
         "Source",
-        "EPF/KWSP i-Saraan official page (2026); ASEAN Snapshot; WIEGO Presentation"
+        "ISSA (2026), Contribution Subsidies Worldwide: Practical Lessons for Social Security Institutions, drawing on the 2025 ISSA–ILO compendium of 41 country experiences; EPF/KWSP i-Saraan official page; ASEAN Snapshot"
       ]
     ]
   },
@@ -344,8 +356,8 @@ export const PRACTICES = [
     "workers": "general",
     "workersLabel": "Informal economy (general)",
     "title": "NHIS Earmarked VAT Levy & Informal Flat-Rate Contributions",
-    "summary": "FINANCING BASIS: mixed — an earmarked 2.5% VAT levy (NHIL) alongside genuine flat-rate contributions from informal workers, with exemptions for indigents, children, the elderly and pregnant women.",
-    "detail": "FINANCING BASIS: mixed — an earmarked 2.5% VAT levy (NHIL) alongside genuine flat-rate contributions from informal workers, with exemptions for indigents, children, the elderly and pregnant women. Retained in scope because informal workers contribute directly and the levy subsidises their insurance cover, rather than funding a non-contributory assistance benefit.",
+    "summary": "Retained in scope because informal workers contribute directly and the levy subsidises their insurance cover, rather than funding a non-contributory assistance benefit.",
+    "detail": "Retained in scope because informal workers contribute directly and the levy subsidises their insurance cover, rather than funding a non-contributory assistance benefit.",
     "impact": "Active membership reached about 56% of the national population (over 18 million active members) by 2024–25, up from roughly 40% a decade earlier, substantially reducing out-of-pocket health expenditure.",
     "agency": "National Health Insurance Authority (NHIA)",
     "sources": "NHIA/NHIS Ghana news releases (2024–25); ILO WP 176",
@@ -357,6 +369,10 @@ export const PRACTICES = [
       [
         "Implementing agency",
         "National Health Insurance Authority (NHIA)"
+      ],
+      [
+        "Financing basis",
+        "mixed — an earmarked 2.5% VAT levy (NHIL) alongside genuine flat-rate contributions from informal workers, with exemptions for indigents, children, the elderly and pregnant women."
       ],
       [
         "Coverage & key features",
@@ -488,8 +504,8 @@ export const PRACTICES = [
     "workers": "domestic",
     "workersLabel": "Domestic workers",
     "title": "Tamil Nadu Domestic Workers Welfare Board",
-    "summary": "FINANCING BASIS: statutory cess plus government allocations — an earmarked sectoral levy, not general revenue and not worker social insurance contributions.",
-    "detail": "FINANCING BASIS: statutory cess plus government allocations — an earmarked sectoral levy, not general revenue and not worker social insurance contributions. Tamil Nadu pioneered state-level welfare boards for unorganised workers. The Board issues worker identity cards and provides educational stipends for children, maternity assistance and old-age pensions, with the cost carried by the levy rather than by workers' own wages.",
+    "summary": "Tamil Nadu pioneered state-level welfare boards for unorganised workers.",
+    "detail": "Tamil Nadu pioneered state-level welfare boards for unorganised workers. The Board issues worker identity cards and provides educational stipends for children, maternity assistance and old-age pensions, with the cost carried by the levy rather than by workers' own wages.",
     "impact": "Registered tens of thousands of domestic workers, pioneering organised welfare representation for the sector in South Asia.",
     "agency": "Tamil Nadu Domestic Workers Welfare Board / Ministry of Labour",
     "sources": "WIEGO Tamil Nadu Policy Brief No. 23; ILO Social Protection Guide (2020)",
@@ -501,6 +517,10 @@ export const PRACTICES = [
       [
         "Implementing agency",
         "Tamil Nadu Domestic Workers Welfare Board / Ministry of Labour"
+      ],
+      [
+        "Financing basis",
+        "statutory cess plus government allocations — an earmarked sectoral levy, not general revenue and not worker social insurance contributions."
       ],
       [
         "Coverage & key features",
@@ -560,8 +580,8 @@ export const PRACTICES = [
     "workers": "general",
     "workersLabel": "Informal economy (general)",
     "title": "Worker Welfare Funds & Cess-Based Financing",
-    "summary": "FINANCING BASIS: earmarked sectoral levy, not general revenue.",
-    "detail": "FINANCING BASIS: earmarked sectoral levy, not general revenue. Sector-specific welfare boards are funded by a statutory 1–2% cess on commercial construction project cost or on production value, providing health, accident, maternity and funeral benefits. Retained in scope as a levy that shifts cost onto the industry rather than a tax-financed assistance benefit — though note these are welfare funds rather than social insurance schemes proper.",
+    "summary": "Sector-specific welfare boards are funded by a statutory 1–2% cess on commercial construction project cost or on production value, providing health, accident, maternity and funeral benefits.",
+    "detail": "Sector-specific welfare boards are funded by a statutory 1–2% cess on commercial construction project cost or on production value, providing health, accident, maternity and funeral benefits. Retained in scope as a levy that shifts cost onto the industry rather than a tax-financed assistance benefit — though note these are welfare funds rather than social insurance schemes proper.",
     "impact": "Decoupled benefit financing from direct worker wages, securing social protection for millions of casual workers.",
     "agency": "State Welfare Boards (Construction, Beedi and others)",
     "sources": "ILO WP 176; ILO Guidebook",
@@ -573,6 +593,10 @@ export const PRACTICES = [
       [
         "Implementing agency",
         "State Welfare Boards (Construction, Beedi and others)"
+      ],
+      [
+        "Financing basis",
+        "earmarked sectoral levy, not general revenue."
       ],
       [
         "Coverage & key features",
@@ -632,8 +656,8 @@ export const PRACTICES = [
     "workers": "general",
     "workersLabel": "Informal economy (general)",
     "title": "Packaging Bill — Extended Producer Responsibility for Inclusive Recycling",
-    "summary": "FINANCING BASIS: third-party producer levy, not state revenue.",
-    "detail": "FINANCING BASIS: third-party producer levy, not state revenue. A law arising from sustained pressure by organised waste workers requires packaging-producing companies to contribute directly to the financing of inclusive recycling systems. The revenue improves working conditions and occupational health and safety for informal waste pickers, and supports their access to the Social Monotributo and through it to national social protection.",
+    "summary": "A law arising from sustained pressure by organised waste workers requires packaging-producing companies to contribute directly to the financing of inclusive recycling systems.",
+    "detail": "A law arising from sustained pressure by organised waste workers requires packaging-producing companies to contribute directly to the financing of inclusive recycling systems. The revenue improves working conditions and occupational health and safety for informal waste pickers, and supports their access to the Social Monotributo and through it to national social protection.",
     "impact": "Shifts part of the cost of protecting informal waste pickers onto the commercial actors whose packaging they handle, rather than onto the workers' own low and volatile earnings. Structurally the same co-contribution logic as Germany's KSK user levy, India's construction cess and Singapore's platform operator contributions.",
     "agency": "National Government / waste picker organisations",
     "sources": "WIEGO Social Protection Briefing Note No. 7 (2023)",
@@ -645,6 +669,10 @@ export const PRACTICES = [
       [
         "Implementing agency",
         "National Government / waste picker organisations"
+      ],
+      [
+        "Financing basis",
+        "third-party producer levy, not state revenue."
       ],
       [
         "Coverage & key features",
@@ -740,8 +768,8 @@ export const PRACTICES = [
     "workers": "general",
     "workersLabel": "Informal economy (general)",
     "title": "State Contribution Subsidy for the Voluntary Social Insurance Scheme",
-    "summary": "FINANCING BASIS: state subsidy of worker contributions to a contributory scheme.",
-    "detail": "FINANCING BASIS: state subsidy of worker contributions to a contributory scheme. The voluntary social insurance scheme, established in 2008 for workers outside the mandatory regime, charges a flat 22% of a self-selected income level, which may not fall below the rural poverty line (VND 1,500,000 a month since 1 January 2022). Because there is no employer, the voluntary contributor carries the whole 22%, against the 8% an employee pays for old-age insurance under the compulsory scheme. From 2018 the state began subsidising a share of the minimum contribution, graded by household status: 30% for poor households (VND 99,000 a month), 25% for near-poor households (VND 82,500) and 10% for everyone else (VND 33,000). The Social Insurance Law 2024, in force from 1 July 2025, cuts the pension vesting period from 20 years to 15, adds a maternity benefit of VND 2,000,000 per child for those contributing in at least 6 of the 12 months before birth, and restricts lump-sum withdrawal for new participants.",
+    "summary": "The voluntary social insurance scheme, established in 2008 for workers outside the mandatory regime, charges a flat 22% of a self-selected income level, which may not fall below the rural poverty line (VND 1,500,000 a month since 1 January 2022).",
+    "detail": "The voluntary social insurance scheme, established in 2008 for workers outside the mandatory regime, charges a flat 22% of a self-selected income level, which may not fall below the rural poverty line (VND 1,500,000 a month since 1 January 2022). Because there is no employer, the voluntary contributor carries the whole 22%, against the 8% an employee pays for old-age insurance under the compulsory scheme. From 2018 the state began subsidising a share of the minimum contribution, graded by household status: 30% for poor households (VND 99,000 a month), 25% for near-poor households (VND 82,500) and 10% for everyone else (VND 33,000). The Social Insurance Law 2024, in force from 1 July 2025, cuts the pension vesting period from 20 years to 15, adds a maternity benefit of VND 2,000,000 per child for those contributing in at least 6 of the 12 months before birth, and restricts lump-sum withdrawal for new participants.",
     "impact": "Participation rose sharply once the subsidy was introduced: 277,000 participants in 2018, 558,000 in 2019, 1.45 million in 2021 and 1.837 million by 2023 — roughly 4% of the labour force. A more than sixfold increase in five years, from a scheme that had been close to static for a decade.",
     "agency": "Viet Nam Social Security (VSS) / MOLISA",
     "sources": "World Bank (2025), Expanding Coverage in Viet Nam's Voluntary Social Insurance Scheme; Social Insurance Law 2024; ILO Working Paper 176 (2026)",
@@ -753,6 +781,10 @@ export const PRACTICES = [
       [
         "Implementing agency",
         "Viet Nam Social Security (VSS) / MOLISA"
+      ],
+      [
+        "Financing basis",
+        "state subsidy of worker contributions to a contributory scheme."
       ],
       [
         "Coverage & key features",
@@ -776,8 +808,8 @@ export const PRACTICES = [
     "workers": "agricultural",
     "workersLabel": "Agricultural / rural workers",
     "title": "Contribution Subsidies and Retroactive Premium Buy-Back for Herders and Self-Employed Workers",
-    "summary": "FINANCING BASIS: state subsidy of contributions to a contributory scheme.",
-    "detail": "FINANCING BASIS: state subsidy of contributions to a contributory scheme. Working-age herders are treated as self-employed and fall under voluntary social insurance, while health insurance is mandatory. Three affordability measures apply. (1) RETROACTIVE BUY-BACK: the Law on Reimbursement of Pension Insurance Premiums of Herders and Self-Account Workers, approved 2 February 2017 with further parliamentary approval on 29 January 2021, lets herders and own-account workers pay in missed contributions for the years 1995–2020, repairing contribution gaps that would otherwise have cost them pension entitlement. (2) COVID-ERA SUBSIDY: from April 2020 to the end of 2021 the government partially subsidised both mandatory and voluntary social insurance contributions. (3) PROPOSED STANDING SUBSIDY: a revision of the Social Insurance Package Law would have the government cover 50% of herders' social insurance contributions for five years — reported as pending approval as at the May 2023 UN Joint Programme evaluation and not confirmed here as enacted.",
+    "summary": "Working-age herders are treated as self-employed and fall under voluntary social insurance, while health insurance is mandatory.",
+    "detail": "Working-age herders are treated as self-employed and fall under voluntary social insurance, while health insurance is mandatory. Three affordability measures apply. (1) RETROACTIVE BUY-BACK: the Law on Reimbursement of Pension Insurance Premiums of Herders and Self-Account Workers, approved 2 February 2017 with further parliamentary approval on 29 January 2021, lets herders and own-account workers pay in missed contributions for the years 1995–2020, repairing contribution gaps that would otherwise have cost them pension entitlement. (2) COVID-ERA SUBSIDY: from April 2020 to the end of 2021 the government partially subsidised both mandatory and voluntary social insurance contributions. (3) PROPOSED STANDING SUBSIDY: a revision of the Social Insurance Package Law would have the government cover 50% of herders' social insurance contributions for five years — reported as pending approval as at the May 2023 UN Joint Programme evaluation and not confirmed here as enacted.",
     "impact": "Herders' social insurance coverage stood at 16.4% and health insurance at 25.1% nationally in 2020. In the soums targeted by the ILO-led UN Joint Programme, herder social insurance coverage averaged 24.6% in 2021 — above the programme's 20% target — and health insurance 34%, against 23% nationally.",
     "agency": "Social Insurance General Office / Ministry of Labour and Social Protection",
     "sources": "ILO, Extending Social Protection Coverage among Mongolian Herders; UN Joint Programme, Extending Social Protection to Herders with Enhanced Shock Responsiveness — final evaluation (May 2023); Law on Reimbursement of Pension Insurance Premiums of Herders and Self-Account Workers (2017, 2021)",
@@ -789,6 +821,10 @@ export const PRACTICES = [
       [
         "Implementing agency",
         "Social Insurance General Office / Ministry of Labour and Social Protection"
+      ],
+      [
+        "Financing basis",
+        "state subsidy of contributions to a contributory scheme."
       ],
       [
         "Coverage & key features",
@@ -1640,7 +1676,7 @@ export const PRACTICES = [
     "workers": "domestic",
     "workersLabel": "Domestic workers",
     "title": "Domestic Work Tickets System (Bonuri de Muncă / Law 111/2022)",
-    "summary": "Under Law No. 111/2022 and Government Decision 822/2022, Romania launched an online platform for domestic work tickets. Household beneficiaries purchase electronic tickets (15 lei, about €3, each) that automatically register unqualified domestic service providers, pay wages and remit social insurance contributions and income tax to the state. Income tax (10%) and the pension contribution (25%) are each applied to only 50% of earned income. Workers redeeming at least 85 tickets a month qualify for free health insurance, and beneficiaries buying 600+ tickets a year receive 75 free tickets.",
+    "summary": "Under Law No. 111/2022 and Government Decision 822/2022, Romania launched an online platform for domestic work tickets.",
     "detail": "Under Law No. 111/2022 and Government Decision 822/2022, Romania launched an online platform for domestic work tickets. Household beneficiaries purchase electronic tickets (15 lei, about €3, each) that automatically register unqualified domestic service providers, pay wages and remit social insurance contributions and income tax to the state. Income tax (10%) and the pension contribution (25%) are each applied to only 50% of earned income. Workers redeeming at least 85 tickets a month qualify for free health insurance, and beneficiaries buying 600+ tickets a year receive 75 free tickets.",
     "impact": "Targets the formalisation and digital social security registration of at least 60,000 previously unemployed or inactive people as domestic workers by 2026.",
     "agency": "National Employment Agency (ANOFM) / Ministry of Labour",
@@ -2036,7 +2072,7 @@ export const PRACTICES = [
     "workers": "domestic",
     "workersLabel": "Domestic workers",
     "title": "NAPSA Domestic Worker Extension & Civic Education Campaign",
-    "summary": "Domestic workers are compulsorily covered by NAPSA under the National Pension Scheme Act No.",
+    "summary": "Domestic workers are compulsorily covered by NAPSA under the National Pension Scheme Act No. 40 of 1996, and employers must register them within one month of the start of work.",
     "detail": "Domestic workers are compulsorily covered by NAPSA under the National Pension Scheme Act No. 40 of 1996, and employers must register them within one month of the start of work. Contributions are 10% of gross monthly earnings, shared equally between employer and worker, subject to a minimum qualifying income. Statutory enforcement was paired with intensive media and door-to-door civic education campaigns framing registration as a legal and moral civic duty.",
     "impact": "Increased public awareness and employer compliance across urban centres, establishing NAPSA pension accounts for household care workers; NAPSA operates a dedicated reporting line for unregistered domestic workers.",
     "agency": "National Pension Scheme Authority (NAPSA) / Ministry of Labour",
@@ -2324,7 +2360,7 @@ export const PRACTICES = [
     "workers": "self-employed",
     "workersLabel": "Self-employed / own-account",
     "title": "Family Benefits Scheme for Self-Employed Workers (Law No. 1493)",
-    "summary": "Law No. 1493 of 8 July 2020 extended family and prenatal benefits to self-employed workers through CAMTI, the sickness, accident and maternity insurance fund for the self-employed. Benefits are of equal value to those in the employed workers' scheme, which had previously been the only route to family benefits. Implementation required identifying eligible beneficiaries among the self-employed, supporting them through file creation, and paying benefits from the law's effective date.",
+    "summary": "Law No. 1493 of 8 July 2020 extended family and prenatal benefits to self-employed workers through CAMTI, the sickness, accident and maternity insurance fund for the self-employed.",
     "detail": "Law No. 1493 of 8 July 2020 extended family and prenatal benefits to self-employed workers through CAMTI, the sickness, accident and maternity insurance fund for the self-employed. Benefits are of equal value to those in the employed workers' scheme, which had previously been the only route to family benefits. Implementation required identifying eligible beneficiaries among the self-employed, supporting them through file creation, and paying benefits from the law's effective date.",
     "impact": "Closed a benefit-branch gap between employed and self-employed workers, achieving parity of family benefits across employment status for the whole working population of the Principality.",
     "agency": "Caisses Sociales de Monaco (CSM) / CAMTI",
@@ -2504,8 +2540,8 @@ export const PRACTICES = [
     "workers": "self-employed",
     "workersLabel": "Self-employed / own-account",
     "title": "NSSF Healthcare via Voluntary Contribution Regime (Sub-Decree No. 280)",
-    "summary": "FINANCING BASIS: contributory, with government co-financing of the NSSF alongside member contributions.",
-    "detail": "FINANCING BASIS: contributory, with government co-financing of the NSSF alongside member contributions. Established by Sub-Decree No. 280 of 28 August 2023 and implemented by Inter-Ministerial Prakas No. 330/23 of 13 November 2023, the scheme took effect on 14 November 2023. It opens NSSF healthcare to self-employed people under 60 and to dependants of existing NSSF members — spouses in registered marriages, and children under 18 or of any age where they have a disability or chronic illness. Members pay a flat 15,600 riel a month (2.6% of a notional 600,000 riel reference wage) to NSSF partner banks by the 15th. Two benefit levels apply: Level 1 covers medical treatment, health care, maternity and a funeral allowance; Level 2 adds a daily allowance during medical leave. Entitlement opens after two consecutive monthly contributions and runs up to 180 days of care per 12-month period at partner facilities. Lapsed members keep cover for two further months, and restore entitlement by repaying arrears plus two new consecutive months. Registration is at any NSSF branch on production of a national ID card.",
+    "summary": "Established by Sub-Decree No. 280 of 28 August 2023 and implemented by Inter-Ministerial Prakas No. 330/23 of 13 November 2023, the scheme took effect on 14 November 2023.",
+    "detail": "Established by Sub-Decree No. 280 of 28 August 2023 and implemented by Inter-Ministerial Prakas No. 330/23 of 13 November 2023, the scheme took effect on 14 November 2023. It opens NSSF healthcare to self-employed people under 60 and to dependants of existing NSSF members — spouses in registered marriages, and children under 18 or of any age where they have a disability or chronic illness. Members pay a flat 15,600 riel a month (2.6% of a notional 600,000 riel reference wage) to NSSF partner banks by the 15th. Two benefit levels apply: Level 1 covers medical treatment, health care, maternity and a funeral allowance; Level 2 adds a daily allowance during medical leave. Entitlement opens after two consecutive monthly contributions and runs up to 180 days of care per 12-month period at partner facilities. Lapsed members keep cover for two further months, and restore entitlement by repaying arrears plus two new consecutive months. Registration is at any NSSF branch on production of a national ID card.",
     "impact": "Over 106,000 people enrolled in the first seven weeks to 1 January 2024 — 97,031 self-employed and 9,831 dependants — using NSSF services nearly 50,000 times at a cost of about 799 million riel. By 2025 roughly 680,000 people had registered within about 19 months, some 500,000 of them self-employed, against a target population of around 5 million previously uncovered. Supported by an awareness campaign reaching over 1.3 million people through factories, markets and social media featuring artists and influencers.",
     "agency": "National Social Security Fund (NSSF) / Ministry of Labour and Vocational Training",
     "sources": "Sub-Decree No. 280 (28 Aug 2023); Inter-Ministerial Prakas No. 330/23 (13 Nov 2023); KPMG Cambodia technical update (2024); Sok Siphana & Associates legal alert; Phnom Penh Post (Jan 2024); Cambodianess (2025)",
@@ -2517,6 +2553,10 @@ export const PRACTICES = [
       [
         "Implementing agency",
         "National Social Security Fund (NSSF) / Ministry of Labour and Vocational Training"
+      ],
+      [
+        "Financing basis",
+        "contributory, with government co-financing of the NSSF alongside member contributions."
       ],
       [
         "Coverage & key features",
@@ -2684,7 +2724,7 @@ export const PRACTICES = [
     "workers": "domestic",
     "workersLabel": "Domestic workers",
     "title": "Domestic Workers Act of 2013 (Batas Kasambahay / RA 10361)",
-    "summary": "Republic Act 10361, enacted following ratification of ILO Convention No.",
+    "summary": "Republic Act 10361, enacted following ratification of ILO Convention No. 189, establishes mandatory SSS, PhilHealth and Pag-IBIG coverage for all domestic workers with at least one month of service.",
     "detail": "Republic Act 10361, enacted following ratification of ILO Convention No. 189, establishes mandatory SSS, PhilHealth and Pag-IBIG coverage for all domestic workers with at least one month of service. Where the worker earns less than PHP 5,000 a month, the household employer must pay the full social security premium. The Act provides a minimum wage, written contracts in a language the worker understands, daily and weekly rest, and five days of service incentive leave. Supported by SUMAPI (the national domestic workers' organisation), barangay Kasambahay Desks and National Domestic Workers Day.",
     "impact": "Extended statutory entitlement to roughly 1.9 million domestic workers and set a legal benchmark for ASEAN, although effective registration remains low because of household privacy barriers to enforcement.",
     "agency": "SSS, PhilHealth, Pag-IBIG Fund, DOLE",
@@ -2705,6 +2745,246 @@ export const PRACTICES = [
       [
         "Source",
         "Republic Act No. 10361; Republic Act No. 11210 (2019); UN Women & ITUC Briefing Kit; ILO ASEAN Report (2024)"
+      ]
+    ]
+  },
+  {
+    "id": "jo-estidama-contribution-subsidy-coverage",
+    "country": "Jordan",
+    "a2": "jo",
+    "lonlat": [
+      37.042,
+      32.774
+    ],
+    "category": "affordability",
+    "workers": "general",
+    "workersLabel": "Informal economy (general)",
+    "title": "Estidama++ Contribution Subsidy ('coverage rewards')",
+    "summary": "Launched after COVID-19 to reach unregistered wage workers in micro, small and medium enterprises and self-employed workers, prioritising those earning under JOD 500 a month.",
+    "detail": "Launched after COVID-19 to reach unregistered wage workers in micro, small and medium enterprises and self-employed workers, prioritising those earning under JOD 500 a month. It pays flat 'coverage rewards' to both sides of the relationship: quarterly payments into workers' bank accounts and monthly payments into employers' SSC accounts, worth up to JOD 760 (about USD 1,072) per worker over twelve months. Outreach ran through SMS, radio and a WhatsApp chatbot.",
+    "impact": "Over 40,000 workers registered by January 2025, an 18.2% rise in annual registrations. Preliminary results show more than 75% of those completing the subsidy period kept contributing at the full rate once it ended. A randomised trial found in-person outreach raised firm participation by 14%. Drop-out was higher among women and among Jordanian self-employed workers, and SSC's own evaluation found the scheme worked better for wage employees than for self-employed workers with fluctuating incomes. ISSA also reports that income volatility was NOT a significant predictor of non-contribution for Jordanian own-account workers, though it was for non-Jordanians.",
+    "agency": "Social Security Corporation (SSC) / donor-funded",
+    "sources": "ISSA (2026), Contribution Subsidies Worldwide: Practical Lessons for Social Security Institutions, drawing on the 2025 ISSA–ILO compendium of 41 country experiences",
+    "facts": [
+      [
+        "Worker group",
+        "Informal economy (general)"
+      ],
+      [
+        "Implementing agency",
+        "Social Security Corporation (SSC) / donor-funded"
+      ],
+      [
+        "Financing basis",
+        "donor-funded, time-bound fixed-amount subsidy."
+      ],
+      [
+        "Coverage & key features",
+        "Over 40,000 workers registered by January 2025, an 18.2% rise in annual registrations. Preliminary results show more than 75% of those completing the subsidy period kept contributing at the full rate once it ended. A randomised trial found in-person outreach raised firm participation by 14%. Drop-out was higher among women and among Jordanian self-employed workers, and SSC's own evaluation found the scheme worked better for wage employees than for self-employed workers with fluctuating incomes. ISSA also reports that income volatility was NOT a significant predictor of non-contribution for Jordanian own-account workers, though it was for non-Jordanians."
+      ],
+      [
+        "Source",
+        "ISSA (2026), Contribution Subsidies Worldwide: Practical Lessons for Social Security Institutions, drawing on the 2025 ISSA–ILO compendium of 41 country experiences"
+      ]
+    ]
+  },
+  {
+    "id": "ph-contribution-subsidy-provider-programme",
+    "country": "Philippines",
+    "a2": "ph",
+    "lonlat": [
+      119.39,
+      15.357
+    ],
+    "category": "affordability",
+    "workers": "self-employed",
+    "workersLabel": "Self-employed / own-account",
+    "title": "Contribution Subsidy Provider Programme (CSPP)",
+    "summary": "Companies, NGOs or private individuals register as contribution subsidy providers and sponsor at least six months of SSS contributions on behalf of self-employed members or overseas Filipino workers.",
+    "detail": "Companies, NGOs or private individuals register as contribution subsidy providers and sponsor at least six months of SSS contributions on behalf of self-employed members or overseas Filipino workers.",
+    "impact": "By March 2024, 10 providers had covered 685 workers. ISSA identifies the central limitation: nothing in the design sustains coverage once a sponsorship ends, so the scheme has no built-in path from sponsored to self-sustaining contribution.",
+    "agency": "Social Security System (SSS)",
+    "sources": "ISSA (2026), Contribution Subsidies Worldwide: Practical Lessons for Social Security Institutions, drawing on the 2025 ISSA–ILO compendium of 41 country experiences",
+    "facts": [
+      [
+        "Worker group",
+        "Self-employed / own-account"
+      ],
+      [
+        "Implementing agency",
+        "Social Security System (SSS)"
+      ],
+      [
+        "Financing basis",
+        "full third-party financing — the only scheme of its kind in the ISSA–ILO compendium, and it carries no direct fiscal cost."
+      ],
+      [
+        "Coverage & key features",
+        "By March 2024, 10 providers had covered 685 workers. ISSA identifies the central limitation: nothing in the design sustains coverage once a sponsorship ends, so the scheme has no built-in path from sponsored to self-sustaining contribution."
+      ],
+      [
+        "Source",
+        "ISSA (2026), Contribution Subsidies Worldwide: Practical Lessons for Social Security Institutions, drawing on the 2025 ISSA–ILO compendium of 41 country experiences"
+      ]
+    ]
+  },
+  {
+    "id": "tn-regime-for-self-employed",
+    "country": "Tunisia",
+    "a2": "tn",
+    "lonlat": [
+      9.819,
+      35.648
+    ],
+    "category": "affordability",
+    "workers": "self-employed",
+    "workersLabel": "Self-employed / own-account",
+    "title": "Regime for Self-Employed Workers (RTNS, Law no. 2002-32)",
+    "summary": "Under Law no. 2002-32, self-employed workers are assigned to a fixed income bracket set as a multiple of the minimum wage and pay a single combined rate of 14.71%, against 25.75% combined for salaried non-agricultural workers.",
+    "detail": "Under Law no. 2002-32, self-employed workers are assigned to a fixed income bracket set as a multiple of the minimum wage and pay a single combined rate of 14.71%, against 25.75% combined for salaried non-agricultural workers. The reduction is paid for partly by a narrower benefit package: disability cover is less generous and child benefits are excluded, while pensions, maternity and survivors' benefits are retained.",
+    "impact": "Non-agricultural self-employed contributors rose from 117,270 in 2000 to 431,316 in 2020; agricultural self-employed contributors from 46,617 to 139,229 over the same period. ISSA notes the limits: fishermen, domestic workers and artisans with multiple irregular incomes have not joined in meaningful numbers, so the presumptive-bracket design appears to work for workers with one stable occupation and not for those without.",
+    "agency": "Caisse Nationale de Sécurité Sociale (CNSS)",
+    "sources": "ISSA (2026), Contribution Subsidies Worldwide: Practical Lessons for Social Security Institutions, drawing on the 2025 ISSA–ILO compendium of 41 country experiences",
+    "facts": [
+      [
+        "Worker group",
+        "Self-employed / own-account"
+      ],
+      [
+        "Implementing agency",
+        "Caisse Nationale de Sécurité Sociale (CNSS)"
+      ],
+      [
+        "Financing basis",
+        "contribution-rate reduction with presumptive income assessment."
+      ],
+      [
+        "Coverage & key features",
+        "Non-agricultural self-employed contributors rose from 117,270 in 2000 to 431,316 in 2020; agricultural self-employed contributors from 46,617 to 139,229 over the same period. ISSA notes the limits: fishermen, domestic workers and artisans with multiple irregular incomes have not joined in meaningful numbers, so the presumptive-bracket design appears to work for workers with one stable occupation and not for those without."
+      ],
+      [
+        "Source",
+        "ISSA (2026), Contribution Subsidies Worldwide: Practical Lessons for Social Security Institutions, drawing on the 2025 ISSA–ILO compendium of 41 country experiences"
+      ]
+    ]
+  },
+  {
+    "id": "tr-5-point-and-6",
+    "country": "Turkey",
+    "a2": "tr",
+    "lonlat": [
+      35.422,
+      38.991
+    ],
+    "category": "affordability",
+    "workers": "general",
+    "workersLabel": "Informal economy (general)",
+    "title": "5-Point and 6-Point Employer Contribution Subsidies",
+    "summary": "The 5-Point subsidy is a permanent, nationwide cut of 5 percentage points in employer social security contributions.",
+    "detail": "The 5-Point subsidy is a permanent, nationwide cut of 5 percentage points in employer social security contributions. The 6-Point subsidy adds a further, time-bound reduction for employers in the least-developed provinces.",
+    "impact": "The 6-Point scheme was associated with a 6–8% rise in formal employment in eligible provinces. ISSA's assessment is pointed: formalisation mainly moved existing informal jobs into the system rather than creating new ones. It also flags a governance gap — the 5-Point scheme has no sunset clause and no published cost estimate, so a permanent treasury liability runs without a public price attached to it.",
+    "agency": "Social Security Institution (SGK) / Treasury",
+    "sources": "ISSA (2026), Contribution Subsidies Worldwide: Practical Lessons for Social Security Institutions, drawing on the 2025 ISSA–ILO compendium of 41 country experiences",
+    "facts": [
+      [
+        "Worker group",
+        "Informal economy (general)"
+      ],
+      [
+        "Implementing agency",
+        "Social Security Institution (SGK) / Treasury"
+      ],
+      [
+        "Financing basis",
+        "employer contribution-rate reduction, fully treasury-financed."
+      ],
+      [
+        "Coverage & key features",
+        "The 6-Point scheme was associated with a 6–8% rise in formal employment in eligible provinces. ISSA's assessment is pointed: formalisation mainly moved existing informal jobs into the system rather than creating new ones. It also flags a governance gap — the 5-Point scheme has no sunset clause and no published cost estimate, so a permanent treasury liability runs without a public price attached to it."
+      ],
+      [
+        "Source",
+        "ISSA (2026), Contribution Subsidies Worldwide: Practical Lessons for Social Security Institutions, drawing on the 2025 ISSA–ILO compendium of 41 country experiences"
+      ]
+    ]
+  },
+  {
+    "id": "aw-loonsubsidie-covid-19-wage",
+    "country": "Aruba",
+    "a2": "aw",
+    "lonlat": [
+      -69.983,
+      12.521
+    ],
+    "category": "affordability",
+    "workers": "general",
+    "workersLabel": "Informal economy (general)",
+    "title": "Loonsubsidie — COVID-19 Wage and Contribution Subsidy",
+    "summary": "A COVID-era measure combining wage support with social security contribution support, implemented at exceptional scale relative to the population.",
+    "detail": "A COVID-era measure combining wage support with social security contribution support, implemented at exceptional scale relative to the population.",
+    "impact": "Reached 24.5% of Aruba's working-age population — by a wide margin the highest reach of any scheme in the ISSA–ILO survey of 41 country experiences, where 80% of schemes reporting coverage reached under 4% of the working-age population and two-thirds reached under 2%.",
+    "agency": "Social Insurance Bank (SVB) / Government of Aruba",
+    "sources": "ISSA (2026), Contribution Subsidies Worldwide: Practical Lessons for Social Security Institutions, drawing on the 2025 ISSA–ILO compendium of 41 country experiences",
+    "facts": [
+      [
+        "Worker group",
+        "Informal economy (general)"
+      ],
+      [
+        "Implementing agency",
+        "Social Insurance Bank (SVB) / Government of Aruba"
+      ],
+      [
+        "Financing basis",
+        "emergency wage-and-contribution subsidy from explicit budget."
+      ],
+      [
+        "Coverage & key features",
+        "Reached 24.5% of Aruba's working-age population — by a wide margin the highest reach of any scheme in the ISSA–ILO survey of 41 country experiences, where 80% of schemes reporting coverage reached under 4% of the working-age population and two-thirds reached under 2%."
+      ],
+      [
+        "Source",
+        "ISSA (2026), Contribution Subsidies Worldwide: Practical Lessons for Social Security Institutions, drawing on the 2025 ISSA–ILO compendium of 41 country experiences"
+      ]
+    ]
+  },
+  {
+    "id": "bn-spk-and-supplemental-contributory",
+    "country": "Brunei",
+    "a2": "bn",
+    "lonlat": [
+      114.592,
+      4.491
+    ],
+    "category": "affordability",
+    "workers": "self-employed",
+    "workersLabel": "Self-employed / own-account",
+    "title": "SPK and Supplemental Contributory Pensions — Matching Contributions for the Self-Employed",
+    "summary": "Brunei's SPK and Supplemental Contributory Pensions schemes provide matching contributions for self-employed workers, cited in the ISSA–ILO compendium among the minority of schemes using a matching-grant design rather than a fixed amount or a rate reduction.",
+    "detail": "Brunei's SPK and Supplemental Contributory Pensions schemes provide matching contributions for self-employed workers, cited in the ISSA–ILO compendium among the minority of schemes using a matching-grant design rather than a fixed amount or a rate reduction.",
+    "impact": "Places Brunei in the small group of compendium schemes using matching grants — ISSA records matching grants and full third-party financing as rare, against 19 of 41 schemes using a fixed amount and 11 of 41 using a rate reduction.",
+    "agency": "Employees Trust Fund (TAP) / SPK",
+    "sources": "ISSA (2026), Contribution Subsidies Worldwide: Practical Lessons for Social Security Institutions, drawing on the 2025 ISSA–ILO compendium of 41 country experiences",
+    "facts": [
+      [
+        "Worker group",
+        "Self-employed / own-account"
+      ],
+      [
+        "Implementing agency",
+        "Employees Trust Fund (TAP) / SPK"
+      ],
+      [
+        "Financing basis",
+        "matching contributions."
+      ],
+      [
+        "Coverage & key features",
+        "Places Brunei in the small group of compendium schemes using matching grants — ISSA records matching grants and full third-party financing as rare, against 19 of 41 schemes using a fixed amount and 11 of 41 using a rate reduction."
+      ],
+      [
+        "Source",
+        "ISSA (2026), Contribution Subsidies Worldwide: Practical Lessons for Social Security Institutions, drawing on the 2025 ISSA–ILO compendium of 41 country experiences"
       ]
     ]
   }
